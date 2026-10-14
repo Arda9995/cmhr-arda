@@ -1,0 +1,22 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["All"] + " " + _localizer["NewsMultiple"];
+    ViewData[ViewDataNames.AsideMenu] = "News";
+    ViewData[ViewDataNames.AsideSubMenu] = "News";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["NewsMultiple"], "/News/List")
+    };
+}
+@model Quark.CMS.Business.Models.Requests.NewsRequests.GetNewsFiltersRequest
+
+@section Scripts{
+    <script src="/Scripts/News/List.js" asp-append-version="true"></script>
+}
+
+@section ToolBarRight
+{
+    <partial name="_List/_NewButton"/>
+}
+
+<partial name="_List/_ListFilterPartial"/>
+<partial name="_List/_Table"/>

@@ -1,0 +1,72 @@
+﻿@model Quark.CMS.Business.Models.Responses.HomeResponses.HomeResponse
+
+
+<div class="row g-5 g-xl-10">
+    <!--begin::Col-->
+    <div class="col-xl-4 mb-xl-10">
+
+        <!--begin::List widget 20-->
+        <div class="card h-xl-100">
+            <!--begin::Header-->
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-gray-900">@_localizer["NewsTypes"]</span>
+
+                    <span class="text-muted mt-1 fw-semibold fs-7"></span>
+                </h3>
+
+                <!--begin::Toolbar-->
+                <div class="card-toolbar">
+                    <a href="/News/List" class="btn btn-sm btn-light">@_localizer["AllNews"]</a>
+                </div>
+                <!--end::Toolbar-->
+            </div>
+            <!--end::Header-->
+            <!--begin::Body-->
+            <div class="card-body pt-6 newsTypesAndCounts">
+            </div>
+            <!--end::Body-->
+        </div>
+        <!--end::List widget 20-->
+    </div>
+    <!--end::Col-->
+    <!--begin::Col-->
+    <div class="col-xl-8 mb-5 mb-xl-10">
+        <!--begin::Chart widget 18-->
+        <div class="card card-flush h-xl-100">
+            <!--begin::Header-->
+            <div class="card-header pt-2">
+                <!--begin::Title-->
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-gray-800">@_localizer["NewsChart"]</span>
+                    <span class="text-gray-500 mt-1 fw-semibold fs-6">@_localizer["CategoryBasedNewsChart"]</span>
+                </h3>
+                <!--end::Title-->
+                <!--begin::Toolbar-->
+                <div class="card-toolbar">
+              @*       <div class="d-flex align-items-center">
+                        <!-- Date Range Picker -->
+                        <div id="datePickerContainer" class="btn btn-sm btn-light d-flex align-items-center px-4">
+                            <input type="text" id="dateRangePicker" class="form-control" style="border: none; background: none; width: auto; font-weight: bold;" readonly />
+                            <i class="ki-duotone ki-calendar-8 text-gray-500 lh-0 fs-2 ms-2"></i>
+                        </div>
+                    </div> *@
+                </div>
+                <!--end::Toolbar-->
+            </div>
+            <!--end::Header-->
+            <!--begin::Body-->
+            <div class="card-body">
+                <!--begin::Chart-->
+                <div id="kt_charts_widget_18_chart" class="text-center d-flex justify-content-center align-items-center" >
+                   
+                </div>
+                <!--end::Chart-->
+            </div>
+            <!--end: Card Body-->
+        </div>
+        <!--end::Chart widget 18-->
+
+    </div>
+    <!--end::Col-->
+</div>

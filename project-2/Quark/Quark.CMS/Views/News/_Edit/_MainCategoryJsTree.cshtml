@@ -1,0 +1,56 @@
+<style>
+    body.modal-open {
+        overflow: hidden;
+    }
+
+    #mainCategoryModal .modal-dialog {
+        max-width: 600px; 
+        margin: 1.75rem auto; 
+    }
+
+    #mainCategoryModal .modal-content {
+        max-height: 90vh; 
+        display: flex;
+        flex-direction: column; 
+    }
+
+    #mainCategoryModal .modal-body {
+        flex: 1; 
+        overflow-y: auto; 
+    }
+
+    #mainCategoryModal .modal-header,
+    #mainCategoryModal .modal-footer {
+        flex-shrink: 0; 
+    }
+</style>
+
+
+
+<div class="modal fade" tabindex="-1" id="mainCategoryModal" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">@_localizer["MainCategory"]</h3>
+
+                <!--begin::Close-->
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross-circle fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+                <!--end::Close-->
+            </div>
+
+            <div class="modal-body">
+                <div id="divMainCategoriesTree"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">@_localizer["Cancel"]</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        onclick="saveCategories('#divMainCategoriesTree', '#spanSelectedMainCategory', '#mainCategoryIdMap', '1')">
+                    @_localizer["Save"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

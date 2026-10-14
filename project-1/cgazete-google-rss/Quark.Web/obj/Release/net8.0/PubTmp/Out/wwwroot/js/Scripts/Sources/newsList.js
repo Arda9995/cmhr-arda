@@ -1,0 +1,77 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const loadMoreButton = document.getElementById('load-more-news');
+
+    if (loadMoreButton) {
+        loadMoreButton.addEventListener('click', loadMoreNews);
+    }
+});
+
+function loadMoreNews() {
+    const button = this;
+    const categoryId = button.getAttribute('data-slug');
+    const page = parseInt(button.getAttribute('data-page'));
+    const nextPage = page + 1;
+
+    button.innerText = 'Yükleniyor...';
+    button.disabled = true;
+
+    fetch(`/Source/LoadMoreNews?slug=${categoryId}&page=${nextPage}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.items && data.items.length > 0) {
+                const container = document.getElementById('category-news-container');
+
+                data.items.forEach(news => {
+
+
+                    const newsElement = createNewsElement(news);
+                    container.insertBefore(newsElement, container.lastElementChild);
+
+                });
+
+                button.setAttribute('data-page', nextPage.toString());
+
+                button.innerText = 'Daha Fazla Göster';
+                button.disabled = false;
+
+                if (!data.hasMoreItems) {
+                    button.style.display = 'none';
+                }
+            } else {
+                button.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            button.innerText = 'Daha Fazla Göster';
+            button.disabled = false;
+        });
+}
+
+function createNewsElement(news) {
+    const div = document.createElement('div');
+    div.className = 'group block relative col-span-12 sm:col-span-1 space-y-1';
+
+    div.innerHTML = `
+        <button onclick="saveNewsID(${news.id})" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+            <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+            </svg>
+        </button>
+        <a href="${news.slug}" class="overflow-hidden relative aspect-[16/9] mb-2 block ">
+            <img src="${news.imageURL}" class="w-full h-full object-cover animate-img" alt="${news.headline}" loading="lazy">
+        </a>
+        <a href="${news.slug}" class="font-semibold line-clamp-2 text-secondary-500 mb-1">
+            ${news.headline}
+        </a>
+        <a href="${news.slug}" class="text-sm group-hover:underline line-clamp-2 text-secondary-400 font-medium">
+            ${news.upSubtitle}
+        </a>
+    `;
+
+    return div;
+}

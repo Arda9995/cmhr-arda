@@ -1,0 +1,136 @@
+﻿using AvvaMobile.Core.Business;
+using AvvaMobile.Core.Caching;
+using Hangfire;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Common.BaseServices;
+using Quark.Data;
+using Quark.Hangfire.Business.Interfaces;
+using Quark.Resources;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+
+namespace Quark.Hangfire.Business.Services;
+
+public class XmlFeedHangfireHangfireService(
+    IHttpContextAccessor httpContext,
+    QuarkDataContext context,
+    IStringLocalizer<CommonResource> localizer,
+    AppSettingsKeys appSettingsKeys,
+    ICacheManager cache,
+    IXmlFeedCachingService xmlFeedCachingService,
+    IDbContextFactory<QuarkDataContext> contextFactory)
+    : BaseService(httpContext, context, localizer, appSettingsKeys, cache), IXmlFeedHangfireService
+{
+    public async Task RefreshNewsSiteMap()
+    {
+        var result = await xmlFeedCachingService.RefreshNewsSiteMap();
+    }
+
+    public async Task RefreshTagsSiteMap()
+    {
+        var result = await xmlFeedCachingService.RefreshTagsSiteMap();
+    }
+
+    public async Task RefreshPostsSiteMap()
+    {
+        var result = await xmlFeedCachingService.RefreshPostsSiteMap();
+    }
+
+    public async Task RefreshSourcesSiteMap()
+    {
+        var result = await xmlFeedCachingService.RefreshSourcesSiteMap();
+    }
+
+    public async Task RefreshMainRSS()
+    {
+        var result = await xmlFeedCachingService.RefreshMainRSS();
+    }
+
+    public async Task RefreshCategoryRSS()
+    {
+        List<string> categoryUrls;
+        await using (var context = await contextFactory.CreateDbContextAsync())
+        {
+            categoryUrls = await context.Categories.Select(c => c.Url).ToListAsync();
+        }
+
+        foreach (var categoryUrl in categoryUrls)
+        {
+            var result = await xmlFeedCachingService.RefreshCategoryRSS(categoryUrl);
+        }
+    }
+
+    public async Task RefreshGoogleAiRSS()
+    {
+        var result = await xmlFeedCachingService.RefreshGoogleAiRSS();
+    }
+
+    public async Task RefreshSiteMaps()
+    {
+        var result = await xmlFeedCachingService.RefreshSiteMaps();
+    }
+
+    public async Task RefreshLast3MonthlyPostsSitemap()
+    {
+        List<int> last3Months = new List<int>();
+        for (int i = 0; i < 3; i++)
+        {
+            last3Months.Add(DateTime.Now.AddMonths(-i).Month);
+        }
+
+        int currentYear = DateTime.Now.Year;
+
+        foreach (var month in last3Months)
+        {
+            var result = await xmlFeedCachingService.RefreshMonthlyPostsSitemap(currentYear, month);
+        }
+    }
+
+    public async Task RefreshLast3MonthlyTagsSitemap()
+    {
+        List<int> last3Months = new List<int>();
+        for (int i = 0; i < 3; i++)
+        {
+            last3Months.Add(DateTime.Now.AddMonths(-i).Month);
+        }
+
+        int currentYear = DateTime.Now.Year;
+
+        foreach (var month in last3Months)
+        {
+            var result = await xmlFeedCachingService.RefreshMonthlyTagsSitemap(currentYear, month);
+        }
+    }
+    
+    public async Task RefreshMonthlyPostsSitemap()
+    {
+        DateTime minPublishedDate;
+        await using (var context = await contextFactory.CreateDbContextAsync())
+        {
+            minPublishedDate = await context.NewsPublished.MinAsync(n => n.PublishedDate);
+        }
+
+        while (minPublishedDate < DateTime.Now)
+        {
+            var result = await xmlFeedCachingService.RefreshMonthlyPostsSitemap(minPublishedDate.Year, minPublishedDate.Month);
+            minPublishedDate = minPublishedDate.AddMonths(1);
+        }
+    }
+
+    public async Task RefreshMonthlyTagsSitemap()
+    {
+        DateTime minCreatedDate;
+        await using (var context = await contextFactory.CreateDbContextAsync())
+        {
+            minCreatedDate = await context.Tags.MinAsync(n => n.CreatedDate) ?? DateTime.Now;
+        }
+
+        while (minCreatedDate < DateTime.Now)
+        {
+            var result = await xmlFeedCachingService.RefreshMonthlyTagsSitemap(minCreatedDate.Year, minCreatedDate.Month);
+            minCreatedDate = minCreatedDate.AddMonths(1);
+        }
+    }
+}

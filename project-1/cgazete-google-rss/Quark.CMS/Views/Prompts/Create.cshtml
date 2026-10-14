@@ -1,0 +1,64 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["New"] + " " + _localizer["Prompt"];
+    ViewData[ViewDataNames.AsideMenu] = "Management";
+    ViewData[ViewDataNames.AsideSubMenu] = "PromptManagement";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Management"], string.Empty),
+        new BreadcrumbItem(_localizer["PromptManagement"], "/Prompts/List")
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.PromptRequests.CreatePromptRequest
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Prompt"] @_localizer["Informations"]</h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data">
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Name"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Name" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Name" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Message"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Message" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Message" class="fv-plugins-message-container invalid-feedback"></span>
+                    <div class="form-text">
+                        @_localizer["PromptMessageText"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["PromptType"]</label>
+                <div class="col-lg-9">
+                    <select asp-items="@Model.PromptTypes" asp-for="PromptTypeID" class="form-select form-select-lg form-select-solid" data-control="select2"></select>
+                    <span asp-validation-for="@Model.PromptTypeID" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["RequestType"]</label>
+                <div class="col-lg-9">
+                    <select asp-items="@Model.RequestTypes" asp-for="RequestTypeID" class="form-select form-select-lg form-select-solid" data-control="select2"></select>
+                    <span asp-validation-for="@Model.RequestTypeID" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/Prompts/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,86 @@
+﻿using Hangfire;
+using Hangfire.SqlServer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Quark.Business.Caching.Interfaces;
+using Quark.CMS.Business.Interfaces;
+
+namespace Quark.CMS.Business.Services
+{
+    public class GoogleAiFeedJobTrigger : IGoogleAiFeedJobTrigger
+    {
+        private static readonly object StorageLock = new();
+        private static JobStorage _storage;
+
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<GoogleAiFeedJobTrigger> _logger;
+
+        public GoogleAiFeedJobTrigger(IConfiguration configuration, ILogger<GoogleAiFeedJobTrigger> logger)
+        {
+            _configuration = configuration;
+            _logger = logger;
+        }
+
+        public void Enqueue()
+        {
+            try
+            {
+                var storage = GetStorage();
+                if (storage == null)
+                {
+                    _logger.LogWarning("HangfireConnection is not configured; Google AI feed refresh was not enqueued.");
+                    return;
+                }
+
+                new BackgroundJobClient(storage)
+                    .Enqueue<IXmlFeedCachingService>(x => x.RefreshGoogleAiRSS());
+            }
+            catch (Exception ex)
+            {
+                // Publishing must not fail because the job could not be enqueued; the recurring job still refreshes the feed.
+                _logger.LogError(ex, "Google AI feed refresh could not be enqueued to Hangfire.");
+            }
+        }
+
+        public void EnqueueRemove(long newsId)
+        {
+            try
+            {
+                var storage = GetStorage();
+                if (storage == null)
+                {
+                    _logger.LogWarning("HangfireConnection is not configured; Google AI feed item removal was not enqueued.");
+                    return;
+                }
+
+                new BackgroundJobClient(storage)
+                    .Enqueue<IXmlFeedCachingService>(x => x.RemoveGoogleAiNewsFromFeedAsync(newsId));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Google AI feed item removal for news {NewsId} could not be enqueued to Hangfire.", newsId);
+            }
+        }
+
+        private JobStorage GetStorage()
+        {
+            if (_storage != null)
+                return _storage;
+
+            var connectionString = _configuration.GetConnectionString("HangfireConnection");
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return null;
+
+            lock (StorageLock)
+            {
+                _storage ??= new SqlServerStorage(connectionString, new SqlServerStorageOptions
+                {
+                    PrepareSchemaIfNecessary = false,
+                    SqlClientFactory = Microsoft.Data.SqlClient.SqlClientFactory.Instance
+                });
+            }
+
+            return _storage;
+        }
+    }
+}

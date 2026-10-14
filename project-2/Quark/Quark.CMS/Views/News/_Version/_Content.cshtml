@@ -1,0 +1,13 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.NewsVersionResponseComparable
+
+<div class="card card-flush mb-10 shadow">
+    <div class="card-body m-5">
+        <h1 class="fw-bold mb-5">@Model.Title</h1>
+        <h1 class="fw-bold mb-5">@Model.Headline</h1>
+        <h3 class="fw-bold mb-5">@Model.Subtitle</h3>
+        <div class="d-flex justify-content-center mb-5">
+            <img src="@Model.Photos.First(i => i.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto).PhotoURL" alt="@Model.Title"/>
+        </div>
+        <p>@Html.Raw(Model.Content)</p>
+    </div>
+</div>

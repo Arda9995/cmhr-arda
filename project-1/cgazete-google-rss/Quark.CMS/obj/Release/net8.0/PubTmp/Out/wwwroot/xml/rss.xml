@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.0">
+  <channel>
+    <title>Site News Feed</title>
+    <link>https://dev.example.com</link>
+    <description>Latest news from our site</description>
+    <language>tr-TR</language>
+    <copyright>Copyright 2025</copyright>
+    <lastBuildDate>Fri, 18 Apr 2025 11:08:13 GMT</lastBuildDate>
+    <item>
+      <title>test haber validasyon 12345678</title>
+      <link>https://dev.example.comcumhuriyet-daily/test-2500005</link>
+      <description>test haber validasyon 12345678</description>
+      <pubDate>Fri, 18 Apr 2025 11:08:12 GMT</pubDate>
+      <guid>https://dev.example.comcumhuriyet-daily/test-2500005</guid>
+      <category>Cumhuriyet Daily</category>
+    </item>
+  </channel>
+</rss>

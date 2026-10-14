@@ -1,0 +1,391 @@
+@using Quark.Data.Models
+@{
+    Layout = "_LayoutNoAds";
+}
+
+@model Quark.API.Business.Models.Responses.AccountResponses.AccountMainPageResponse
+
+<head>
+    <meta name="description" content="Reklamsız Cumhuriyet üyelik bilgilerinizi görüntüleyin ve düzenleyin.">
+    <title>Üyelik Bilgileri - Reklamsız Cumhuriyet</title><!-- Plugins -->
+</head>
+
+<partial name="_Header" />
+
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <div class="max-w-container mx-auto space-y-6 max-w-none">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full font-helvetica">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Navigation -->
+                <partial name="~/Views/Account/_AccountSideBar.cshtml" />
+                <div class="flex-1 space-y-6">
+                    <!-- Üyelik Bilgileri -->
+                    <div class="bg-white shadow rounded-lg overflow-hidden">
+                        <div class="p-6 sm:p-8">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-6">Üyelik Bilgileriniz</h2>
+                            <form class="space-y-6">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="name"
+                                               class="block text-sm font-medium text-gray-700">Adınız</label> <input type="text" name="name" id="name" value="@Model.FirstName"
+                                                                                                                     class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm text-gray-500 sm:text-sm"
+                                                                                                                     readonly>
+                                    </div>
+                                    <div>
+                                        <label for="surname"
+                                               class="block text-sm font-medium text-gray-700">Soyadınız</label> <input type="text" name="surname" id="surname" value="@Model.LastName"
+                                                                                                                        class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm text-gray-500 sm:text-sm"
+                                                                                                                        readonly>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label for="email"
+                                               class="block text-sm font-medium text-gray-700">
+                                            E-posta
+                                            adresiniz
+                                        </label> <input type="email" name="email" id="email"
+                                                        value="@Model.Email"
+                                                        class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm text-gray-500 sm:text-sm"
+                                                        readonly>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700">
+                                            Doğum
+                                            Tarihi
+                                        </label>
+                                        <div class="mt-1 flex gap-2">
+                                            <select name="day"
+                                                    class="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm text-gray-500 sm:text-sm"
+                                                    disabled>
+                                                <option value="@Model.BirthDay" selected>@Model.BirthDay</option>
+                                            </select> <select name="month"
+                                                              class="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm text-gray-500 sm:text-sm"
+                                                              disabled>
+                                                <option value="@Model.BirthMonth" selected>@Model.BirthMonth</option>
+                                            </select> <select name="year"
+                                                              class="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm text-gray-500 sm:text-sm"
+                                                              disabled>
+                                                <option value="@Model.BirthYear" selected>@Model.BirthYear</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700">Cinsiyet</label>
+                                        <div class="mt-1 space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" name="gender" value="female"
+                                                       class="form-radio text-red-600"
+                                                @(Model.Gender == "kadin" || Model.Gender == "Kadin" || Model.Gender == "Kadın" ? "checked" : "")
+                                                       disabled>
+                                                <span class="ml-2 text-sm text-gray-700">Kadın</span>
+                                            </label>
+
+                                            <label class="inline-flex items-center ml-4">
+                                                <input type="radio" name="gender" value="male"
+                                                       class="form-radio text-red-600"
+                                                @(Model.Gender == "erkek" || Model.Gender == "Erkek" ? "checked" : "")
+                                                       disabled>
+                                                <span class="ml-2 text-sm text-gray-700">Erkek</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Pazarlama İzni</label>
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox"
+                                                   class="form-checkbox text-red-600 rounded"
+                                                   id="marketing-checkbox"
+                                            @(Model.MarketingConsent ? "checked" : "") />
+                                                   
+                                                   <span class="ml-2 text-sm text-gray-600">Pazarlama amaçları doğrultusunda kayıt verilerimi Reklamsız Cumhuriyet'ın içerik sağlayıcıları ile paylaş.</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div> <!-- Fatura Bilgileri -->
+                    <div class="bg-white shadow rounded-lg overflow-hidden">
+                        <div class="p-6 sm:p-8">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-6">Fatura Bilgileri</h2>
+                            <form class="space-y-6" asp-action="MembershipInformations" asp-controller="Account" method="post" id="membership-info-form">
+                                <input type="hidden" id="marketing-consent" name="MarketingConsent" value="@Model.MarketingConsent.ToString().ToLower()" />
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700">
+                                            Fatura
+                                            Tipi
+                                        </label>
+                                        <div class="mt-1 space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" name="invoice_type" value="individual" id="individual_type"
+                                                       class="form-radio text-red-600"
+                                                @(Model.TypeID == 1 ? "checked" : "")>
+                                                <span class="ml-2 text-sm text-gray-700">Bireysel</span>
+                                            </label>
+
+                                            <label class="inline-flex items-center ml-4">
+                                                <input type="radio" name="invoice_type" value="corporate" id="corporate_type"
+                                                       class="form-radio text-red-600"
+                                                @(Model.TypeID == 2 ? "checked" : "")>
+                                                <span class="ml-2 text-sm text-gray-700">Kurumsal</span>
+                                            </label>
+
+                                            <input type="hidden" name="TypeID" id="TypeID" value="@Model.TypeID" />
+                                        </div>
+
+                                    </div>
+                                    <div id="individual_form" class="sm:col-span-2">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            <div>
+                                                <label for="invoice_name" class="block text-sm font-medium text-gray-700">
+                                                    Ad
+                                                    Soyad
+                                                </label> <input type="text" asp-for="@Model.BillingFullName" id="invoice_name"
+                                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                            </div>
+                                            <div>
+                                                <label for="tax_id" class="block text-sm font-medium text-gray-700">
+                                                    T.C. Kimlik
+                                                    Numarası
+                                                </label> <input type="text" asp-for="@Model.TCIdentityNumber" id="tax_id"
+                                                              
+                                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                            </div>
+                                            <div class="sm:col-span-2">
+                                                <label for="address"
+                                                       class="block text-sm font-medium text-gray-700">Adres</label>
+                                                <textarea asp-for="@Model.Address" id="address" rows="3"
+                                                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm"></textarea>
+                                            </div>
+                                            <div>
+                                                <label for="city" class="block text-sm font-medium text-gray-700">Şehir</label>
+                                                <select asp-items="@Model.Cities" asp-for="@Model.CityID" id="city"
+                                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                                  
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label for="district"
+                                                       class="block text-sm font-medium text-gray-700">İlçe</label> 
+                                                <select asp-for="@Model.DistrictID" id="individual_district"
+                                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label for="postal_code" class="block text-sm font-medium text-gray-700">
+                                                    Posta
+                                                    Kodu
+                                                </label> <input type="text" asp-for="@Model.ZipCode" id="postal_code"
+                                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                            </div>
+                                            <div>
+                                                <label for="phone" class="block text-sm font-medium text-gray-700">
+                                                    Cep
+                                                    Telefonu
+                                                </label> <input type="tel" asp-for="@Model.PhoneNumber" id="mobilePhone"
+                                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="corporate_form" class="sm:col-span-2">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            <div>
+                                                <label for="invoice_name" class="block text-sm font-medium text-gray-700">
+                                                   Firma Adı
+                                                </label> <input type="text" asp-for="@Model.CompanyName" id="invoice_name"
+                                                                
+                                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                            </div>
+                                            <div>
+                                                <label for="tax_id" class="block text-sm font-medium text-gray-700">
+                                                    Vergi Kimlik No
+                                                </label> <input type="text" asp-for="@Model.CompanyIdentityNumber" id="tax_id"
+                                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                            </div>
+                                            <div class="sm:col-span-2">
+                                                <label for="address"
+                                                       class="block text-sm font-medium text-gray-700">Adres</label>
+                                                <textarea asp-for="@Model.CompanyAddress" id="address" rows="3"
+                                                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">Prof.Nurettin Mazhar Öktel Sok. No:2 Şişli</textarea>
+                                            </div>
+                                            <div>
+                                                <label for="city" class="block text-sm font-medium text-gray-700">Şehir</label>
+                                                <select asp-items="@Model.Cities" asp-for="@Model.CompanyCityID" id="city"
+                                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                                   
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label for="district"
+                                                       class="block text-sm font-medium text-gray-700">İlçe</label> 
+                                                <select asp-for="@Model.CompanyDistrictID" id="corporate_district" 
+                                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label for="postal_code" class="block text-sm font-medium text-gray-700">
+                                                    Posta
+                                                    Kodu
+                                                </label> <input type="text" asp-for="@Model.CompanyZipCode" id="postal_code"
+                                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                            </div>
+                                            <div>
+                                                <label for="phone" class="block text-sm font-medium text-gray-700">
+                                                    Cep
+                                                    Telefonu
+                                                </label> <input type="tel" asp-for="@Model.CompanyPhoneNumber" id="companyPhone"
+                                                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" class="form-checkbox text-red-600 rounded" checked> <span class="ml-2 text-sm text-gray-600">Fatura bilgilerimle teslimat bilgilerim aynı</span>
+                                    </label>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        Kaydet
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const individualType = document.getElementById('individual_type');
+            const corporateType = document.getElementById('corporate_type');
+            const individualForm = document.getElementById('individual_form');
+            const corporateForm = document.getElementById('corporate_form');
+            const typeId = document.getElementById("TypeID");
+            const individualCitySelect = document.querySelector('#individual_form #city');
+            const corporateCitySelect = document.querySelector('#corporate_form #city');
+            const individualDistrictSelect = document.getElementById('individual_district');
+            const corporateDistrictSelect = document.getElementById('corporate_district');
+
+            // Function to load districts based on selected city
+            function loadDistricts(cityId, districtSelect, selectedDistrictId = null) {
+                if (!cityId) return;
+                
+                fetch(`/Location/GetDistrictsByCity?cityId=${cityId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear current options
+                        districtSelect.innerHTML = '';
+                        
+                        // Add options from response
+                        data.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district.id;
+                            option.textContent = district.name;
+                            
+                            // Select the option if it matches the selectedDistrictId
+                            if (selectedDistrictId && district.id == selectedDistrictId) {
+                                option.selected = true;
+                            }
+                            
+                            districtSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error loading districts:', error));
+            }
+
+            function toggleForms() {
+                if (individualType.checked) {
+                    individualForm.style.display = 'block';
+                    corporateForm.style.display = 'none';
+                    typeId.value = 1;
+                } else {
+                    individualForm.style.display = 'none';
+                    corporateForm.style.display = 'block';
+                    typeId.value = 2;
+                }
+            }
+
+            // Initial state
+            toggleForms();
+
+            // Add event listeners
+            individualType.addEventListener('change', toggleForms);
+            corporateType.addEventListener('change', toggleForms);
+
+            // Add event listeners for city selects to load districts
+            individualCitySelect.addEventListener('change', function() {
+                loadDistricts(this.value, individualDistrictSelect);
+            });
+
+            corporateCitySelect.addEventListener('change', function() {
+                loadDistricts(this.value, corporateDistrictSelect);
+            });
+
+            // Load initial districts based on selected cities
+            const initialIndividualCityId = individualCitySelect.value;
+            const initialCorporateCityId = corporateCitySelect.value;
+            const initialIndividualDistrictId = @(Model.DistrictID != null ? Model.DistrictID : "null");
+            const initialCorporateDistrictId = @(Model.CompanyDistrictID != null ? Model.CompanyDistrictID : "null");
+
+            if (initialIndividualCityId) {
+                loadDistricts(initialIndividualCityId, individualDistrictSelect, initialIndividualDistrictId);
+            }
+
+            if (initialCorporateCityId) {
+                loadDistricts(initialCorporateCityId, corporateDistrictSelect, initialCorporateDistrictId);
+            }
+
+            // Phone number formatting
+            const mobilePhoneInput = document.getElementById('mobilePhone');
+            const companyPhoneInput = document.getElementById('companyPhone');
+            const form = document.getElementById('membership-info-form');
+
+            function formatPhoneNumber(phoneNumber) {
+                if (!phoneNumber) return phoneNumber;
+
+                // Remove all non-digit characters
+                phoneNumber = phoneNumber.replace(/\D/g, '');
+
+                if (phoneNumber.length === 10) {
+                    return "+90" + phoneNumber;
+                } else if (phoneNumber.length === 11 && phoneNumber.startsWith('0')) {
+                    return "+9" + phoneNumber;
+                } else if (phoneNumber.length === 12 && phoneNumber.startsWith('90')) {
+                    return "+" + phoneNumber;
+                } else if (!phoneNumber.startsWith('+')) {
+                    return "+" + phoneNumber;
+                }
+
+                return phoneNumber;
+            }
+
+            form.addEventListener('submit', function(e) {
+                if (mobilePhoneInput && mobilePhoneInput.value) {
+                    mobilePhoneInput.value = formatPhoneNumber(mobilePhoneInput.value);
+                }
+                if (companyPhoneInput && companyPhoneInput.value) {
+                    companyPhoneInput.value = formatPhoneNumber(companyPhoneInput.value);
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const checkbox = document.getElementById("marketing-checkbox");
+            const hiddenInput = document.getElementById("marketing-consent");
+
+            // İlk yüklemede doğru değeri setle
+            hiddenInput.value = checkbox.checked.toString();
+
+            checkbox.addEventListener("change", function () {
+                hiddenInput.value = checkbox.checked.toString(); // "true" ya da "false"
+            });
+        });
+    </script>
+}
+
+

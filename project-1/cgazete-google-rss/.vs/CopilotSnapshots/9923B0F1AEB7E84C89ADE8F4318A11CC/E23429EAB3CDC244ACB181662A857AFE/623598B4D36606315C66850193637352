@@ -1,0 +1,1353 @@
+﻿using AvvaMobile.Core.Business;
+using AvvaMobile.Core.Caching;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Common.BaseServices;
+using Quark.Data;
+using Quark.Resources;
+using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Xml;
+using System.Xml.Linq;
+using Quark.Core.Extentions;
+using Quark.Data.Models;
+using AvvaMobile.Core.Extensions;
+using System.Globalization;
+using Quark.Business.Caching.Models.Responses.XmlFeedCachingResponses;
+using Quark.Business.Common.Caching;
+using Quark.Business.ElasticSearch.Abstractions;
+using Quark.Business.ElasticSearch.Constants;
+
+namespace Quark.Business.Caching.Services
+{
+    public class XmlFeedCachingService : BaseService, IXmlFeedCachingService
+    {
+        private const int MAX_SITEMAP_ITEMS = 50000;
+        private const int MAX_RSS_ITEMS = 100;
+        private const string GoogleAiFeedArchiveBasePath = @"E:\GitHub\cgazete-google-rss\GoogleAiFeedArchive";
+        private readonly string _siteUrl;
+        private readonly XmlWriterSettings _xmlSettings;
+        private readonly IElasticSearchService _elasticSearchService;
+        private readonly ILogger<XmlFeedCachingService> _logger;
+
+        public XmlFeedCachingService(
+            IHttpContextAccessor httpContext,
+            QuarkDataContext context,
+            IStringLocalizer<CommonResource> localizer,
+            Common.Caching.AppSettingsKeys appSettingsKeys,
+            ICacheManager cache, IElasticSearchService elasticSearchService,
+            ILogger<XmlFeedCachingService> logger) : base(httpContext, context, localizer,
+            appSettingsKeys, cache)
+        {
+            _elasticSearchService = elasticSearchService;
+            _logger = logger;
+            _siteUrl = appSettingsKeys.Common_ClientWebSite;
+            _xmlSettings = new XmlWriterSettings
+            {
+                Encoding = Encoding.UTF8,
+                Indent = true,
+                OmitXmlDeclaration = false
+            };
+        }
+
+        private string SerializeXml(XDocument doc)
+        {
+            using var ms = new MemoryStream();
+            using (var writer = XmlWriter.Create(ms, _xmlSettings))
+            {
+                doc.Save(writer);
+            }
+
+            return Encoding.UTF8.GetString(ms.ToArray());
+        }
+
+        private string FormatRfc822Date(DateTime? date)
+        {
+            if (!date.HasValue)
+                return string.Empty;
+
+            var offset = TimeZoneInfo.Local.GetUtcOffset(date.Value);
+            var sign = offset.Hours >= 0 ? "+" : "-";
+            var hours = Math.Abs(offset.Hours).ToString("00");
+            var minutes = Math.Abs(offset.Minutes).ToString("00");
+
+            return date.Value.ToString($"ddd, dd MMM yyyy HH:mm:ss {sign}{hours}{minutes}",
+                CultureInfo.InvariantCulture);
+        }
+
+        public static string ConvertToIso8601WithOffset(DateTime dateTime)
+        {
+            var offset = TimeSpan.FromHours(3); // UTC+3
+            var dateTimeOffset = new DateTimeOffset(dateTime, offset);
+            return dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:sszzz");
+        }
+
+        public async Task<string> GetMainRSS()
+        {
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticRssKeysEnum.MainRssKey).ToString()
+                , IndexNames.MainRSS);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshMainRSS();
+            cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticRssKeysEnum.MainRssKey).ToString()
+                , IndexNames.MainRSS);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<string> GetCategoryRSS(string category)
+        {
+            var categoryEntity = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Url == category);
+
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                categoryEntity.ID.ToString()
+                , IndexNames.Category_RSS);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshCategoryRSS(category);
+            await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                categoryEntity.ID.ToString()
+                , IndexNames.Category_RSS);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<string> GetGoogleAiRSS()
+        {
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticRssKeysEnum.GoogleAiRssKey).ToString(),
+                IndexNames.GoogleAiRSS);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshGoogleAiRSS();
+            cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticRssKeysEnum.GoogleAiRssKey).ToString(),
+                IndexNames.GoogleAiRSS);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<string> GetNewsSitemap()
+        {
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticSitemapKeysEnum.NewsSitemapKey).ToString()
+                , IndexNames.Sitemaps);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshNewsSiteMap();
+            cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticSitemapKeysEnum.NewsSitemapKey).ToString()
+                , IndexNames.Sitemaps);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<string> GetPostsSitemap()
+        {
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticSitemapKeysEnum.PostsSitemapKey).ToString()
+                , IndexNames.Sitemaps);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshPostsSiteMap();
+            cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticSitemapKeysEnum.PostsSitemapKey).ToString()
+                , IndexNames.Sitemaps);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<string> GetTagsSitemap()
+        {
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticSitemapKeysEnum.TagsSitemapKey).ToString()
+                , IndexNames.Sitemaps);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshTagsSiteMap();
+            cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticSitemapKeysEnum.TagsSitemapKey).ToString()
+                , IndexNames.Sitemaps);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<string> GetSourcesSitemap()
+        {
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticSitemapKeysEnum.SourceSitemapKey).ToString()
+                , IndexNames.Sitemaps);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshSourcesSiteMap();
+            cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                ((int)ElasticSitemapKeysEnum.SourceSitemapKey).ToString()
+                , IndexNames.Sitemaps);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<string> GetMonthlyPostsSitemap(int year, int month)
+        {
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                $"{year}-{month}"
+                , IndexNames.Monthly_Post_Sitemap);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshMonthlyPostsSitemap(year, month);
+            cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                $"{year}-{month}"
+                , IndexNames.Monthly_Post_Sitemap);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<string> GetMonthlyTagsSitemap(int year, int month)
+        {
+            var cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                $"{year}-{month}"
+                , IndexNames.Monthly_Tag_Sitemap);
+
+            if (cachedContent != null && !string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return cachedContent.Content;
+            }
+
+            await RefreshMonthlyTagsSitemap(year, month);
+            cachedContent = await _elasticSearchService.GetDocumentAsync<SitemapRssCachingResponse>(
+                $"{year}-{month}"
+                , IndexNames.Monthly_Tag_Sitemap);
+
+            if (cachedContent == null || string.IsNullOrEmpty(cachedContent.Content))
+            {
+                return string.Empty;
+            }
+
+            return cachedContent.Content;
+        }
+
+        public async Task<ServiceResult> RefreshNewsSiteMap()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var news = await _context.NewsPublished
+                    .Where(n => n.PublishedDate >= DateTime.Now.AddHours(-48))
+                    .Where(n => n.AllowToSendGoogleSideMap)
+                    .OrderByDescending(n => n.PublishedDate)
+                    .Select(n => new
+                    {
+                        n.Slug,
+                        n.PublishedDate,
+                        n.Title,
+                        n.CategoryID
+                    })
+                    .ToListAsync();
+
+                var newsNs = XNamespace.Get("http://www.google.com/schemas/sitemap-news/0.9");
+                var sitemapNs = XNamespace.Get("http://www.sitemaps.org/schemas/sitemap/0.9");
+
+                var sitemap = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement(sitemapNs + "urlset",
+                        new XAttribute(XNamespace.Xmlns + "news", newsNs)));
+
+                foreach (var item in news)
+                {
+                    sitemap.Root.Add(
+                        new XElement(sitemapNs + "url",
+                            new XElement(sitemapNs + "loc",
+                                item.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite)),
+                            new XElement(newsNs + "news",
+                                new XElement(newsNs + "publication",
+                                    new XElement(newsNs + "name", "Cumhuriyet"),
+                                    new XElement(newsNs + "language", "tr")),
+                                new XElement(newsNs + "publication_date",
+                                    ConvertToIso8601WithOffset(item.PublishedDate)),
+                                new XElement(newsNs + "title", item.Title))));
+                }
+
+                var xmlContent = SerializeXml(sitemap);
+                var sitemapCachingModel = new SitemapRssCachingResponse()
+                {
+                    ID = ((int)ElasticSitemapKeysEnum.NewsSitemapKey).ToString(),
+                    Key = ElasticSitemapKeys.NewsSitemapKey,
+                    Content = xmlContent,
+                };
+                await _elasticSearchService.UpdateDocumentAsync(sitemapCachingModel,
+                    ((int)ElasticSitemapKeysEnum.NewsSitemapKey).ToString(),
+                    IndexNames.Sitemaps);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshPostsSiteMap()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var sitemapNs = XNamespace.Get("http://www.sitemaps.org/schemas/sitemap/0.9");
+
+                var sitemapResults = await _context.NewsPublished
+                    .Where(n => n.AllowToSendGoogleSideMap)
+                    .GroupBy(n => new { n.PublishedDate.Year, n.PublishedDate.Month })
+                    .Select(g => new
+                    {
+                        PublishedYear = g.Key.Year,
+                        PublishedMonth = g.Key.Month,
+                        LastModifiedDate = g
+                            .Select(n => n.ManuelUpdatedDate < n.PublishedDate ? n.PublishedDate : n.ManuelUpdatedDate)
+                            .Max()
+                    })
+                    .OrderByDescending(x => x.PublishedYear)
+                    .ThenByDescending(x => x.PublishedMonth)
+                    .ToListAsync();
+
+                var sitemap = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement(sitemapNs + "sitemapindex"));
+
+                foreach (var sitemapItem in sitemapResults)
+                {
+                    sitemap.Root.Add(
+                        new XElement(sitemapNs + "sitemap",
+                            new XElement(sitemapNs + "loc",
+                                $"{_siteUrl.TrimEnd('/')}/sitemaps/posts-{sitemapItem.PublishedYear}-{sitemapItem.PublishedMonth}.xml"),
+                            new XElement(sitemapNs + "lastmod",
+                                ConvertToIso8601WithOffset((DateTime)sitemapItem.LastModifiedDate))));
+                }
+
+                var xmlContent = SerializeXml(sitemap);
+                var sitemapCachingModel = new SitemapRssCachingResponse()
+                {
+                    ID = ((int)ElasticSitemapKeysEnum.PostsSitemapKey).ToString(),
+                    Key = ElasticSitemapKeys.PostsSitemapKey,
+                    Content = xmlContent,
+                };
+                await _elasticSearchService.UpdateDocumentAsync(sitemapCachingModel,
+                    ((int)ElasticSitemapKeysEnum.PostsSitemapKey).ToString(),
+                    IndexNames.Sitemaps);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshTagsSiteMap()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var sitemapNs = XNamespace.Get("http://www.sitemaps.org/schemas/sitemap/0.9");
+
+                var sitemapResults = await (
+                    from nt in _context.NewsTags
+                    join t in _context.Tags on nt.TagID equals t.ID
+                    join n in _context.NewsPublished on nt.NewsID equals n.NewsID
+                    where n.AllowToSendGoogleSideMap
+                    group n by new { t.CreatedDate.Value.Year, t.CreatedDate.Value.Month }
+                    into g
+                    orderby g.Key.Year descending, g.Key.Month descending
+                    select new
+                    {
+                        TagCreatedYear = g.Key.Year,
+                        TagCreatedMonth = g.Key.Month,
+                        LastModifiedDate = g.Max(item => item.ManuelUpdatedDate)
+                    }).ToListAsync();
+
+                var sitemap = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement(sitemapNs + "sitemapindex"));
+
+                foreach (var sitemapItem in sitemapResults)
+                {
+                    sitemap.Root.Add(
+                        new XElement(sitemapNs + "sitemap",
+                            new XElement(sitemapNs + "loc",
+                                $"{_siteUrl.TrimEnd('/')}/sitemaps/tag-{sitemapItem.TagCreatedYear}-{sitemapItem.TagCreatedMonth}.xml"),
+                            new XElement(sitemapNs + "lastmod",
+                                ConvertToIso8601WithOffset((DateTime)sitemapItem.LastModifiedDate))));
+                }
+
+                var xmlContent = SerializeXml(sitemap);
+                var sitemapCachingModel = new SitemapRssCachingResponse()
+                {
+                    ID = ((int)ElasticSitemapKeysEnum.TagsSitemapKey).ToString(),
+                    Key = ElasticSitemapKeys.TagsSitemapKey,
+                    Content = xmlContent,
+                };
+                await _elasticSearchService.UpdateDocumentAsync(sitemapCachingModel,
+                    ((int)ElasticSitemapKeysEnum.TagsSitemapKey).ToString(),
+                    IndexNames.Sitemaps);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshSourcesSiteMap()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var now = DateTime.Now;
+
+                var sitemapResults = (await (
+                    from nt in _context.NewsSources
+                    join ns in _context.Sources on nt.SourceID equals ns.ID
+                    join n in _context.NewsPublished.Select(x => new
+                        { x.NewsID, x.AllowToSendGoogleSideMap, x.ManuelUpdatedDate, x.Slug }) on nt.NewsID equals n
+                        .NewsID
+                    where n.AllowToSendGoogleSideMap
+                    group new { ns, n } by new { ns.Url }
+                    into g
+                    select new
+                    {
+                        Slug = g.Select(n => n.ns.Url).FirstOrDefault(),
+                        LastModifiedDate = g.Max(item => item.n.ManuelUpdatedDate)
+                    }).ToListAsync()).Select(item =>
+                {
+                    var lastMod = item.LastModifiedDate;
+                    var daysDiff = (now - lastMod).Value.TotalDays;
+                    var hoursDiff = (now - lastMod).Value.TotalHours;
+
+                    string changefreq;
+                    string priority;
+
+                    if (hoursDiff <= 24)
+                    {
+                        changefreq = "always";
+                        priority = "1.0";
+                    }
+                    else if (hoursDiff <= 48)
+                    {
+                        changefreq = "hourly";
+                        priority = "0.9";
+                    }
+                    else if (daysDiff <= 7)
+                    {
+                        changefreq = "daily";
+                        priority = "0.8";
+                    }
+                    else if (daysDiff <= 30)
+                    {
+                        changefreq = "weekly";
+                        priority = "0.7";
+                    }
+                    else if (daysDiff <= 365)
+                    {
+                        changefreq = "monthly";
+                        priority = "0.6";
+                    }
+                    else
+                    {
+                        changefreq = "yearly";
+                        priority = "0.5";
+                    }
+
+                    return new
+                    {
+                        LastMod = ConvertToIso8601WithOffset((DateTime)lastMod),
+                        ChangeFreq = changefreq,
+                        Priority = priority,
+                        Slug = item.Slug
+                    };
+                }).OrderByDescending(x => x.LastMod).ToList();
+
+                var sitemapNs = XNamespace.Get("http://www.sitemaps.org/schemas/sitemap/0.9");
+
+                var sitemap = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement(sitemapNs + "urlset"));
+
+                sitemapResults = sitemapResults.Where(x =>
+                    x.ChangeFreq != null
+                    && x.LastMod != null
+                    && x.Priority != null
+                    && x.Slug != null).ToList();
+
+                foreach (var source in sitemapResults)
+                {
+                    sitemap.Root.Add(
+                        new XElement(sitemapNs + "url",
+                            new XElement(sitemapNs + "loc",
+                                $"{_appSettingsKeys.Common_ClientWebSite.TrimStart('/') + _appSettingsKeys.SlugPrefix_Sources.TrimStart('/') + "/" + source.Slug.TrimStart('/')}"),
+                            new XElement(sitemapNs + "changefreq", source.ChangeFreq),
+                            new XElement(sitemapNs + "priority", source.Priority)));
+                }
+
+                var xmlContent = SerializeXml(sitemap);
+                var sitemapCachingModel = new SitemapRssCachingResponse()
+                {
+                    ID = ((int)ElasticSitemapKeysEnum.SourceSitemapKey).ToString(),
+                    Key = ElasticSitemapKeys.SourceSitemapKey,
+                    Content = xmlContent,
+                };
+                await _elasticSearchService.UpdateDocumentAsync(sitemapCachingModel,
+                    ((int)ElasticSitemapKeysEnum.SourceSitemapKey).ToString(),
+                    IndexNames.Sitemaps);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshMainRSS()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var news = await (from np in _context.NewsPublished
+                    let photo = (from ph in _context.NewsPublishedPhotos
+                        where ph.NewsID == np.NewsID &&
+                              (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                               ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                        orderby
+                            ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                ? 0
+                                : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                                  !string.IsNullOrEmpty(ph.PhotoUrl)
+                                    ? 1
+                                    : 2
+                        select ph).FirstOrDefault()
+                    where np.AllowToSendRSS
+                    select new
+                    {
+                        Title = !string.IsNullOrEmpty(np.Title)
+                            ? np.Title
+                            : (!string.IsNullOrEmpty(np.Headline) ? np.Headline : string.Empty),
+                        Subtitle = !string.IsNullOrEmpty(np.Subtitle)
+                            ? np.Subtitle
+                            : (!string.IsNullOrEmpty(np.UpSubtitle)
+                                ? np.UpSubtitle
+                                : (!string.IsNullOrEmpty(np.Content)
+                                    ? np.Content.ExtractTextFromHtml()
+                                    : string.Empty)),
+                        Slug = !string.IsNullOrEmpty(np.Slug) ? np.Slug : string.Empty,
+                        PublishedDate = np.PublishedDate,
+                        ImageURL = photo != null && !string.IsNullOrEmpty(photo.PhotoUrl)
+                            ? photo.PhotoUrl.TrimStart('/').PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                _appSettingsKeys.CDN_MediaGalleryFolder)
+                            : "https://media.cumhuriyet.com.tr/cumhuriyet-noimage.jpg",
+                    }).OrderByDescending(x => x.PublishedDate).Take(MAX_RSS_ITEMS).ToListAsync();
+
+                var atomNs = XNamespace.Get("http://www.w3.org/2005/Atom");
+                var contentNs = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
+                var mediaNs = XNamespace.Get("http://search.yahoo.com/mrss/");
+                var dcNs = XNamespace.Get("http://purl.org/dc/elements/1.1/");
+
+
+                var rss = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement("rss",
+                        new XAttribute("version", "2.0"),
+                        new XAttribute(XNamespace.Xmlns + "content", contentNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "media", mediaNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "atom", atomNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "dc", dcNs.NamespaceName),
+                        new XElement("channel",
+                            new XElement("title", $"Cumhuriyet Gazetesi"),
+                            new XElement("link", $"{_siteUrl}"),
+                            new XElement("description", "Cumhuriyet Gazetesi"),
+                            new XElement("language", "tr-TR"),
+                            new XElement("category", "News"),
+                            new XElement("lastBuildDate", FormatRfc822Date(DateTime.Now)),
+                            new XElement("pubDate", FormatRfc822Date(DateTime.Now)),
+                            new XElement("copyright", "Cumhuriyet Gazetesi"),
+                            new XElement("ttl", "60"),
+                            new XElement("image",
+                                new XElement("url", "https://media.cumhuriyet.com.tr/cumhuriyet-amp-logo.png"),
+                                new XElement("title", $"Cumhuriyet Gazetesi"),
+                                new XElement("link", _siteUrl),
+                                new XElement("width", "144"),
+                                new XElement("height", "60")),
+                            new XElement(atomNs + "link",
+                                new XAttribute("href", $"{_siteUrl.TrimEnd('/')}/rss"),
+                                new XAttribute("rel", "self"),
+                                new XAttribute("type", "application/rss+xml"))
+                        )));
+
+
+                foreach (var item in news)
+                {
+                    rss.Root.Element("channel").Add(
+                        new XElement("item",
+                            new XElement("title", item.Title),
+                            new XElement("link", $"{_siteUrl.TrimEnd('/')}/{item.Slug}"),
+                            new XElement("enclosure",
+                                new XAttribute("url", $"{item.ImageURL}"),
+                                new XAttribute("length", "50000"),
+                                new XAttribute("type", "image/jpeg")
+                            ),
+                            new XElement(mediaNs + "content",
+                                new XAttribute("url", $"{item.ImageURL}"),
+                                new XAttribute("type", "image/jpeg"),
+                                new XAttribute("height", "720"),
+                                new XAttribute("width", "1280"),
+                                new XAttribute("expression", "full")
+                            ),
+                            new XElement("guid",
+                                new XAttribute("isPermaLink", "false"),
+                                $"{_siteUrl.TrimEnd('/')}/{item.Slug.TrimStart('/')}"
+                            ),
+                            new XElement("pubDate", FormatRfc822Date(item.PublishedDate)),
+                            new XElement("description", new XCData(item.Subtitle)))
+                    );
+                }
+
+                var xmlContent = SerializeXml(rss);
+                var sitemapCachingModel = new SitemapRssCachingResponse()
+                {
+                    ID = ((int)ElasticRssKeysEnum.MainRssKey).ToString(),
+                    Key = ElasticRssKeys.MainRssKey,
+                    Content = xmlContent,
+                };
+                await _elasticSearchService.UpdateDocumentAsync(sitemapCachingModel,
+                    ((int)ElasticRssKeysEnum.MainRssKey).ToString(),
+                    IndexNames.MainRSS);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshCategoryRSS(string category)
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var categoryEntity = await _context.Categories
+                    .FirstOrDefaultAsync(c => c.Url == category);
+
+                if (categoryEntity == null)
+                    return result;
+
+                bool isColumnArticleCategory = categoryEntity.ID == (int)CategoryEnum.Authors;
+
+                var news = await (from np in _context.NewsPublished
+                    join c in _context.Categories on np.CategoryID equals c.ID into cat
+                    from c in cat.DefaultIfEmpty()
+                    let photo = (from ph in _context.NewsPublishedPhotos
+                        where ph.NewsID == np.NewsID &&
+                              (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                               ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                        orderby
+                            ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                ? 0
+                                : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                                  !string.IsNullOrEmpty(ph.PhotoUrl)
+                                    ? 1
+                                    : 2
+                        select ph).FirstOrDefault()
+                    where np.AllowToSendRSS && (isColumnArticleCategory
+                        ? np.NewsTypeID == (int)NewsTypesEnum.ColumnArticles
+                        : np.CategoryID == categoryEntity.ID)
+                    select new
+                    {
+                        Title = !string.IsNullOrEmpty(np.Title)
+                            ? np.Title
+                            : (!string.IsNullOrEmpty(np.Headline) ? np.Headline : string.Empty),
+                        Subtitle = !string.IsNullOrEmpty(np.Subtitle)
+                            ? np.Subtitle
+                            : (!string.IsNullOrEmpty(np.UpSubtitle)
+                                ? np.UpSubtitle
+                                : (!string.IsNullOrEmpty(np.Content)
+                                    ? np.Content.ExtractTextFromHtml()
+                                    : string.Empty)),
+                        Slug = !string.IsNullOrEmpty(np.Slug) ? np.Slug : string.Empty,
+                        PublishedDate = np.PublishedDate,
+                        CategoryName = c != null && !string.IsNullOrEmpty(c.Name) ? c.Name : string.Empty,
+                        ImageURL = photo != null && !string.IsNullOrEmpty(photo.PhotoUrl)
+                            ? photo.PhotoUrl.TrimStart('/').PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                _appSettingsKeys.CDN_MediaGalleryFolder)
+                            : "https://media.cumhuriyet.com.tr/cumhuriyet-noimage.jpg",
+                    }).OrderByDescending(x => x.PublishedDate).Take(MAX_RSS_ITEMS).ToListAsync();
+
+                var atomNs = XNamespace.Get("http://www.w3.org/2005/Atom");
+                var contentNs = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
+                var mediaNs = XNamespace.Get("http://search.yahoo.com/mrss/");
+                var dcNs = XNamespace.Get("http://purl.org/dc/elements/1.1/");
+
+                var rss = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement("rss",
+                        new XAttribute("version", "2.0"),
+                        new XAttribute(XNamespace.Xmlns + "content", contentNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "media", mediaNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "atom", atomNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "dc", dcNs.NamespaceName),
+                        new XElement("channel",
+                            new XElement("title", $"Cumhuriyet Gazetesi - {categoryEntity.Name}"),
+                            new XElement("link", $"{_siteUrl.TrimEnd('/')}/{categoryEntity.Url.TrimStart('/')}"),
+                            new XElement("description", "Cumhuriyet Gazetesi"),
+                            new XElement("language", "tr-TR"),
+                            new XElement("category", "News"),
+                            new XElement("lastBuildDate", FormatRfc822Date(DateTime.Now)),
+                            new XElement("pubDate", FormatRfc822Date(DateTime.Now)),
+                            new XElement("copyright", "Cumhuriyet Gazetesi"),
+                            new XElement("ttl", "60"),
+                            new XElement("image",
+                                new XElement("url", "https://media.cumhuriyet.com.tr/cumhuriyet-amp-logo.png"),
+                                new XElement("title", $"Cumhuriyet Gazetesi - {categoryEntity.Name}"),
+                                new XElement("link", $"{_siteUrl.TrimEnd('/')}/{categoryEntity.Url.TrimStart('/')}"),
+                                new XElement("width", "144"),
+                                new XElement("height", "60")),
+                            new XElement(atomNs + "link",
+                                new XAttribute("href",
+                                    $"{_siteUrl.TrimEnd('/')}/rss/{categoryEntity.Url.TrimStart('/')}"),
+                                new XAttribute("rel", "self"),
+                                new XAttribute("type", "application/rss+xml"))
+                        )));
+
+                foreach (var item in news)
+                {
+                    rss.Root.Element("channel").Add(
+                        new XElement("item",
+                            new XElement("title", item.Title),
+                            new XElement("link", $"{_siteUrl.TrimEnd('/')}/{item.Slug}"),
+                            new XElement("enclosure",
+                                new XAttribute("url", $"{item.ImageURL}"),
+                                new XAttribute("length", "50000"),
+                                new XAttribute("type", "image/jpeg")
+                            ),
+                            new XElement(mediaNs + "content",
+                                new XAttribute("url", $"{item.ImageURL}"),
+                                new XAttribute("type", "image/jpeg"),
+                                new XAttribute("height", "720"),
+                                new XAttribute("width", "1280"),
+                                new XAttribute("expression", "full")
+                            ),
+                            new XElement("guid",
+                                new XAttribute("isPermaLink", "false"),
+                                $"{_siteUrl.TrimEnd('/')}/{item.Slug.TrimStart('/')}"
+                            ),
+                            new XElement("pubDate", FormatRfc822Date(item.PublishedDate)),
+                            new XElement("description", new XCData(item.Subtitle))));
+                }
+
+                var xmlContent = SerializeXml(rss);
+                var sitemapCachingModel = new SitemapRssCachingResponse()
+                {
+                    ID = categoryEntity.ID.ToString(),
+                    Key = string.Format(ElasticRssKeys.CategoryRssKey, categoryEntity.Url.ToLower()),
+                    Content = xmlContent,
+                };
+                await _elasticSearchService.UpdateDocumentAsync(sitemapCachingModel,
+                    categoryEntity.ID.ToString(),
+                    IndexNames.Category_RSS);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshGoogleAiRSS()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var feed = await BuildGoogleAiRssAsync();
+                var document = new SitemapRssCachingResponse
+                {
+                    ID = ((int)ElasticRssKeysEnum.GoogleAiRssKey).ToString(),
+                    Key = ElasticRssKeys.GoogleAiRssKey,
+                    Content = SerializeXml(feed.Document)
+                };
+                var updated = await _elasticSearchService.UpdateDocumentAsync(document,
+                    document.ID, IndexNames.GoogleAiRSS);
+                if (!updated)
+                {
+                    _logger.LogError("Google AI live feed could not be updated in Elasticsearch");
+                    result.SetError("Google AI live feed could not be updated.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Google AI live feed refresh failed");
+                result.SetError("Google AI live feed could not be refreshed.");
+            }
+
+            return result;
+        }
+
+        private async Task<(XDocument Document, DateTime? PublishedDate)> BuildGoogleAiRssAsync(long? newsId = null)
+        {
+                var publishedNews = _context.NewsPublished.AsQueryable();
+                if (newsId.HasValue)
+                {
+                    publishedNews = publishedNews.Where(x => x.NewsID == newsId.Value);
+                }
+                else
+                {
+                    var since = DateTime.UtcNow.AddHours(-48).ToLocalTime();
+                    publishedNews = publishedNews.Where(x => x.PublishedDate >= since);
+                }
+
+                var news = await (from np in publishedNews
+                    join author in _context.Authors on np.AuthorID equals author.ID into authors
+                    from author in authors.DefaultIfEmpty()
+                    let photo = (from ph in _context.NewsPublishedPhotos
+                        where ph.NewsID == np.NewsID &&
+                              !string.IsNullOrEmpty(ph.PhotoUrl) &&
+                              (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.GoogleAiHighResPhoto ||
+                               ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                               ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                        orderby
+                            ph.PhotoTypeID == (int)NewsPhotoTypesEnum.GoogleAiHighResPhoto
+                                ? 0
+                                : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto
+                                    ? 1
+                                    : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto
+                                        ? 2
+                                        : 3
+                        select ph).FirstOrDefault()
+                    where np.AllowToSendRSS
+                          && !np.ExcludeFromGoogleAiFeed
+                          && (np.NewsTypeID == (int)NewsTypesEnum.News ||
+                              np.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+                    select new
+                    {
+                        Title = !string.IsNullOrEmpty(np.Title)
+                            ? np.Title
+                            : (!string.IsNullOrEmpty(np.Headline) ? np.Headline : string.Empty),
+                        Subtitle = !string.IsNullOrEmpty(np.Subtitle)
+                            ? np.Subtitle
+                            : (!string.IsNullOrEmpty(np.UpSubtitle)
+                                ? np.UpSubtitle
+                                : (!string.IsNullOrEmpty(np.Content)
+                                    ? np.Content.ExtractTextFromHtml()
+                                    : string.Empty)),
+                        Content = !string.IsNullOrEmpty(np.Content) ? np.Content : string.Empty,
+                        Slug = !string.IsNullOrEmpty(np.Slug) ? np.Slug : string.Empty,
+                        PublishedDate = np.PublishedDate,
+                        AuthorName = author != null
+                            ? ((author.Firstname ?? string.Empty) + " " + (author.Lastname ?? string.Empty)).Trim()
+                            : string.Empty,
+                        IsGoogleAiHighResPhoto = photo != null &&
+                                                 photo.PhotoTypeID == (int)NewsPhotoTypesEnum.GoogleAiHighResPhoto,
+                        ImageWidth = photo != null ? photo.Width : null,
+                        ImageHeight = photo != null ? photo.Height : null,
+                        ImageURL = photo != null && !string.IsNullOrEmpty(photo.PhotoUrl)
+                            ? photo.PhotoUrl.TrimStart('/').PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                _appSettingsKeys.CDN_MediaGalleryFolder)
+                            : "https://media.cumhuriyet.com.tr/cumhuriyet-noimage.jpg",
+                    }).OrderByDescending(x => x.PublishedDate).Take(newsId.HasValue ? 1 : MAX_RSS_ITEMS).ToListAsync();
+
+                if (newsId.HasValue && news.Count == 0)
+                    return (null, null);
+
+                var atomNs = XNamespace.Get("http://www.w3.org/2005/Atom");
+                var contentNs = XNamespace.Get("http://purl.org/rss/1.0/modules/content/");
+                var mediaNs = XNamespace.Get("http://search.yahoo.com/mrss/");
+                var dcNs = XNamespace.Get("http://purl.org/dc/elements/1.1/");
+
+                var feedSelfUrl = $"{_siteUrl.TrimEnd('/')}/feeds/google-ai.xml";
+
+                var rss = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement("rss",
+                        new XAttribute("version", "2.0"),
+                        new XAttribute(XNamespace.Xmlns + "content", contentNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "media", mediaNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "atom", atomNs.NamespaceName),
+                        new XAttribute(XNamespace.Xmlns + "dc", dcNs.NamespaceName),
+                        new XElement("channel",
+                            new XElement("title", "Cumhuriyet Gazetesi - Google AI Feed"),
+                            new XElement("link", $"{_siteUrl}"),
+                            new XElement("description", "Cumhuriyet Gazetesi Google News AI Pilot Feed"),
+                            new XElement("language", "tr-TR"),
+                            new XElement("category", "News"),
+                            new XElement("lastBuildDate", FormatRfc822Date(DateTime.Now)),
+                            new XElement("pubDate", FormatRfc822Date(DateTime.Now)),
+                            new XElement("copyright", "Cumhuriyet Gazetesi"),
+                            new XElement("ttl", "60"),
+                            new XElement("image",
+                                new XElement("url", "https://media.cumhuriyet.com.tr/cumhuriyet-amp-logo.png"),
+                                new XElement("title", "Cumhuriyet Gazetesi - Google AI Feed"),
+                                new XElement("link", _siteUrl),
+                                new XElement("width", "144"),
+                                new XElement("height", "60")),
+                            new XElement(atomNs + "link",
+                                new XAttribute("href", feedSelfUrl),
+                                new XAttribute("rel", "self"),
+                                new XAttribute("type", "application/rss+xml"))
+                        )));
+
+                foreach (var item in news)
+                {
+                    var itemUrl = $"{_siteUrl.TrimEnd('/')}/{item.Slug.TrimStart('/')}";
+                    var mediaWidth = item.ImageWidth.HasValue && item.ImageWidth.Value > 0
+                        ? item.ImageWidth.Value.ToString()
+                        : (item.IsGoogleAiHighResPhoto ? "1600" : "1280");
+                    var mediaHeight = item.ImageHeight.HasValue && item.ImageHeight.Value > 0
+                        ? item.ImageHeight.Value.ToString()
+                        : (item.IsGoogleAiHighResPhoto ? "1200" : "720");
+                    var itemElement = new XElement("item",
+                        new XElement("title", item.Title),
+                        new XElement("link", itemUrl),
+                        new XElement("enclosure",
+                            new XAttribute("url", $"{item.ImageURL}"),
+                            new XAttribute("length", "50000"),
+                            new XAttribute("type", "image/jpeg")
+                        ),
+                        new XElement(mediaNs + "content",
+                            new XAttribute("url", $"{item.ImageURL}"),
+                            new XAttribute("type", "image/jpeg"),
+                            new XAttribute("height", mediaHeight),
+                            new XAttribute("width", mediaWidth),
+                            new XAttribute("expression", "full")
+                        ),
+                        new XElement("guid",
+                            new XAttribute("isPermaLink", "false"),
+                            itemUrl
+                        ),
+                        new XElement("pubDate", FormatRfc822Date(item.PublishedDate)),
+                        new XElement("description", new XCData(item.Subtitle)),
+                        new XElement(contentNs + "encoded", new XCData(item.Content))
+                    );
+
+                    if (!string.IsNullOrWhiteSpace(item.AuthorName))
+                    {
+                        itemElement.Add(new XElement(dcNs + "creator", item.AuthorName));
+                    }
+
+                    rss.Root.Element("channel").Add(itemElement);
+                }
+
+                return (rss, news.FirstOrDefault()?.PublishedDate);
+        }
+
+        public async Task<ServiceResult<string>> ArchiveGoogleAiNewsAsync(long newsId)
+        {
+            var result = new ServiceResult<string>();
+            try
+            {
+                var feed = await BuildGoogleAiRssAsync(newsId);
+                if (feed.Document == null)
+                {
+                    result.Message = "The article is not published or is not eligible for the Google AI feed.";
+                    return result;
+                }
+
+                var day = feed.PublishedDate.Value.Date;
+                var yearDirectory = Path.Combine(GoogleAiFeedArchiveBasePath, day.Year.ToString());
+                Directory.CreateDirectory(yearDirectory);
+                var stem = $"feed-{day:yyyy-MM-dd}";
+                var temporaryPath = Path.Combine(yearDirectory, stem + "." + Guid.NewGuid().ToString("N") + ".tmp");
+                try
+                {
+                    // SerializeXml already includes the UTF-8 preamble; do not add a second one.
+                    await File.WriteAllTextAsync(temporaryPath, SerializeXml(feed.Document), new UTF8Encoding(false));
+                    for (var number = 0; ; number = checked(number + 1))
+                    {
+                        var suffix = number == 0 ? string.Empty : $" ({number})";
+                        var archiveFilePath = Path.Combine(yearDirectory, stem + suffix + ".xml");
+                        try
+                        {
+                            // The non-overwriting move also handles concurrent publishers choosing the same name.
+                            File.Move(temporaryPath, archiveFilePath, false);
+                            result.Data = archiveFilePath;
+                            _logger.LogInformation("Google AI archive for news {NewsId} written to {ArchivePath}",
+                                newsId, archiveFilePath);
+                            return result;
+                        }
+                        catch (IOException) when (File.Exists(archiveFilePath))
+                        {
+                            // Try the next sequence number without modifying the existing archive.
+                        }
+                    }
+                }
+                finally
+                {
+                    if (File.Exists(temporaryPath))
+                        File.Delete(temporaryPath);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Google AI archive for news {NewsId} failed at {ArchivePath}", newsId, GoogleAiFeedArchiveBasePath);
+                result.SetError("Google AI feed archive could not be written.");
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshSiteMaps()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var tasks = new List<Task<ServiceResult>>
+                {
+                    RefreshNewsSiteMap(),
+                    RefreshTagsSiteMap(),
+                    RefreshPostsSiteMap(),
+                    RefreshSourcesSiteMap()
+                };
+
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshMonthlyPostsSitemap(int year, int month)
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var now = DateTime.UtcNow;
+
+                var sitemapResults = (await _context.NewsPublished
+                        .Where(n => n.AllowToSendGoogleSideMap && n.PublishedDate.Year == year &&
+                                    n.PublishedDate.Month == month && n.ManuelUpdatedDate != null)
+                        .OrderByDescending(n => n.PublishedDate)
+                        .Select(n => new
+                        {
+                            n.PublishedDate,
+                            n.ManuelUpdatedDate,
+                            n.Slug,
+                        })
+                        .ToListAsync())
+                    .Select(item =>
+                    {
+                        var lastMod = item.ManuelUpdatedDate < item.PublishedDate
+                            ? item.PublishedDate
+                            : item.ManuelUpdatedDate;
+                        var daysDiff = (now - lastMod)?.TotalDays;
+                        var hoursDiff = (now - lastMod)?.TotalHours;
+
+                        string changefreq;
+                        string priority;
+
+                        if (hoursDiff <= 24)
+                        {
+                            changefreq = "always";
+                            priority = "1.0";
+                        }
+                        else if (hoursDiff <= 48)
+                        {
+                            changefreq = "hourly";
+                            priority = "0.9";
+                        }
+                        else if (daysDiff <= 7)
+                        {
+                            changefreq = "daily";
+                            priority = "0.8";
+                        }
+                        else if (daysDiff <= 30)
+                        {
+                            changefreq = "weekly";
+                            priority = "0.7";
+                        }
+                        else if (daysDiff <= 365)
+                        {
+                            changefreq = "monthly";
+                            priority = "0.6";
+                        }
+                        else
+                        {
+                            changefreq = "yearly";
+                            priority = "0.5";
+                        }
+
+                        return new
+                        {
+                            LastMod = ConvertToIso8601WithOffset((DateTime)lastMod),
+                            ChangeFreq = changefreq,
+                            Priority = priority,
+                            Slug = item.Slug
+                        };
+                    })
+                    .ToList();
+
+                var sitemapNs = XNamespace.Get("http://www.sitemaps.org/schemas/sitemap/0.9");
+
+                var sitemap = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement(sitemapNs + "urlset"));
+
+                sitemapResults = sitemapResults.Where(x =>
+                    x.ChangeFreq != null
+                    && x.LastMod != null
+                    && x.Priority != null
+                    && x.Slug != null).ToList();
+
+                foreach (var post in sitemapResults)
+                {
+                    sitemap.Root.Add(
+                        new XElement(sitemapNs + "url",
+                            new XElement(sitemapNs + "loc", $"{_siteUrl.TrimEnd('/')}/{post.Slug.TrimStart('/')}"),
+                            new XElement(sitemapNs + "lastmod", post.LastMod),
+                            new XElement(sitemapNs + "changefreq", post.ChangeFreq),
+                            new XElement(sitemapNs + "priority", post.Priority)));
+                }
+
+                var xmlContent = SerializeXml(sitemap);
+                var sitemapCachingModel = new SitemapRssCachingResponse()
+                {
+                    ID = $"{year}-{month}",
+                    Key = ElasticSitemapKeys.MonthlyPostsSitemapKey(year, month),
+                    Content = xmlContent,
+                };
+                await _elasticSearchService.UpdateDocumentAsync(sitemapCachingModel,
+                    $"{year}-{month}",
+                    IndexNames.Monthly_Post_Sitemap);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshMonthlyTagsSitemap(int year, int month)
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var now = DateTime.Now;
+
+                var sitemapResults = (await (
+                    from nt in _context.NewsTags
+                    join t in _context.Tags on nt.TagID equals t.ID
+                    join n in _context.NewsPublished on nt.NewsID equals n.NewsID
+                    where t.CreatedDate.Value.Year == year && t.CreatedDate.Value.Month == month
+                    group new { t, n } by new { t.ID, t.Url, t.CreatedDate.Value.Year, t.CreatedDate.Value.Month }
+                    into t
+                    orderby t.Key.Year descending, t.Key.Month descending
+                    select new
+                    {
+                        Slug = t.Key.Url,
+                        TagCreatedYear = t.Key.Year,
+                        TagCreatedMonth = t.Key.Month,
+                        LastModifiedDate = t.Max(item => item.n.ManuelUpdatedDate)
+                    }).ToListAsync()).Select(item =>
+                {
+                    var lastMod = item.LastModifiedDate;
+                    var daysDiff = (now - lastMod).Value.TotalDays;
+                    var hoursDiff = (now - lastMod).Value.TotalHours;
+
+                    string changefreq;
+                    string priority;
+
+                    if (hoursDiff <= 24)
+                    {
+                        changefreq = "always";
+                        priority = "1.0";
+                    }
+                    else if (hoursDiff <= 48)
+                    {
+                        changefreq = "hourly";
+                        priority = "0.9";
+                    }
+                    else if (daysDiff <= 7)
+                    {
+                        changefreq = "daily";
+                        priority = "0.8";
+                    }
+                    else if (daysDiff <= 30)
+                    {
+                        changefreq = "weekly";
+                        priority = "0.7";
+                    }
+                    else if (daysDiff <= 365)
+                    {
+                        changefreq = "monthly";
+                        priority = "0.6";
+                    }
+                    else
+                    {
+                        changefreq = "yearly";
+                        priority = "0.5";
+                    }
+
+                    return new
+                    {
+                        LastMod = ConvertToIso8601WithOffset((DateTime)lastMod),
+                        ChangeFreq = changefreq,
+                        Priority = priority,
+                        Slug = item.Slug
+                    };
+                }).ToList();
+
+                var sitemapNs = XNamespace.Get("http://www.sitemaps.org/schemas/sitemap/0.9");
+
+                var sitemap = new XDocument(
+                    new XDeclaration("1.0", "utf-8", null),
+                    new XElement(sitemapNs + "urlset"));
+
+                foreach (var tag in sitemapResults)
+                {
+                    sitemap.Root.Add(
+                        new XElement(sitemapNs + "url",
+                            new XElement(sitemapNs + "loc",
+                                $"{_siteUrl.TrimEnd('/')}/{_appSettingsKeys.SlugPrefix_Tags}/{tag.Slug}"),
+                            new XElement(sitemapNs + "lastmod", tag.LastMod),
+                            new XElement(sitemapNs + "changefreq", tag.ChangeFreq),
+                            new XElement(sitemapNs + "priority", tag.Priority)));
+                }
+
+                var xmlContent = SerializeXml(sitemap);
+                var sitemapCachingModel = new SitemapRssCachingResponse()
+                {
+                    ID = $"{year}-{month}",
+                    Key = ElasticSitemapKeys.MonthlyTagsSitemapKey(year, month),
+                    Content = xmlContent,
+                };
+                await _elasticSearchService.UpdateDocumentAsync(sitemapCachingModel,
+                    $"{year}-{month}",
+                    IndexNames.Monthly_Tag_Sitemap);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshAllRSS()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                var categoryEntity = await _context.Categories.ToListAsync();
+
+                foreach (var category in categoryEntity)
+                {
+                    await RefreshCategoryRSS(category.Url);
+                }
+
+                await RefreshMainRSS();
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RefreshAllSiteMaps()
+        {
+            var result = new ServiceResult();
+            try
+            {
+                await RefreshNewsSiteMap();
+                await RefreshTagsSiteMap();
+                await RefreshPostsSiteMap();
+                await RefreshSourcesSiteMap();
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+    }
+}

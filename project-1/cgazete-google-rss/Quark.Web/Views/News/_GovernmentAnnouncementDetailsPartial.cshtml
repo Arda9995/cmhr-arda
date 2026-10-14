@@ -1,0 +1,93 @@
+@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsDetailResponse;
+<style>
+	.bik-metni p {
+		font-size: 16px;
+		font-family: Arial;
+		margin: 16px 0;
+	}
+</style>
+<div class="max-w-container mx-auto space-y-6 undefined">
+	<input type="hidden" class="news-detail-header-title" asp-for="@Model.CategoryName"/>
+	<input type="hidden" class="news-detail-news-type" asp-for="@Model.NewsTypeID"/>
+	<input type="hidden" class="news-detail-header-title" asp-for="@Model.ScrollNewsIDs"/>
+	<input type="hidden" class="news-detail-header-title" asp-for="@Model.ID"/>
+	<!-- Breadcrumb Start -->
+	<nav class="flex items-center gap-2 text-xs undefined">
+		<a href="/" class="text-gray-500 hover:text-gray-600 transition-all font-medium"> Haberler </a>
+		<span>
+			<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M6 12L10 8L6 4" stroke="#6B7280" stroke-width="2" stroke-linecap="round"
+				      stroke-linejoin="round"></path>
+			</svg>
+		</span><a href="@Model.CategorySlug" class="text-red-600 font-semibold "> Resmi İlanlar </a>
+	</nav> <!-- Breadcrumb End -->
+	<div class="text-center mt-8 mb-9 space-y-4">
+		<!-- Title Start -->
+		<h1 class="text-slate-900 text-xl font-semibold title" data-title-news-id="@Model.ID"> @Model.Title </h1> <!-- Title End  -->
+		<!-- Share Area Start -->
+		<div>
+			<nav class="flex gap-4 items-center justify-center">
+				<a href="#" data-platform="facebook" class="share-btn">
+					<svg class="size-5" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100"
+					     viewBox="0 0 24 24">
+						<path class="fill-sky-600"
+						      d="M17.525,9H14V7c0-1.032,0.084-1.682,1.563-1.682h1.868v-3.18C16.522,2.044,15.608,1.998,14.693,2 C11.98,2,10,3.657,10,6.699V9H7v4l3-0.001V22h4v-9.003l3.066-0.001L17.525,9z"></path>
+					</svg>
+				</a>
+				<a data-platform="twitter" data-title="@Model.Headline" data-username="cumhuriyetcomtr"
+				   data-related="ferdiisahin" href="#" class="share-btn">
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<g clip-path="url(#clip0_3245_1736)">
+							<path
+								d="M12.5944 0.798828H15.0361L9.70281 6.91083L16 15.1988H11.0522L7.19679 10.1748L2.76305 15.1988H0.321285L6.04016 8.67083L0 0.798828H5.07631L8.57831 5.40683L12.5944 0.798828ZM11.7269 13.7268H13.0763L4.33735 2.17483H2.85944L11.7269 13.7268Z"
+								fill="black"></path>
+						</g>
+						<defs>
+							<clipPath id="clip0_3245_1736">
+								<rect width="16" height="14.4" fill="white" transform="translate(0 0.799805)"></rect>
+							</clipPath>
+						</defs>
+					</svg>
+				</a>
+				<a data-platform="whatsapp" data-title="@Model.Headline" href="#" class="share-btn">
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<g clip-path="url(#clip0_3245_1741)">
+							<path fill-rule="evenodd" clip-rule="evenodd"
+							      d="M13.6687 2.32334C12.1648 0.825856 10.1647 0.000759757 8.0336 0C3.64227 0 0.068376 3.55377 0.066848 7.92199C0.066084 9.31841 0.433176 10.6814 1.13031 11.8826L0 15.9883L4.22327 14.8867C5.3868 15.5181 6.69702 15.8504 8.03018 15.8508H8.0336C12.4242 15.8508 15.9985 12.2967 16 7.92844C16.0008 5.8114 15.173 3.8212 13.6687 2.32372V2.32334ZM8.0336 14.5129H8.03093C6.84293 14.5125 5.67751 14.1949 4.66067 13.5951L4.41885 13.4523L1.91262 14.106L2.58148 11.6759L2.4241 11.4267C1.76135 10.3783 1.41107 9.16645 1.41183 7.92239C1.41336 4.29187 4.38371 1.33793 8.03631 1.33793C9.80489 1.33869 11.4673 2.02438 12.7176 3.26924C13.9678 4.51372 14.6558 6.16849 14.655 7.92769C14.6535 11.5586 11.6832 14.5125 8.0336 14.5125V14.5129ZM11.6656 9.5813C11.4665 9.48217 10.4879 9.00349 10.3053 8.93741C10.1227 8.87129 9.99018 8.83828 9.8576 9.03655C9.72507 9.23487 9.34347 9.68084 9.22733 9.81264C9.1112 9.94484 8.99507 9.96119 8.79604 9.86201C8.59707 9.76287 7.95569 9.55394 7.19516 8.87965C6.60347 8.35465 6.20387 7.70661 6.08778 7.50829C5.97164 7.31001 6.07556 7.20287 6.17484 7.10449C6.26422 7.0156 6.37387 6.87315 6.47356 6.75766C6.57329 6.64217 6.60613 6.55938 6.67258 6.42754C6.73907 6.29534 6.70582 6.17989 6.65618 6.08071C6.60649 5.98157 6.20849 5.00716 6.04231 4.61096C5.88071 4.22501 5.71649 4.27744 5.59462 4.27098C5.47849 4.26528 5.34596 4.26414 5.21302 4.26414C5.08009 4.26414 4.86462 4.31352 4.68204 4.51182C4.49947 4.7101 3.98529 5.18913 3.98529 6.16314C3.98529 7.13715 4.69849 8.07889 4.79818 8.21109C4.89787 8.34329 6.20196 10.3426 8.19862 11.2004C8.67347 11.4043 9.04436 11.5263 9.33351 11.6175C9.81027 11.7683 10.2442 11.747 10.5872 11.6961C10.9696 11.6391 11.7649 11.2171 11.9307 10.7547C12.0964 10.2924 12.0964 9.89582 12.0468 9.81339C11.9972 9.73096 11.8642 9.68119 11.6652 9.58206L11.6656 9.5813Z"
+							      fill="#25D366"></path>
+						</g>
+						<defs>
+							<clipPath id="clip0_3245_1741">
+								<rect width="16" height="16" fill="white"></rect>
+							</clipPath>
+						</defs>
+					</svg>
+				</a>
+				<div class="relative share-dropdown">
+					<button id="shareDropdownButton" class="py-3 px-0 cursor-pointer">
+						<svg width="12" height="4" viewBox="0 0 12 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M2.66667 1.99913C2.66667 2.35275 2.52619 2.69189 2.27614 2.94194C2.02609 3.19199 1.68696 3.33247 1.33333 3.33247C0.979711 3.33247 0.640573 3.19199 0.390524 2.94194C0.140476 2.69189 0 2.35275 0 1.99913C0 1.64551 0.140476 1.30637 0.390524 1.05632C0.640573 0.806275 0.979711 0.665799 1.33333 0.665799C1.68696 0.665799 2.02609 0.806275 2.27614 1.05632C2.52619 1.30637 2.66667 1.64551 2.66667 1.99913ZM7.33333 1.99913C7.33333 2.35275 7.19286 2.69189 6.94281 2.94194C6.69276 3.19199 6.35362 3.33247 6 3.33247C5.64638 3.33247 5.30724 3.19199 5.05719 2.94194C4.80714 2.69189 4.66667 2.35275 4.66667 1.99913C4.66667 1.64551 4.80714 1.30637 5.05719 1.05632C5.30724 0.806275 5.64638 0.665799 6 0.665799C6.35362 0.665799 6.69276 0.806275 6.94281 1.05632C7.19286 1.30637 7.33333 1.64551 7.33333 1.99913ZM12 1.99913C12 2.35275 11.8595 2.69189 11.6095 2.94194C11.3594 3.19199 11.0203 3.33247 10.6667 3.33247C10.313 3.33247 9.97391 3.19199 9.72386 2.94194C9.47381 2.69189 9.33333 2.35275 9.33333 1.99913C9.33333 1.64551 9.47381 1.30637 9.72386 1.05632C9.97391 0.806275 10.313 0.665799 10.6667 0.665799C11.0203 0.665799 11.3594 0.806275 11.6095 1.05632C11.8595 1.30637 12 1.64551 12 1.99913Z"
+								fill="#393952"></path>
+						</svg>
+					</button>
+					<div
+						class="absolute w-52 top-full right-0 bg-white shadow-lg border border-gray-200 rounded content hidden">
+						<a class="text-sm p-2 block hover:bg-zinc-100 font-medium share-btn" href="#"
+						   data-platform="linkedin">Linkedin'de Paylaş</a>
+						<a
+							class="text-sm p-2 block hover:bg-zinc-100 font-medium"
+							href="mailto:?subject=Haber&body=Cumhuriyet - İmamoğlu’nun diplomasının gerçek öyküsü https://www.cumhuriyet.com.tr/haber-burada-olacak">E-Posta
+							Gönder</a></div>
+				</div>
+			</nav>
+		</div> <!-- Share Area End --> <!-- Date Start -->
+		<div class="font-helvetica">Yayınlanma @Model.CreatedDate.ToString()</div> <!-- Date End  -->
+	</div>
+	<div property="ilanBody" class="bik-metni" style="font-family: Arial; font-size:16px !important; text-align:justify;" data-content-news-id="@Model.ID">
+		
+		@Html.Raw(Model.Content)
+		
+	</div>
+	<div class="font-bold text-end text-slate-900 text-sm mt-5"> #ilangovtr BASIN NO: @Model.PressNo </div>
+</div>

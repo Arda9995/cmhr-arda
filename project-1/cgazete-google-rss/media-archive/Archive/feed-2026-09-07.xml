@@ -1,0 +1,21 @@
+﻿﻿<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Cumhuriyet Gazetesi - Google AI Feed Archive</title>
+    <link>https://maintest.cumhuriyet.com.tr/</link>
+    <description>Cumhuriyet Gazetesi Google News AI Pilot Feed Archive - 2026-09-07</description>
+    <language>tr-TR</language>
+    <category>News</category>
+    <lastBuildDate>Mon, 07 Sep 2026 14:15:35 +0300</lastBuildDate>
+    <pubDate>Mon, 07 Sep 2026 00:00:00 +0300</pubDate>
+    <copyright>Cumhuriyet Gazetesi</copyright>
+    <item>
+      <title>Test Haberi3</title>
+      <link>https://maintest.cumhuriyet.com.tr/cevre/test-haberi3-2440936</link>
+      <guid isPermaLink="false">https://maintest.cumhuriyet.com.tr/cevre/test-haberi3-2440936</guid>
+      <pubDate>Mon, 07 Sep 2026 10:57:00 +0300</pubDate>
+      <description><![CDATA[Test Haberi3]]></description>
+      <content:encoded><![CDATA[<p>Test Haberi3</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,217 @@
+@{
+	ViewData[ViewDataNames.Title] = _localizer["Cache"] + " " + _localizer["Management"];
+	ViewData[ViewDataNames.AsideMenu] = "Management";
+	ViewData[ViewDataNames.AsideSubMenu] = "Caches";
+	ViewData["ShowBackButton"] = true;
+	ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+	{
+		new BreadcrumbItem(_localizer["Management"], string.Empty),
+		new BreadcrumbItem(_localizer["Cache"] +" "+ _localizer["Management"], "/Caches/List")
+	};
+}
+
+@section Scripts {
+    <script src="/Scripts/Caches/List.js" asp-append-version="true"></script>
+}
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+	    <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Cache"] @_localizer["List"]</h3>
+	    </div>
+    </div>
+    <div class="card-body border-top p-9">
+	    <div class="card-body p-0">
+		    <table class="table table-bordered">
+			    <tbody>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('anomaly')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Anomaly"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('prompt')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">AI @_localizer["Prompts"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('block')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Blocks"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('tag')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Tags"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('newsPhotoTypes')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["PhotoType"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('newsStatus')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["News"] @_localizer["Status"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('source')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["News"] @_localizer["Sources"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('newsType')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["NewsType"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('category')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Categories"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('user')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Users"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('menu')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Menus"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('page')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Pages"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('appsettings')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["SystemSettings"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('systemlog')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["SystemLogs"]</label>
+				    </td>
+			    </tr>
+			    <tr>
+				    <td>
+					    <a class="btn btn-sm btn-primary" onclick="Refresh('author')">
+						    @_localizer["Refresh"]
+					    </a>
+				    </td>
+				    <td>
+					    <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Authors"]</label>
+				    </td>
+			    </tr>
+					<tr>
+						<td>
+							<a class="btn btn-sm btn-primary" onclick="Refresh('news')">
+								@_localizer["Refresh"]
+							</a>
+						</td>
+						<td>
+							<label class="col-lg-2 col-form-label fw-bold fs-6">Haberler</label>
+							<p class="fs-8">Anasayfa Blok Haberleri</p>
+							<p class="fs-8">Anasayfa Resmi Ilanlar</p>
+							<p class="fs-8">Anasayfa Burclar</p>
+							<p class="fs-8">Yazar Detay Haber Listesi </p>
+							<p class="fs-8">Yazar Detay Bugunun Kose Yazilari</p>
+							<p class="fs-8">Gunun Kose Yazilari </p>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<a class="btn btn-sm btn-primary" onclick="Refresh('sitemaps')">
+								@_localizer["Refresh"]
+							</a>
+						</td>
+						<td>
+							<label class="col-lg-2 col-form-label fw-bold fs-6">Sitemap'leri yenile.</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<a class="btn btn-sm btn-primary" onclick="Refresh('rss')">
+								@_localizer["Refresh"]
+							</a>
+						</td>
+						<td>
+							<label class="col-lg-2 col-form-label fw-bold fs-6">RSS verilerini yenile</label>
+						</td>
+					</tr>		
+			    </tbody>
+		    </table>
+	    </div>
+    </div>
+</div>

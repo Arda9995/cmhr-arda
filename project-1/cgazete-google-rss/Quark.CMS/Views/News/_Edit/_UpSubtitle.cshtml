@@ -1,0 +1,9 @@
+﻿@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="mb-10 fv-row">
+    <label class="form-label">@_localizer["UpSpot"]</label>
+    <div class="input-group">
+        <input asp-for="@Model.UpSubtitle" type="text" class="form-control maxlength" maxlength="1000"/>
+    </div>
+    <span asp-validation-for="@Model.UpSubtitle" class="fv-plugins-message-container invalid-feedback"></span>
+</div>

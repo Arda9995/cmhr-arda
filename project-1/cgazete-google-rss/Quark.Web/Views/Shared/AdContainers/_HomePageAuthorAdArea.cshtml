@@ -1,0 +1,24 @@
+﻿@{
+    var hasPremiumMembership = "False";
+
+    var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    if (id !=  null)
+    {
+        hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+    }
+}
+
+@if (hasPremiumMembership == "True")
+{
+    
+}
+else
+{
+    <div class="ads-box" style="">
+        <div class="flex justify-center items-center">
+            <cmh-ads data-adunit="/cumhuriyet.com.tr/anasayfa_yazar_yani"
+                     data-sizes="[[336, 280], [300, 250], 'fluid']" data-device="desktop"
+                     style="max-height:280px; min-height:250px; display:block;"></cmh-ads>
+        </div>
+    </div> 
+}

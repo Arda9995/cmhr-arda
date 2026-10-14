@@ -1,0 +1,13 @@
+E:\GitHub\cgazete-google-rss\Quark.Data\bin\Release\net8.0\Quark.Data.deps.json
+E:\GitHub\cgazete-google-rss\Quark.Data\bin\Release\net8.0\Quark.Data.dll
+E:\GitHub\cgazete-google-rss\Quark.Data\bin\Release\net8.0\Quark.Data.pdb
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\Quark.Data.csproj.AssemblyReference.cache
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\Quark.Data.GeneratedMSBuildEditorConfig.editorconfig
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\Quark.Data.AssemblyInfoInputs.cache
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\Quark.Data.AssemblyInfo.cs
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\Quark.Data.csproj.CoreCompileInputs.cache
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\Quark.Data.dll
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\refint\Quark.Data.dll
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\Quark.Data.pdb
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\ref\Quark.Data.dll
+E:\GitHub\cgazete-google-rss\Quark.Data\obj\Release\net8.0\Quark.Data.csproj.Up2Date

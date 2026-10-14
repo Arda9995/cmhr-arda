@@ -1,0 +1,28 @@
+@{
+	var hasPremiumMembership = "False";
+
+	var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+	if (id !=  null)
+	{
+		hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+	}
+}
+
+<div data-astro-cid-j7pv25f6>
+	@if (hasPremiumMembership == "True")
+	{
+		
+	}
+	else
+	{
+		<!-- Ad Start -->
+		<div class="ads-box mt-4 mb-5">
+			<div class="mb-5 flex justify-center items-center">
+				<cmh-ads data-adunit="/cumhuriyet.com.tr/genel_banner_300x250_1"
+				         data-sizes="[[336, 280], [300, 250], [250, 250], 'fluid']" data-device="mobile"
+				         style="max-height: 280px; min-height:280px;"></cmh-ads>
+			</div>
+		</div>
+		<!-- Ad End -->
+	}
+</div>

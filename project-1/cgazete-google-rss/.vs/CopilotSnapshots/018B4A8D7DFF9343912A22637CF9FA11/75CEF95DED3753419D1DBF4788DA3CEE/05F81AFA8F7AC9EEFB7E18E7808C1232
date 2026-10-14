@@ -1,0 +1,661 @@
+﻿using AvvaMobile.Core.Business;
+using AvvaMobile.Core.Caching;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Common.BaseServices;
+using Quark.Cloudflare.Adapter.Interfaces;
+using Quark.CMS.Business.Interfaces;
+using Quark.Data;
+using Quark.Data.Models;
+using Quark.Data.Models.LogModels;
+using Quark.Data.Models.News;
+using Quark.Data.Models.SystemLog;
+using Quark.Hangfire.Business.Interfaces;
+using Quark.Hangfire.Business.Models.Responses.NewsResponses;
+using Quark.Resources;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+
+namespace Quark.Hangfire.Business.Services;
+
+public class NewsHangfireService : BaseService, INewsHangfireService
+{
+    private readonly StatisticsDataContext _statisticsContext;
+    private readonly INewsCachingService _newsCachingService;
+    private readonly IAuthorCachingService _authorCachingService;
+    private readonly IAnomalyService _anomalyService;
+    private readonly ISystemLogCachingService _systemLogCachingService;
+    private readonly IXmlFeedCachingService _xmlFeedCachingService;
+    private readonly INewsPhotosCachingService _newsPhotosCachingService;
+    private readonly ICloudflareAdapter _cloudflareAdapter;
+    private readonly IBlockCachingService _blockCachingService;
+
+    public NewsHangfireService(QuarkDataContext context, IHttpContextAccessor httpContext,
+        IStringLocalizer<CommonResource> localizer, AppSettingsKeys appSettingsKeys, ICacheManager cache, INewsPhotosCachingService newsPhotosCachingService,
+        StatisticsDataContext statisticsContext, INewsCachingService newsCachingService, IAnomalyService anomalyService, ISystemLogCachingService systemLogCachingService, IAuthorCachingService authorCachingService, IXmlFeedCachingService xmlFeedCachingService, ICloudflareAdapter cloudflareAdapter, IBlockCachingService blockCachingService) : base(httpContext, context, localizer, appSettingsKeys, cache)
+    {
+        _statisticsContext = statisticsContext;
+        _newsCachingService = newsCachingService;
+        _anomalyService = anomalyService;
+        _systemLogCachingService = systemLogCachingService;
+        _context = context;
+        _authorCachingService = authorCachingService;
+        _xmlFeedCachingService = xmlFeedCachingService;
+        _cloudflareAdapter = cloudflareAdapter;
+        _newsPhotosCachingService = newsPhotosCachingService;
+        _blockCachingService = blockCachingService;
+    }
+
+    public async Task UnlockNews()
+    {
+        await _newsCachingService.RefreshMainPageGovernmentAnnouncement();
+        var newsList = (from n in await _context.News
+                        where n.IsLocked
+                              && n.LockedTime.Value.AddMinutes(30) >= DateTime.Now
+                        select n).ToListAsync();
+
+        if (newsList.Any())
+        {
+            foreach (var news in newsList)
+            {
+                await UnLock(news.ID);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task PublishScheduledNews()
+    {
+        var scheduledNews = await _context.News.Where(x => x.StatusID == (int)NewsStatusEnum.Scheduled && x.PublishDate <= DateTime.Now).ToListAsync();
+
+        foreach (var news in scheduledNews)
+        {
+            try
+            {
+                PublishNow(news);
+            }
+            catch (Exception e)
+            {
+                var log = new SystemLog
+                {
+                    UserID = 86, //SYSTEM USER
+                    LogTypeID = (int)LogTypesEnum.News,
+                    IsSuccess = false,
+                    Message = news.Title + " yayına alınırken hata oluştu. Hata: " + e.Message,
+                    ObjectID = (long)news.ID
+                };
+                _context.SystemLogs.Add(log);
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
+
+    public async Task UnPublishNewsByPublishEndDate()
+    {
+        var publishedNews = await _context.News
+            .Where(x => x.StatusID == (int)NewsStatusEnum.Published && x.PublishEndDate <= DateTime.Now)
+            .ToListAsync();
+
+        var description = "Yayından kalkma tarihinden dolayı haber yayından kaldırıldı. ";
+
+        if (publishedNews.Count > 0 && publishedNews is not null)
+        {
+            foreach (var news in publishedNews)
+            {
+                try
+                {
+                    UnPublish((long)news.ID, description);
+                }
+                catch (Exception e)
+                {
+                    var log = new SystemLog
+                    {
+                        LogTypeID = (int)LogTypesEnum.Hangfire,
+                        IsSuccess = false,
+                        Message = "Haber yayından kaldırılamadı. " + e,
+                        ObjectID = (long)news.ID
+                    };
+
+                    _context.SystemLogs.Add(log);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            // Cache refresh operations after all transactions
+            await _xmlFeedCachingService.RefreshAllRSS();
+            await _authorCachingService.RefreshAll();
+            await _authorCachingService.RefreshMainPageAuthorsAll();
+            await _systemLogCachingService.RefreshAll();
+        }
+    }
+
+    public async Task RefreshSurveyCount()
+    {
+        await using var tx = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var surveyIDs = await _context.Surveys.Select(x => x.ID).ToListAsync();
+            foreach (var survey in surveyIDs)
+            {
+
+                var newsId = (from s in _context.Surveys
+                              join nw in _context.NewsVersions on s.NewsVersionID equals nw.ID
+                              where s.ID == survey
+                              select nw.NewsID).FirstOrDefault();
+
+                if (newsId != 0 && newsId != null)
+                {
+                    var surveyResult = await _newsCachingService.GetSurveyOptionResult(survey);
+                    if (surveyResult.Data == null || !surveyResult.IsSuccess)
+                    {
+                        continue;
+                    }
+                    if (surveyResult.Data.SurveyOptions.Any())
+                    {
+                        var cachedSurveyOptions = surveyResult.Data.SurveyOptions;
+
+                        var surveyOptions = await _context.SurveyOptions.Where(x => x.SurveyID == survey)
+                            .ToListAsync();
+
+                        foreach (var surveyOption in surveyOptions)
+                        {
+                            surveyOption.AnswerCount = cachedSurveyOptions.FirstOrDefault(x => x.OptionID == surveyOption.ID)?.AnswerCount ?? 0;
+                            _context.SurveyOptions.Update(surveyOption);
+                        }
+                        await _context.SaveChangesAsync();
+                        await _blockCachingService.RefreshBlockNewsWithKey("AnaSayfa-AnketHaberi");
+                        await _newsCachingService.RefreshNewsDetails((int)newsId);
+                        await _newsCachingService.RefreshNewsByCategorySlug((int)CategoryEnum.Survey);
+                    }
+                }
+            }
+
+            await tx.CommitAsync();
+        }
+        catch (Exception e)
+        {
+            await tx.RollbackAsync();
+            var log = new SystemLog
+            {
+                LogTypeID = (int)LogTypesEnum.Hangfire,
+                IsSuccess = false,
+                Message = "Anket sonuçları güncellenirken hata oluştu: " + e.Message,
+            };
+
+            _context.SystemLogs.Add(log);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task RefreshAuthorsMainPageAndTodaysNewsList()
+    {
+        try
+        {
+            await _authorCachingService.RefreshAll();
+        }
+        catch (Exception e)
+        {
+            var log = new SystemLog
+            {
+                UserID = 86,
+                LogTypeID = (int)LogTypesEnum.News,
+                IsSuccess = false,
+                Message = "Günün köşe yazıları veya anasayfa yazarlar yenilenirken sorun oluştu. HATA : " + e.Message,
+            };
+            _context.SystemLogs.Add(log);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    private async Task<ServiceResult> PublishNow(News news)
+    {
+        var result = new ServiceResult();
+
+        await using var tx = await _context.Database.BeginTransactionAsync();
+        try
+        {
+
+
+            // 2. Handle published news
+            var publishedNews = await _context.NewsPublished.FirstOrDefaultAsync(x => x.NewsID == news.ID);
+
+            if (publishedNews != null)
+            {
+                if (news.IsPublished && news.StatusID == (int)NewsStatusEnum.Scheduled)
+                {
+                    UpdatePublishedNews(publishedNews, news, 86);
+                    _context.NewsPublished.Update(publishedNews);
+
+                    var publishedNewsPhotos = await _context.NewsPublishedPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+                    _context.NewsPublishedPhotos.RemoveRange(publishedNewsPhotos);
+                    await _context.SaveChangesAsync();
+                }
+                else if (!news.IsPublished && news.StatusID == (int)NewsStatusEnum.Scheduled)
+                {
+                    news.IsPublished = true;
+                    _context.News.Update(news);
+                    await _context.SaveChangesAsync();
+
+                    UpdatePublishedNews(publishedNews, news, 86);
+                    _context.NewsPublished.Update(publishedNews);
+
+                    var publishedNewsPhotos = await _context.NewsPublishedPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+                    _context.NewsPublishedPhotos.RemoveRange(publishedNewsPhotos);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                var newsPublished = new NewsPublished
+                {
+                    NewsID = news.ID,
+                    PublishedBy = 86, //SYSTEM USER
+                    PublishedDate = news.PublishDate ?? DateTime.Now,
+                    PublishEndDate = news.PublishEndDate,
+                    NewsTypeID = news.NewsTypeID,
+                    CategoryID = news.CategoryID,
+                    AuthorID = news.AuthorID,
+                    Slug = news.Slug,
+                    Title = news.Title,
+                    SubHeading = news.SubHeading,
+                    UpHeadline = news.UpHeadline,
+                    UpSubHeading = news.UpSubHeading,
+                    ShowUpHeadline = news.ShowUpHeadline,
+                    ShowSubHeading = news.ShowSubHeading,
+                    ShowUpSubHeading = news.ShowUpSubHeading,
+                    RedirectLink = news.RedirectLink,
+                    UpSubtitle = news.UpSubtitle,
+                    Subtitle = news.Subtitle,
+                    Content = news.Content,
+                    Tags = news.Tags,
+                    Video = news.Video,
+                    PressNo = news.PressNo,
+                    Headline = news.Headline,
+                    AllowAds = news.AllowAds,
+                    SourceIDs = news.SourceIDs,
+                    SeoDescription = news.SeoDescription,
+                    SeoTitle = news.SeoTitle,
+                    CategoryMap = news.CategoryMap,
+                    SecondaryCategoryMap = news.SecondaryCategoryMap,
+                    VideoPlayerID = news.VideoPlayerID,
+                    AllowToSendRSS = news.AllowToSendRSS,
+                    ExcludeFromGoogleAiFeed = news.ExcludeFromGoogleAiFeed,
+                    ShowHeadline = news.ShowHeadline,
+                    AllowGoogleIndex = news.AllowGoogleIndex,
+                    AllowToSendGoogleSideMap = news.AllowToSendGoogleSideMap,
+                    BoxCount = news.BoxCount,
+                    ManuelUpdatedDate = news.ManuelUpdatedDate,
+                };
+
+                _context.NewsPublished.Add(newsPublished);
+                await _context.SaveChangesAsync();
+            }
+
+            // 3. Handle photos
+            var newsPhotos = await _context.NewsPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+            foreach (var photo in newsPhotos)
+            {
+
+                var publishedNewsPhoto = new NewsPublishedPhoto
+                {
+                    NewsID = photo.NewsID,
+                    PhotoTypeID = photo.PhotoTypeID,
+                    PhotoUrl = photo.PhotoUrl,
+                    Width = photo.Width,
+                    Height = photo.Height
+                };
+
+                _context.NewsPublishedPhotos.Add(publishedNewsPhoto);
+            }
+            await _context.SaveChangesAsync();
+
+            // 4. Handle photo gallery
+            if (news.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+            {
+                if (news.StatusID == (int)NewsStatusEnum.Draft && news.IsPublished)
+                {
+                    var publishedNewsPhotoGalleryItems = await _context.NewsPublishedPhotoGalleryItems
+                        .Where(x => x.NewsID == news.ID).ToListAsync();
+                    _context.NewsPublishedPhotoGalleryItems.RemoveRange(publishedNewsPhotoGalleryItems);
+                    await _context.SaveChangesAsync();
+                }
+
+                var newsPhotoGalleryItems = await _context.NewsPhotoGalleryItems.Where(x => x.NewsID == news.ID).ToListAsync();
+                foreach (var item in newsPhotoGalleryItems)
+                {
+
+
+                    var publishedNewsPhotoGalleryItem = new NewsPublishedPhotoGalleryItem
+                    {
+                        NewsID = news.ID,
+                        PhotoUrl = item.PhotoUrl,
+                        Order = item.Order,
+                        Content = item.Content,
+                    };
+
+                    _context.NewsPublishedPhotoGalleryItems.Add(publishedNewsPhotoGalleryItem);
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            // 5. Update news status
+            news.StatusID = (int)NewsStatusEnum.Published;
+            news.IsPublished = true;
+            _context.News.Update(news);
+            await _context.SaveChangesAsync();
+
+            // 6. Add system log
+            var log = new SystemLog
+            {
+                UserID = 86, //SYSTEM USER
+                LogTypeID = (int)LogTypesEnum.News,
+                IsSuccess = true,
+                Message = news.Title + " yayına alındı.",
+                ObjectID = (long)news.ID
+            };
+            _context.SystemLogs.Add(log);
+            await _context.SaveChangesAsync();
+
+            await tx.CommitAsync();
+
+            // 7. Handle cache operations after transaction
+            await _newsCachingService.HandlePublishCacheOperations(news);
+
+            result.SetSuccess(_localizer["RecordUpdated"]);
+        }
+        catch (Exception e)
+        {
+            await tx.RollbackAsync();
+            result.SetError(_localizer["Error"]);
+            return result;
+        }
+
+        return result;
+    }
+
+    private void UpdatePublishedNews(NewsPublished publishedNews, News news, int publishedBy)
+    {
+        publishedNews.PublishedBy = publishedBy;
+        publishedNews.PublishedDate = news.PublishDate ?? DateTime.Now;
+        publishedNews.PublishEndDate = news.PublishEndDate;
+        publishedNews.CategoryID = news.CategoryID;
+        publishedNews.AuthorID = news.AuthorID;
+        publishedNews.Slug = news.Slug;
+        publishedNews.Title = news.Title;
+        publishedNews.SubHeading = news.SubHeading;
+        publishedNews.UpHeadline = news.UpHeadline;
+        publishedNews.UpSubHeading = news.UpSubHeading;
+        publishedNews.ShowUpHeadline = news.ShowUpHeadline;
+        publishedNews.ShowSubHeading = news.ShowSubHeading;
+        publishedNews.ShowUpSubHeading = news.ShowUpSubHeading;
+        publishedNews.RedirectLink = news.RedirectLink;
+        publishedNews.UpSubtitle = news.UpSubtitle;
+        publishedNews.Subtitle = news.Subtitle;
+        publishedNews.Content = news.Content;
+        publishedNews.Video = news.Video;
+        publishedNews.PressNo = news.PressNo;
+        publishedNews.Headline = news.Headline;
+        publishedNews.AllowAds = news.AllowAds;
+        publishedNews.SourceIDs = news.SourceIDs;
+        publishedNews.SeoDescription = news.SeoDescription;
+        publishedNews.SeoTitle = news.SeoTitle;
+        publishedNews.CategoryMap = news.CategoryMap;
+        publishedNews.SecondaryCategoryMap = news.SecondaryCategoryMap;
+        publishedNews.VideoPlayerID = news.VideoPlayerID;
+        publishedNews.BoxCount = news.BoxCount;
+        publishedNews.AllowGoogleIndex = news.AllowGoogleIndex;
+        publishedNews.AllowToSendGoogleSideMap = news.AllowToSendGoogleSideMap;
+        publishedNews.AllowToSendRSS = news.AllowToSendRSS;
+        publishedNews.ExcludeFromGoogleAiFeed = news.ExcludeFromGoogleAiFeed;
+        publishedNews.ShowHeadline = news.ShowHeadline;
+        publishedNews.ManuelUpdatedDate = news.ManuelUpdatedDate;
+    }
+
+    private async Task<ServiceResult> UnPublish(long id, string description)
+    {
+        var result = new ServiceResult();
+
+        await using var tx = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // 1. Get and validate news
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+            if (news.IsPublished == false)
+            {
+                result.SetError(_localizer["Error"]);
+                return result;
+            }
+
+            // 3. Update news status
+            news.StatusID = (int)NewsStatusEnum.Unpublished;
+            news.IsPublished = false;
+            _context.News.Update(news);
+            await _context.SaveChangesAsync();
+
+            // 4. Remove published news
+            var publishedNew = await _context.NewsPublished.FirstOrDefaultAsync(x => x.NewsID == id);
+            if (publishedNew != null)
+            {
+                _context.NewsPublished.Remove(publishedNew);
+                await _context.SaveChangesAsync();
+            }
+
+
+            // 6. Remove published photos
+            var publishedPhotos = await _context.NewsPublishedPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+            _context.NewsPublishedPhotos.RemoveRange(publishedPhotos);
+            await _context.SaveChangesAsync();
+
+            // 7. Remove block items and related news
+            var blockItem = await _context.BlockItems.FirstOrDefaultAsync(x => x.NewsID == id);
+            if (blockItem != null)
+            {
+                _context.BlockItems.Remove(blockItem);
+                await _context.SaveChangesAsync();
+            }
+
+            var relatedNews = await _context.RelatedNews.Where(x => x.RelatedNewsID == id).ToListAsync();
+            if (relatedNews.Any())
+            {
+                _context.RelatedNews.RemoveRange(relatedNews);
+                await _context.SaveChangesAsync();
+            }
+
+            // 8. Update author news count
+            var author = await _context.Authors.FirstOrDefaultAsync(x => x.ID == news.AuthorID);
+            if (author != null)
+            {
+                author.TotalNewsCount -= 1;
+                _context.Authors.Update(author);
+                await _context.SaveChangesAsync();
+            }
+
+            // 9. Add system log
+            var log = new SystemLog
+            {
+                UserID = 86, //SYSTEM USER
+                LogTypeID = (int)LogTypesEnum.News,
+                IsSuccess = true,
+                Message = news.Title + " yayından kaldırıldı.",
+                ObjectID = (long)news.ID
+            };
+            _context.SystemLogs.Add(log);
+            await _context.SaveChangesAsync();
+
+            await tx.CommitAsync();
+
+            // 10. Handle cache operations after transaction
+            await _newsCachingService.HandleUnPublishCacheOperations(news);
+
+            result.SetSuccess(_localizer["UnPublishMessage"]);
+        }
+        catch (Exception e)
+        {
+            await tx.RollbackAsync();
+            result.SetError(_localizer["Error"]);
+            return result;
+        }
+
+        return result;
+    }
+
+    private async Task<ServiceResult> UnLock(long id)
+    {
+        var result = new ServiceResult();
+
+        using var tx = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // 1. Get and validate news
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+            if (!news.IsLocked)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            // 2. Update news lock status
+            news.IsLocked = false;
+            news.LockedBy = null;
+            news.LockedTime = null;
+
+            _context.News.Update(news);
+            await _context.SaveChangesAsync();
+            await tx.CommitAsync();
+
+            result.SetSuccess(_localizer["UnLockMessage"]);
+        }
+        catch (Exception e)
+        {
+            await tx.RollbackAsync();
+            result.SetError(_localizer["Error"]);
+            return result;
+        }
+
+        return result;
+    }
+
+    public async Task UnPublishScheduledNews()
+    {
+        var publishedNews = await _context.NewsPublished.Where(x => x.PublishEndDate <= DateTime.Now).ToListAsync();
+        var description = "Yayın süresi dolduğu için yayından kaldırıldı.";
+
+        foreach (var news in publishedNews)
+        {
+            try
+            {
+                UnPublish((long)news.NewsID, description);
+            }
+            catch (Exception e)
+            {
+                var log = new SystemLog
+                {
+                    UserID = 86, //SYSTEM USER
+                    LogTypeID = (int)LogTypesEnum.News,
+                    IsSuccess = false,
+                    Message = news.Title + " yayından kaldırılırken hata oluştu. Hata: " + e.Message,
+                    ObjectID = (long)news.NewsID
+                };
+                _context.SystemLogs.Add(log);
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
+
+    public async Task UnLock()
+    {
+        var lockedNews = await _context.News.Where(x => x.IsLocked && x.LockedTime <= DateTime.Now).ToListAsync();
+
+        foreach (var news in lockedNews)
+        {
+            await using var tx = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                news.IsLocked = false;
+                news.LockedTime = null;
+                _context.News.Update(news);
+
+                var log = new SystemLog
+                {
+                    UserID = 86, //SYSTEM USER
+                    LogTypeID = (int)LogTypesEnum.News,
+                    IsSuccess = true,
+                    Message = news.Title + " kilit süresi dolduğu için kilidi kaldırıldı.",
+                    ObjectID = (long)news.ID
+                };
+                _context.SystemLogs.Add(log);
+
+                await _context.SaveChangesAsync();
+                await tx.CommitAsync();
+            }
+            catch (Exception e)
+            {
+                await tx.RollbackAsync();
+                var log = new SystemLog
+                {
+                    UserID = 86, //SYSTEM USER
+                    LogTypeID = (int)LogTypesEnum.News,
+                    IsSuccess = false,
+                    Message = news.Title + " kilidi kaldırılırken hata oluştu. Hata: " + e.Message,
+                    ObjectID = (long)news.ID
+                };
+                _context.SystemLogs.Add(log);
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
+
+    public async Task RefreshNewsViewCount()
+    {
+        await using var tx = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var increasedElasticDatas = await _newsCachingService.GetIncreasedNewsViewCount();
+            if (increasedElasticDatas.Data.Any())
+            {
+                var increasedDatas = increasedElasticDatas.Data.Select(x => new NewsViewCountHangfireResponse
+                {
+                    Count = x.Count,
+                    NewsID = x.NewsID,
+                }).ToList();
+
+                foreach (var data in increasedDatas)
+                {
+                    var news = await _context.News.FirstOrDefaultAsync(x=>x.ID == data.NewsID);
+                    if(news == null)
+                    {
+                        continue;
+                    }
+                    if (news.ViewCount != null)
+                    {
+                        news.ViewCount += data.Count;
+                    }
+                    else
+                    {
+                        news.ViewCount = 0;
+                    }
+                    _context.News.Update(news);
+                }
+                await _context.SaveChangesAsync();
+                await tx.CommitAsync();
+            }
+        }
+        catch (Exception e)
+        {
+            await tx.RollbackAsync();
+            var log = new SystemLog
+            {
+                LogTypeID = (int)LogTypesEnum.Hangfire,
+                IsSuccess = false,
+                Message = "Haber görüntülenme güncellenirken hata oluştu: " + e.Message,
+            };
+
+            _context.SystemLogs.Add(log);
+            await _context.SaveChangesAsync();
+        }
+
+
+    }
+}

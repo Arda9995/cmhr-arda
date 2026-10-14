@@ -1,0 +1,208 @@
+﻿@using Quark.Core.Extentions
+@using Quark.Data.Models
+@{
+    Layout = "_Layout";
+}
+
+@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsDetailResponse;
+
+@section Metatags {
+    <meta name="description" content="@Html.Raw(Model.SubTitle)">
+    <meta name="datePublished" content="@Html.Raw(Model.PublishDateForMetaTag)">
+    <meta name="dateModified" content="@Html.Raw(Model.UpdateDateForMetaTag)">
+    <meta name="url" content="@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)">
+    <meta name="articleAuthor" content="@Html.Raw(Model.Sources)">
+    <meta name="articleSection" content="news">
+    <title>
+        @Html.Raw(string.Format("{0} - Son Dakika {1} Haberleri | Cumhuriyet", Model.Title.Replace("\"", ""), Model.CategoryName))
+    </title>
+    <meta name="title" itemprop="title" content="@Html.Raw(string.Format("{0} - Son Dakika {1} Haberleri | Cumhuriyet",
+    Html.Raw(Model.Title.Replace("\"", "" )), Model.CategoryName))" />
+    <meta name="keywords" content="@Html.Raw(Model.Tags)" />
+    <meta itemprop="thumbnailUrl" content="@Model.CoverPhoto" />
+    <meta itemprop="datePublished" content="@Html.Raw(Model.PublishDateForMetaTag)" />
+    <meta itemprop="image" content="@Model.CoverPhoto" />
+    <meta property="literal-category" content="@Html.Raw(Model.CategoryName)" />
+    <meta property="og:title" content="@Html.Raw(Model.Title)" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" itemprop="url" content="@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)" />
+    <meta property="og:image:url" content="@Model.CoverPhoto" />
+    <meta property="og:image" content="@Model.CoverPhoto" />
+    <meta property="og:width" content="1280" />
+    <meta property="og:height" content="720" />
+    <meta property="og:description" content="@Html.Raw(Model.SubTitle)" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)" />
+    <meta name="twitter:site" content="@@cumhuriyetgzt" />
+    <meta name="twitter:creator" content="@@cumhuriyetgzt" />
+    <meta name="twitter:title" content="@Html.Raw(Model.Title)" />
+    <meta name="twitter:description" content="@Html.Raw(Model.SubTitle)" />
+    <meta name="twitter:image" content="@Model.CoverPhoto" />
+    <meta name="twitter:image:src" content="@Model.CoverPhoto" />
+    <meta name="twitter:image:alt" content="@Html.Raw(Model.Title)">
+    <link rel="image_src" href="@Model.CoverPhoto" />
+    <link rel="canonical" href="@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)" />
+    <link rel="alternate" type="application/rss+xml" href="@string.Format("https://www.cumhuriyet.com.tr/rss{0}", Model.CategorySlug.Replace("https://www.cumhuriyet.com.tr", ""))" />
+}
+@{
+    var hasPremiumMembership = "False";
+
+    var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    if (id != null)
+    {
+        hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+    }
+}
+@if (hasPremiumMembership == "False")
+{
+
+    @section AdScripts {
+        <!-- Google -->
+        <!-- Start GPT Tag -->
+        <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+        <script data-cfasync="false" async src="https://media.cumhuriyet.com.tr/assets/js/cmhads.js?v=1.01"></script>
+        <script type="text/javascript">
+            let membranaCount = 0;
+            !function (e, f, u) {
+            e.async = 1;
+            e.src = u;
+            f.parentNode.insertBefore(e, f);
+            }(document.createElement('script'), document.getElementsByTagName('script')[0], '//cdn.taboola.com/libtrc/cumhuriyetgazetesi/loader.js');
+        </script>
+        <script async="async" src="https://cdn.membrana.media/cht/ym.js"></script>
+    }
+}
+
+<partial name="~/Views/Shared/_HeaderNewsDetails.cshtml" model="Model" />
+<partial name="~/Views/Shared/AdContainers/_GeneralFloatingAdArea.cshtml" />
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <partial name="~/Views/Shared/AdContainers/_GeneralHeaderAdArea.cshtml" />
+    <input type="hidden" asp-for="ScrollNewsIDs"/>
+    <div id="next-news-container-0">
+        <partial name="_PhotoGalleryDetailsPartial" model="Model"/>
+    </div>
+    <div id="next-news-container-1"></div>
+</main>
+
+@section Scripts {
+    <script async src="/js/Scripts/News/Detail.js" asp-append-version="true"></script>
+    <script async src="/js/Scripts/News/Analytics.js" asp-append-version="true"></script>
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "BreadcrumbList",
+        "itemListElement": [{
+        "@@type": "ListItem",
+        "position": 1,
+        "item": {
+            "@@id": "https://www.cumhuriyet.com.tr/",
+            "name": "Cumhuriyet"
+            }
+        },{
+        "@@type": "ListItem",
+        "position": 2,
+        "item": {
+            "@@id": "@Model.CategorySlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)",
+            "name": "@Html.Raw(Model.CategoryBreadcrumb)"
+            }
+        },{
+        "@@type": "ListItem",
+        "position": 3,
+        "item": {
+            "@@id": "@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)",
+            "name": "@Html.Raw(Model.Title.Replace("\"", ""))"
+            }
+        }]
+        }
+    </script>
+
+    <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "NewsArticle",
+          "mainEntityOfPage": {
+            "@@type": "WebPage",
+            "@@id": "@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)"
+          },
+          "publisher": {
+             "@@type": "Organization",
+             "name": "Cumhuriyet",
+             "logo": {
+               "@@type": "ImageObject",
+               "url": "https://media.cumhuriyet.com.tr/assets/images/icons/cumhuriyet-amp-logo.png",
+                               "width": 259,
+                               "height": 45
+             }
+           },
+          "headline": "@Html.Raw(Model.Title.Replace("\"", ""))",
+          "name": "@Html.Raw(Model.Title.Replace("\"", ""))",
+          "articleBody": "@Html.Raw(Model.Content.ExtractTextFromHtml().Replace("\"", ""))",
+          "description": "@Html.Raw(Model.SubTitle.Replace("\"", ""))",
+          "articleSection": "@Html.Raw(Model.CategoryName)",
+          "dateCreated": "@Html.Raw(Model.PublishDateForMetaTag)",
+          "datePublished": "@Html.Raw(Model.PublishDateForMetaTag)",
+          "dateModified": "@Html.Raw(Model.UpdateDateForMetaTag)",
+          "wordCount": "@Model.Content.ExtractTextFromHtml().Replace("\"", "").CharacterCount()",
+          "inLanguage": "tr-TR",
+          "publishingPrinciples":"https://www.cumhuriyet.com.tr/yayin-ilkeleri",
+          "image" : {
+            "@@type" : "ImageObject",
+            "url" : "@Model.CoverPhoto",
+            "height" : 720,
+            "width" : 1280
+            },
+               "author": [
+        @{
+            var firstSource = Model.SourceList?.FirstOrDefault();
+            if (firstSource != null)
+            {
+                <text>
+                                {
+                                    "@@type": "Person",
+                                    "name": "@Html.Raw(firstSource.Name)",
+                                    "url": "@firstSource.Slug"
+                                }
+                </text>
+            }
+        }
+        ]
+    }
+        
+    </script>
+
+    @if (!string.IsNullOrEmpty(Model.Video))
+    {
+        if (Model.VideoPlayerID == (int)VideoPlayerEnum.Dailymotion)
+        {
+            <script type="application/ld+json">
+                {
+                  "@@context": "https://schema.org",
+                  "@@type": "VideoObject",
+                  "name": "@Html.Raw(Model.Title.Replace("\"", ""))",
+                  "description": "@Html.Raw(Model.SubTitle.Replace("\"", ""))",
+                  "thumbnailUrl": "https://www.dailymotion.com/thumbnail/video/@Model.Video",
+                      "uploadDate": "@Html.Raw(Model.PublishDateForMetaTag)",
+                  "contentUrl": "https://www.dailymotion.com/video/@Model.Video",
+                  "embedUrl": "https://www.dailymotion.com/embed/video/@Model.Video",
+                  "regionsAllowed": "TR"
+                }
+            </script>
+        }
+        else if (Model.VideoPlayerID == (int)VideoPlayerEnum.Youtube)
+        {
+            <script type="application/ld+json">
+                {
+                  "@@context": "https://schema.org",
+                  "@@type": "VideoObject",
+                  "name": "@Html.Raw(Model.Title.Replace("\"", ""))",
+                  "description": "@Html.Raw(Model.SubTitle.Replace("\"", ""))",
+                  "thumbnailUrl": "https://i.ytimg.com/vi/@Model.Video/hqdefault.jpg",
+                  "uploadDate": "@Html.Raw(Model.PublishDateForMetaTag)",
+                  "contentUrl": "https://www.youtube.com/watch?v=@Model.Video",
+                  "embedUrl": "https://www.youtube.com/watch?v=@Model.Video",
+                  "regionsAllowed": "TR"
+                }
+            </script>
+        }
+    }
+}

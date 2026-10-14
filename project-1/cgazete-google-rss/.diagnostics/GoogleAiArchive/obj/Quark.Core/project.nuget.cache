@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "lKOCnxeNXJw=",
+  "success": true,
+  "projectFilePath": "E:\\GitHub\\cgazete-google-rss\\Quark.Core\\Quark.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\tamay.diverjans\\.nuget\\packages\\microsoft.extensions.localization.abstractions\\8.0.2\\microsoft.extensions.localization.abstractions.8.0.2.nupkg.sha512",
+    "C:\\Users\\tamay.diverjans\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.30\\microsoft.netcore.app.ref.8.0.30.nupkg.sha512",
+    "C:\\Users\\tamay.diverjans\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.30\\microsoft.windowsdesktop.app.ref.8.0.30.nupkg.sha512",
+    "C:\\Users\\tamay.diverjans\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.30\\microsoft.aspnetcore.app.ref.8.0.30.nupkg.sha512"
+  ],
+  "logs": []
+}

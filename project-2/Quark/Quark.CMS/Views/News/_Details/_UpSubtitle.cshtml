@@ -1,0 +1,8 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div class="mb-10 fv-row">
+    <label class="form-label">@_localizer["UpSpot"]</label>
+    <div class="input-group">
+        <textarea asp-for="@Model.UpSubTitle" type="text" class="form-control" rows="4" id="news-upsubtitle" readonly></textarea>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div id="drawerHistory" class="bg-white" data-kt-drawer="true" data-kt-drawer-activate="true" data-kt-drawer-close="#drawerHistoryClose" data-kt-drawer-width="400px">
+    <div class="card shadow-none border-0 rounded-0 col-12">
+        <div class="card-header" id="kt_activities_header">
+            <h3 class="card-title fw-bold text-gray-900">
+                @_localizer["News"] @_localizer["History"]
+            </h3>
+            <div class="card-toolbar">
+                <button type="button" class="btn btn-sm btn-icon btn-active-light-primary me-n5" id="drawerHistoryClose">
+                    <i class="ki-duotone ki-cross-circle fs-1">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body position-relative" id="kt_activities_body">
+            <div class="timeline timeline-border-dashed">
+                @foreach (var version in Model.Versions)
+                {
+                    <a class="timeline-item text-dark" href="/News/Version/@version.VersionID">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-icon">
+                            <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-placement="left" title="@version.UserName">
+                                @if (!string.IsNullOrWhiteSpace(@version.UserPhotoURL))
+                                {
+                                    <img src="@version.UserPhotoURL" alt="img"/>
+                                }
+                                else
+                                {
+                                    <span class="symbol-label bg-light-success text-success fs-5 fw-bolder">@version.UserName[0]</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="timeline-content mb-10 row bg-hover-light rounded">
+                            <div class="fs-5 fw-semibold mb-1">@version.CreatedDate</div>
+                            <div class="text-muted fs-7">@version.UserName</div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

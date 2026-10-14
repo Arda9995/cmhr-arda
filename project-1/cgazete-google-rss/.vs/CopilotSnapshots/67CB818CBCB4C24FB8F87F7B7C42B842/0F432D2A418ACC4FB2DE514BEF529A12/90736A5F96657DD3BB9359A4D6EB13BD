@@ -1,0 +1,32 @@
+﻿{
+  "Token": {
+    "Issuer": "AvvaMobile.News",
+    "Audience": "AvvaMobile.News",
+    "SecurityKey": "6ca3f845-49d2-44ea-9734-4eb5b3d44507"
+  },
+  "ConnectionStrings": {
+    Server=192.168.35.32;Database=News-Migration
+  },
+  "RedisConnectionString": "192.168.35.33:6390,password=redispw",
+  "ElasticSearchOptions": {
+    "Uri": "https://192.168.35.34:9200",
+    "ElasticUserName": "elastic",
+    "ElasticPassword": "XkmEjEvWDTIiHkU8vX+6"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "XmlSettings": {
+    "StoragePath": "xml",
+    "SiteUrl": "https://www.example.com",
+    "RssFileName": "rss.xml",
+    "SitemapFileName": "sitemap.xml"
+  },
+  "BasicAuth": {
+    "Username": "admin",
+    "Password": "123456"
+  }
+}

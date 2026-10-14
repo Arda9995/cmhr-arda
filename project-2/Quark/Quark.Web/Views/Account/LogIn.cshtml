@@ -1,0 +1,75 @@
+@model Quark.API.Business.Models.Requests.AccountRequests.EmailLoginRequest
+@{
+    Layout = "_LayoutNoAds";
+}
+
+<head>
+    <meta name="description" content="Reklamsız Cumhuriyet hesabınıza giriş yapın">
+    <title>Giriş Yap - Reklamsız Cumhuriyet</title><!-- Plugins -->
+</head>
+
+<partial name="_Header"/>
+
+<!-- MAIN START -->
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <div class="max-w-container mx-auto space-y-6 max-w-none">
+        <main class="flex items-center justify-center py-12 px-4 font-helvetica">
+            <div class="max-w-[400px] w-full space-y-8"> <!-- Title -->
+                <h1 class="text-2xl font-bold text-center text-gray-900"> Reklamsız Cumhuriyet Giriş </h1> <!-- Form -->
+                <form class="space-y-6" asp-action="LogIn" asp-controller="Account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">E-Posta adresi <span class="text-red-600">*</span></label>
+                        <div class="mt-1">
+                            <input id="email" name="Email" type="email" autocomplete="email" required
+                                   class="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm 
+                                   placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500" 
+                                   value="@Model?.Email">
+                        </div>
+                        <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Şifre <span class="text-red-600">*</span></label>
+                        <div class="mt-1">
+                            <input id="password" name="Password" type="password" autocomplete="current-password" required
+                                   class="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm 
+                                   placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <span asp-validation-for="Password" class="text-red-500 text-sm"></span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="RememberMe" type="checkbox" class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                            <label for="remember-me" class="ml-2 block text-sm text-gray-900">Beni hatırla</label>
+                        </div>
+                        <div class="text-sm">
+                            <a href="/Account/ForgotPassword" class="font-medium text-red-600 hover:text-red-500">Şifremi unuttum</a>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Reklamsız Cumhuriyet Giriş
+                        </button>
+                        <div class="mt-2"><p class="font-bold text-neutral-500 text-[0.85rem] text-center space-y-1"><a href="https://egazete.cumhuriyet.com.tr" target="_blank" rel="nofollow">eGazete'ye giriş yapmak için buraya tıklayınız...</a></p></div>
+                    </div>
+                </form> <!-- Register Link -->
+                <div class="text-center">
+                    <p class="text-sm text-gray-600"> Reklamsız Cumhuriyet Hesabınız yok mu? 
+                        <a href="/uye/kayit-ol"
+                                                                           class="font-medium text-red-600 hover:text-red-500">
+                            Hemen üye olun </a></p>
+                </div> <!-- Footer Links -->
+                <div class="flex justify-center space-x-4 text-sm text-gray-500"><a href="../bize-ulasin"
+                                                                                    class="hover:text-gray-900">Bize
+                        Ulaşın</a> <a href="../kullanim-kosullari" class="hover:text-gray-900">Kullanım Koşulları</a> <a
+                        href="../gizlilik" class="hover:text-gray-900">Gizlilik</a></div>
+            </div>
+        </main>
+    </div>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+

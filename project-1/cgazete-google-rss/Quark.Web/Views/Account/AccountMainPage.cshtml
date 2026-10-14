@@ -1,0 +1,183 @@
+@using Quark.Data.Models.Payment
+@model Quark.API.Business.Models.Responses.AccountResponses.AccountMainPageResponse
+@{
+    Layout = "_LayoutNoAds";
+}
+
+<head>
+    <meta name="description" content="Reklamsız Cumhuriyet üyelik bilgileriniz ve abonelik durumunuz">
+    <title>Hoş Geldiniz - Reklamsız Cumhuriyet</title><!-- Plugins -->
+</head>
+
+<partial name="_Header" />
+
+<main id="main" class="my-4 px-5 tablet:px-0">
+
+    
+    <div class="max-w-container mx-auto space-y-6 max-w-none">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full font-helvetica">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Navigation -->
+
+                <partial name="~/Views/Account/_AccountSideBar.cshtml" />
+
+                <!-- Content -->
+                <div class="flex-1">
+                    <div class="bg-white shadow rounded-lg overflow-hidden">
+                        <div class="p-6 sm:p-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-8">Merhaba @Model.FirstName @Model.LastName</h2>
+                            <!-- Subscription Info -->
+                            <div class="bg-gray-50 rounded-lg p-6 mb-8">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Abonelik bilgileri</h3>
+                                <div class="space-y-3">
+                                    @if (Model.HasPremiumMembership)
+                                    {
+
+                                        <div class="flex items-center text-gray-700">
+                                            <span class="text-gray-600">Aktif olan paketiniz:</span>
+                                            <span class="ml-2 font-medium">@Model.ActivePlan.PaymentIntervalDisplayName Üyelik</span>
+                                        </div>
+                                    }
+                                    
+                                    @if (Model.HasPremiumMembership && Model.PremiumMembershipExpirationDate.HasValue)
+                                    {
+                                        <div class="flex items-center text-gray-700">
+                                            <span class="text-gray-600">Paketinizin bitmesine:</span>
+                                            <span class="ml-2 font-medium">@Model.RemainingDays gün kaldı.</span>
+                                        </div>
+                                        <div class="mt-6">
+                                            <form asp-action="CancelMembershipRenewal" asp-controller="Account" method="post">
+                                                <button type="submit" id="cancelSubscription"
+                                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                    Otomatik Yenilemeyi İptal Et
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else if (Model.RemainingDays > 0)
+                                    {
+                                        <div class="flex items-center text-gray-700">
+                                            <span class="text-gray-600">Paketinizin bitmesine:</span>
+                                            <span class="ml-2 font-medium">@Model.RemainingDays gün kaldı.</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-700">
+                                            <span class="ml-2 font-medium">Premium üyelik avantajlarından yararlanmak üyeliğinizi tekrar aktif edin.</span>
+                                        </div>
+                                        <div>
+                                            <a href="/uye/odeme"
+                                               class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg
+                                                      shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
+                                                      focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                                                Aktif Et
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                                                       
+                                         <div class="flex items-center text-gray-700">
+                                            <span class="text-gray-600">Aktif olan paket bulunmamaktadır.</span>
+                                         </div>
+                                        <div class="flex items-center text-gray-700">
+                                           <span class="ml-2 font-medium">Premium üyelik avantajlarından yararlanmak için üyelik paketlerini inceleyebilirsiniz.</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div> <!-- Plans Grid -->
+                            <div>
+                                <!-- Monthly Plan (Active) -->
+                                @if (Model.ActivePlan != null)
+                                {
+                                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-red-500 relative">
+                                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-red-600"></div>
+                                        <div class="absolute top-4 right-4">
+                                            <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium">Aktif Paketiniz</span>
+                                        </div>
+                                        <div class="p-8">
+                                            <h3 class="text-xl font-bold mb-6">@Model.ActivePlan.PlanName</h3>
+                                            <div class="mb-8">
+                                                <div class="flex items-baseline">
+                                                    <span class="text-4xl font-bold">@Model.ActivePlan.Price</span> <span class="text-xl font-medium ml-1">₺</span> <span class="text-gray-500 ml-2">/ @Model.ActivePlan.PaymentIntervalDisplayName</span>
+                                                </div>
+                                            </div>
+                                            <ul class="space-y-4 mb-8">
+                                                <li class="flex items-center text-gray-700">
+                                                    <svg class="w-5 h-5 text-green-500 mr-3" fill="none"
+                                                         stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    <span>Reklamsız okuma deneyimi</span>
+                                                </li>
+                                                <li class="flex items-center text-gray-700">
+                                                    <svg class="w-5 h-5 text-green-500 mr-3" fill="none"
+                                                         stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    <span>Mobil uygulamada premium deneyim</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @foreach(var plan in Model.Plans)
+                                    {
+                                        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-gray-300 relative" style="margin-bottom:20px;">
+                                            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-red-600"></div>
+
+                                            <div class="absolute top-4 right-4">
+                                                @if(plan.IsPopular){
+
+                                                    <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium">Popüler Paket</span>
+                                                }
+                                            </div>
+                                            <div class="p-8">
+                                                <h3 class="text-xl font-bold mb-6">@plan.PlanName</h3>
+                                                <div class="mb-8">
+                                                    <div class="flex items-baseline">
+                                                        <span class="text-4xl font-bold">@plan.Price</span> <span class="text-xl font-medium ml-1">₺</span> 
+                                                        <span class="text-gray-500 ml-2">/ @plan.PaymentIntervalDisplayName</span>
+                                                    </div>
+                                                </div>
+                                                <ul class="space-y-4 mb-8">
+                                                    <li class="flex items-center text-gray-700">
+                                                        <svg class="w-5 h-5 text-green-500 mr-3" fill="none"
+                                                             stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                        </svg>
+                                                        <span>Reklamsız okuma deneyimi</span>
+                                                    </li>
+                                                    <li class="flex items-center text-gray-700">
+                                                        <svg class="w-5 h-5 text-green-500 mr-3" fill="none"
+                                                             stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                        </svg>
+                                                        <span>Mobil uygulamada premium deneyim</span>
+                                                    </li>
+                                                </ul>
+                                                <div>
+                                                    <a href="/uye/odeme"
+                                                       class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg
+                                                  shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
+                                                  focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                                                        Aktif Et
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                  
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</main>

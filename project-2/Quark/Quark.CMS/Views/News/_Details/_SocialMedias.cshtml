@@ -1,0 +1,59 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+@if (Model.SocialMedias != null)
+{
+    <div class="card mb-5">
+        <div class="card-header collapsible cursor-pointer rotate collapsed" data-bs-toggle="collapse" data-bs-target="#kt_docs_card_collapsible">
+            <div class="card-title">
+                <h2>@_localizer["SocialMedias"]</h2>
+            </div>
+            <div class="card-toolbar rotate-180">
+                <i class="ki-duotone ki-down fs-1"></i>
+            </div>
+        </div>
+        <div id="kt_docs_card_collapsible" class="collapse">
+            <div class="card-body">
+                <ul class="nav justify-content-end mb-5" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-sm btn-color-muted btn-active-primary fw-bold px-4 me-1 active" data-bs-toggle="tab" href="#tab_facebook"><partial name="Icons/Facebook" /></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-sm btn-color-muted btn-active-primary fw-bold px-4 me-1" data-bs-toggle="tab" href="#tab_x"><partial name="Icons/TwitterX" /></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-sm btn-color-muted btn-active-primary fw-bold px-4 me-1" data-bs-toggle="tab" href="#tab_instagram"><partial name="Icons/Instagram" /></a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_facebook">
+                        <div class="d-flex justify-content-center mb-5">
+                            <img src="@Model.SocialMedias.FacebookPhotoUrl" alt="@Model.SocialMedias.FacebookTitle" />
+                        </div>
+                        <h1 class="d-flex justify-content-center mb-5">@Model.SocialMedias.FacebookTitle</h1>
+                        <p>@Html.Raw(Model.SocialMedias.FacebookContent)</p>
+                    </div>
+                    <div class="tab-pane" id="tab_x">
+                        <div class="d-flex justify-content-center mb-5">
+                            <img src="@Model.SocialMedias.XPhotoUrl" alt="@Model.SocialMedias.XTitle" />
+                        </div>
+                        <h1 class="d-flex justify-content-center mb-5">@Model.SocialMedias.XTitle</h1>
+                        <p>@Html.Raw(Model.SocialMedias.XContent)</p>
+                    </div>
+                    <div class="tab-pane" id="tab_instagram">
+                        <div class="d-flex justify-content-center mb-5">
+                            <img src="@Model.SocialMedias.InstagramPhotoUrl" alt="@Model.SocialMedias.InstagramTitle" />
+                        </div>
+                        <h1 class="d-flex justify-content-center mb-5">@Model.SocialMedias.InstagramTitle</h1>
+                        <p>@Html.Raw(Model.SocialMedias.InstagramContent)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-sm btn-primary" href="/News/UpdateSocialMedias/@Model.NewsID">
+                    <partial name="Icons/Edit" />
+                    @_localizer["Update"]
+                </a>
+            </div>
+        </div>
+    </div>
+}

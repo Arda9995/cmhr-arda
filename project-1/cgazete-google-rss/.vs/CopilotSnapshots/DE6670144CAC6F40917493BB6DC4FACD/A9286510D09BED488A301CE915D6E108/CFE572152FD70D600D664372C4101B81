@@ -1,0 +1,33 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "RouteSettings": {
+    "BaseURL": "http://localhost:7295/"
+  },
+  "AllowedHosts": "*",
+  "XmlSettings": {
+    "StoragePath": "xml",
+    "SiteUrl": "https://www.example.com",
+    "RssFileName": "rss.xml",
+    "SitemapFileName": "sitemap.xml"
+  },
+  "GoogleAiRss": {
+    "Username": "google-ai-rss",
+    "Password": "degistirilmeli"
+  },
+  "Keycloak": {
+    "Authority": "http://localhost:8080/realms/quark",
+    "ClientId": "quark-web",
+    "ClientSecret": "your-client-secret-from-keycloak",
+    "RequireHttpsMetadata": false,
+    "SaveTokens": true,
+    "ResponseType": "code",
+    "UsePkce": true,
+    "GetClaimsFromUserInfoEndpoint": true,
+    "Scope": [ "openid", "profile", "email", "roles" ]
+  }
+}

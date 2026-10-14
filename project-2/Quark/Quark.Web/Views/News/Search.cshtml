@@ -1,0 +1,53 @@
+﻿@model List<PageNewsCachingResponse>
+
+<partial name="~/Views/Shared/_Header.cshtml" />
+
+@{
+	var hasPremiumMembership = "False";
+
+	var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+	if (id != null)
+	{
+		hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+	}
+}
+@if (hasPremiumMembership == "False")
+{
+
+	@section AdScripts {
+		<!-- Google -->
+		<!-- Start GPT Tag -->
+		<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+		<script data-cfasync="false" async src="https://media.cumhuriyet.com.tr/assets/js/cmhads.js?v=1.01"></script>
+    }
+}
+@section Scripts {
+    <script src="~/js/Scripts/News/Search.js"></script>
+}
+<partial name="~/Views/Shared/AdContainers/_GeneralFloatingAdArea.cshtml" />
+
+<main id="main" class="my-4 px-5 tablet:px-0">
+	<div class="max-w-container mx-auto space-y-6 undefined">
+		<partial name="~/Views/Shared/AdContainers/_GeneralHeaderAdArea.cshtml" />
+		<div class="text-center space-y-1">
+			<!-- Title Start -->
+			<div class="text-gray-700 text-4xl font-semibold">Arama</div> <!-- Title End --> <!-- Description Start -->
+			<p class="text-gray-700 text-xl font-helvetica"> Merak ettiğiniz haber başlıklarını bulun, dünya gündemini yakından takip edin! </p> <!-- Description End -->
+		</div>
+		<div class="relative mb-20 mt-6 max-w-xl mx-auto">
+			<!-- Form Start -->
+			<form id="searchPageForm" class="flex border border-[#E5E5EA] rounded-2xl p-4 gap-3">
+				<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M5.83332 11.6667C5.83332 10.1196 6.4479 8.63584 7.54186 7.54188C8.63583 6.44792 10.1196 5.83333 11.6667 5.83333C13.2137 5.83333 14.6975 6.44792 15.7914 7.54188C16.8854 8.63584 17.5 10.1196 17.5 11.6667C17.5 13.2138 16.8854 14.6975 15.7914 15.7915C14.6975 16.8854 13.2137 17.5 11.6667 17.5C10.1196 17.5 8.63583 16.8854 7.54186 15.7915C6.4479 14.6975 5.83332 13.2138 5.83332 11.6667ZM11.6667 3.5C10.3731 3.5 9.0981 3.80727 7.94656 4.3965C6.79503 4.98574 5.79994 5.84008 5.04322 6.88917C4.28651 7.93827 3.78982 9.15211 3.59406 10.4307C3.3983 11.7094 3.50907 13.0162 3.91725 14.2437C4.32542 15.4711 5.01932 16.584 5.94181 17.4908C6.86431 18.3976 7.989 19.0722 9.22328 19.4592C10.4576 19.8463 11.7661 19.9345 13.0412 19.7168C14.3163 19.4991 15.5214 18.9816 16.5573 18.207L22.5073 24.1582C22.7261 24.3771 23.0228 24.5001 23.3323 24.5002C23.6418 24.5003 23.9387 24.3775 24.1576 24.1588C24.3765 23.94 24.4995 23.6432 24.4996 23.3337C24.4997 23.0243 24.3769 22.7274 24.1582 22.5085L18.2082 16.5585C19.1162 15.3446 19.6685 13.9019 19.8031 12.3919C19.9377 10.882 19.6494 9.36435 18.9704 8.00894C18.2915 6.65354 17.2486 5.51388 15.9587 4.71754C14.6687 3.9212 13.1826 3.49962 11.6667 3.5Z" fill="#6B6B7D"></path>
+				</svg> 
+				<input id="search-news-input" type="text" class="bg-transparent !ring-0 !outline-none w-full text-xl placeholder-gray-500 font-helvetica" placeholder="Cumhuriyet'te Ara">
+				<button type="submit"
+				        class="text-black border border-gray-300 px-6 py-2 rounded-md text-l font-medium hover:bg-gray-100 transition">
+					Ara
+				</button>
+			</form> <!-- Form End --> <!-- Results Start -->
+		</div> <!-- Best News Start -->
+		<partial name="~/Views/Shared/CommonContainers/_MostSearchedNews.cshtml" model="Model" /> <!-- Best News End -->
+	</div>
+</main>
+

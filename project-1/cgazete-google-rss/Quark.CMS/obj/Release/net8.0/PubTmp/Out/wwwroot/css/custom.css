@@ -1,0 +1,129 @@
+﻿.ck-editor__editable_inline {
+    min-height: 600px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.note-editor .dropdown-toggle::after {
+    all: unset;
+}
+
+.note-cropper-modal .note-modal-content {
+    width: 1050px;
+    height: 700px;
+}
+
+.note-cropper-modal .note-modal-body {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0;
+}
+
+.note-modal[aria-label="Page Templates"] .note-modal-header h4 {
+   display:none;
+}
+
+.note-modal[aria-label="Page Templates"] .note-modal-header {
+    
+    height: 50px;
+    border:none;
+}
+
+.note-modal[aria-label="Page Templates"] .note-modal-content {
+    padding:25px;
+    width: 1100px;
+    height: 670px;
+}
+
+.note-modal[aria-label="Page Templates"] .note-modal-body {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0;
+}
+
+.note-modal[aria-label="Page Templates"] .note-modal-footer {
+  position:absolute;
+  top:90%;
+    left:90%;
+}
+
+
+.note-photoEdit-modal .note-modal-header h4 {
+    display: none;
+}
+
+.note-photoEdit-modal .note-modal-header {
+    padding:20px;
+    border:0;
+}
+
+.note-photoEdit-modal .note-modal-content {
+    padding: 30px 20px 0px 20px;
+    width: 1150px;
+    height: 865px;
+}
+
+.note-photoEdit-modal .note-modal-body {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0;
+}
+
+.note-modal[aria-label="Resim ekle"] .note-modal-content {
+    width: 600px;
+    height: 320px;
+}
+
+
+
+#cropperModal .modal-content{
+    width: 1100px;
+    height: 810px;
+}
+
+.image-input-wrapper {
+    background-size: contain !important;
+    background-position: center !important;
+}
+
+.popover{
+    max-width:700px;
+}
+
+.lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9997;
+}
+
+.lightbox-content img {
+    width:600px;
+    border: 3px solid white;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+}
+

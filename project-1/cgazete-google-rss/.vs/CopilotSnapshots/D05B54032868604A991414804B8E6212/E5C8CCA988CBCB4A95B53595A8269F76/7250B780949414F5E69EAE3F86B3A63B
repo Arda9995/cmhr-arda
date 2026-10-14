@@ -1,0 +1,56 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Quark.Data.Models.News;
+
+[Table("News.News")]
+public class News
+{
+    public int ID { get; set; }
+    public int NewsTypeID { get; set; }
+    public int StatusID { get; set; }
+    public int CategoryID { get; set; }
+    public int? AuthorID { get; set; }
+    public string Slug { get; set; }
+    public string Title { get; set; }
+    public string Subtitle { get; set; }
+    public string UpSubtitle { get; set; }
+    public string Content { get; set; }
+    public string Tags { get; set; }
+    public int CreatedBy { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public int UpdatedBy { get; set; }
+    public DateTime? UpdateDate { get; set; } = DateTime.Now;
+    public bool IsPublished { get; set; }
+    public int ViewCount { get; set; }
+    public DateTime? PublishDate { get; set; }
+    public DateTime? PublishEndDate { get; set; }
+    public bool IsLocked { get; set; }
+    public int? LockedBy { get; set; }
+    public DateTime? LockedTime { get; set; }
+    public string Video { get; set; }
+    public int? ScheduledBy { get; set; }
+    public string PressNo { get; set; }
+    public string Headline { get; set; }
+    public bool ShowHeadline { get; set; }
+    public bool AllowAds { get; set; }
+    public bool AllowGoogleIndex { get; set; }
+    public bool AllowToSendRSS { get; set; }
+    [Column("ExcludeFromGoogleAiFeed")]
+    public bool AllowGoogleAiFeed { get; set; }
+    public bool AllowToSendGoogleSideMap { get; set; }
+    public string SourceIDs { get; set; }
+    public string SeoTitle { get; set; }
+    public string SeoDescription { get; set; }
+    public string CategoryMap { get; set; }
+    public string SecondaryCategoryMap { get; set; }
+    public int? VideoPlayerID { get; set; }
+    public int? BoxCount { get; set; }
+    public string UpHeadline { get; set; }
+    public string SubHeading { get; set; }
+    public string UpSubHeading { get; set; }
+    public bool ShowUpHeadline { get; set; }
+    public bool ShowSubHeading { get; set; }
+    public bool ShowUpSubHeading { get; set; }
+    public string RedirectLink { get; set; }
+    public DateTime ManuelUpdatedDate { get; set; }
+}

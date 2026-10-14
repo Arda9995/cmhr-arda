@@ -1,0 +1,171 @@
+@{
+    ViewData[ViewDataNames.Title] = "Haber Versiyon Görüntüleme";
+    ViewData[ViewDataNames.AsideMenu] = "News";
+    ViewData[ViewDataNames.AsideSubMenu] = "News";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Haberler", "/News/List")
+    };
+}
+@model Quark.CMS.Business.Models.Responses.NewsResponses.NewsVersionLiveResponse
+
+@section Scripts
+{
+    <script src="/Scripts/News/Live.js" asp-append-version="true"></script>
+}
+
+@section ToolBarLeft
+{
+    <a href="/News/Details/@Model.News.ID" class="btn btn-sm btn-secondary">
+        <i class="ki-outline ki-left"></i> @_localizer["ReturnToDetails"]
+    </a>
+}
+
+@section ToolBarRight
+{
+    @if (!(Model.IsLocked && Model.IsLockedByCurrentUser == false) && Model.StatusID == (int)NewsStatusEnum.Draft)
+    {
+        <input id="newsId" type="hidden" value="@Model.News.ID"/>
+
+        <a id="changeLive" class="btn btn-sm btn-primary">
+            <partial name="Icons/Publish"/>
+            @_localizer["DraftToLive"]
+        </a>
+    }
+
+    @if (Model.StatusID == (int)NewsStatusEnum.Draft)
+    {
+        <a class="btn btn-light-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_1">
+            <partial name="Icons/Details"/>
+            @_localizer["Compare"]
+        </a>
+    }
+}
+
+@if (Model.StatusID == (int)NewsStatusEnum.Draft)
+{
+    <partial name="_Details/_AlertLive"/>
+}
+
+<form method="post" class="form row g-10">
+
+    @if (Model.IsLocked && Model.IsLockedByCurrentUser == false)
+    {
+        <partial name="_Version/_AlertLocked" model="Model"/>
+    }
+
+    <!--begin::Content-->
+    <div class="col-xxl-9">
+        <partial name="_Version/_Content" model="Model.Live"/>
+        <partial name="_Version/_Photos" model="Model.Live"/>
+        @if (!Model.Live.Video.IsNullOrEmtpy())
+        {
+            <input type="hidden" id="versionVideoPlayerID" value="@Model.Live.VideoPlayerID"/>
+            <input type="hidden" id="versionVideoCode" value="@Model.Live.Video"/>
+            <partial name="_Version/_Video" model="Model.Live"/>
+        }
+
+        @if (Model.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+        {
+            <partial name="_Version/_PhotoGalleryItems" model="Model.Live"/>
+        }
+        <partial name="_Version/_PressNo" model="Model.Live"/>
+    </div>
+    <!--end::Content-->
+
+    <!--begin::Aside-->
+    <div class="col-xxl-3">
+        @* <partial name="_Version/_VersionBy"/> *@
+        <partial name="_Version/_Category" model="Model.Live"/>
+        <partial name="_Version/_Author" model="Model.Live"/>
+        <partial name="_Version/_Caricaturist" model="Model.Live"/>
+        @if (!Model.Live.Tags.IsNullOrEmtpy())
+        {
+            <partial name="_Version/_Tags" model="Model.Live"/>
+        }
+        <partial name="_Version/_Source" model="Model.Live"/>
+        @if (Model.NewsTypeID != (int)NewsTypesEnum.GovernmentAnnouncement)
+        {
+            <partial name="_Version/_Ads" model="Model.Live"/>
+        }
+    </div>
+    <!--end::Aside-->
+</form>
+
+<div class="modal fade" tabindex="-1" id="kt_modal_1">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">@_localizer["Compare"]</h3>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross-circle-circle fs-1">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="modal-body bg-light">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>@_localizer["Live"]</h2>
+                        <partial name="_Version/_Content" model="Model.Live"/>
+                        <partial name="_Version/_Photos" model="Model.Live"/>
+                        @if (!Model.Live.Video.IsNullOrEmtpy())
+                        {
+                            <partial name="_Version/Modal/_Video" model="Model.Live"/>
+                        }
+
+                        @if (Model.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+                        {
+                            <partial name="_Version/_PhotoGalleryItems" model="Model.Live"/>
+                        }
+                        <partial name="_Version/_PressNo" model="Model.Live"/>
+                        <partial name="_Version/_Category" model="Model.Live"/>
+                        <partial name="_Version/_Author" model="Model.Live"/>
+                        <partial name="_Version/_Caricaturist" model="Model.Live"/>
+                        @if (!Model.Live.Tags.IsNullOrEmtpy())
+                        {
+                            <partial name="_Version/_Tags" model="Model.Live"/>
+                        }
+                        <partial name="_Version/_Source" model="Model.Live"/>
+                        @if (Model.NewsTypeID != (int)NewsTypesEnum.GovernmentAnnouncement)
+                        {
+                            <partial name="_Version/_Ads" model="Model.Live"/>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <h2>@_localizer["Current"]</h2>
+                        <partial name="_Version/_Content" model="Model.News"/>
+                        <partial name="_Version/_Photos" model="Model.News"/>
+                        @if (!Model.News.Video.IsNullOrEmtpy())
+                        {
+                            <input type="hidden" id="newsVideoPlayerID" value="@Model.News.VideoPlayerID"/>
+                            <input type="hidden" id="newsVideoCode" value="@Model.News.Video"/>
+                            <partial name="_Version/Modal/_Video" model="Model.News"/>
+                        }
+
+                        <partial name="_Version/_Author" model="Model.News"/>
+                        <partial name="_Version/_Caricaturist" model="Model.News"/>
+                        @if (Model.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+                        {
+                            <partial name="_Version/_PhotoGalleryItems" model="Model.News"/>
+                        }
+                        <partial name="_Version/_PressNo" model="Model.News"/>
+                        <partial name="_Version/_Category" model="Model.News"/>
+                        @if (!Model.News.Tags.IsNullOrEmtpy())
+                        {
+                            <partial name="_Version/_Tags" model="Model.News"/>
+                        }
+                        <partial name="_Version/_Source" model="Model.News"/>
+                        @if (Model.NewsTypeID != (int)NewsTypesEnum.GovernmentAnnouncement)
+                        {
+                            <partial name="_Version/_Ads" model="Model.News"/>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">@_localizer["Cancel"]</button>
+            </div>
+        </div>
+    </div>
+</div>

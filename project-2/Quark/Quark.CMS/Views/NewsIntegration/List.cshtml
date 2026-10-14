@@ -1,0 +1,65 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["NewsIntegration"];
+    ViewData[ViewDataNames.AsideMenu] = "NewsIntegration";
+    ViewData[ViewDataNames.AsideSubMenu] = "NewsIntegration";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["NewsIntegration"], string.Empty)
+    };
+}
+
+<div class="card col-12">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <partial name="Icons/Search"/>
+                <input type="text" data-kt-filter="datatable-search"
+                       class="form-control form-control-solid w-250px ps-14" placeholder="@_localizer["Search"]">
+            </div>
+        </div>
+        <div class="card-toolbar">
+            <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+                <a href="/NewsIntegration/Create" class="btn btn-primary">
+                    <partial name="Icons/Add" />
+                    Yeni Haber Aktar
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <table id="newsIntegrationDatatable">
+            <thead>
+            <tr>
+                <th>Haber ID</th>
+                <th>Başlık</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <div style="display:none">
+                <div id="Col1">
+                    {1}
+                </div>
+                <div id="Col2">
+                    {1}
+                </div>
+                <div class="text-center" id="Col3">
+                    <a href="/NewsIntegration/Update?newsIntegrationId={0}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
+                       data-bs-toggle="tooltip" data-bs-placement="top" title="@_localizer["Update"]">
+                        <partial name="Icons/Edit"/>
+                    </a>
+                    @* <a onclick="DeleteRecordAndRefreshPage('/Users/Delete/{0}')" *@
+                    @*    class="btn btn-icon btn-bg-light btn-active-color-danger btn-sm me-1" data-bs-toggle="tooltip" *@
+                    @*    data-bs-placement="top" title="@_localizer["Delete"]"> *@
+                    @*     <partial name="Icons/Delete"/> *@
+                    @* </a> *@
+                </div>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="/Scripts/NewsIntegration/List.js" asp-append-version="true"></script>
+}

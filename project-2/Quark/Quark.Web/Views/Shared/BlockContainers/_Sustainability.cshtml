@@ -1,0 +1,28 @@
+﻿@model MainPageResponse
+
+@{
+    var newsList = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-SurdurulebilirliHaberleri").ToList();
+}
+
+<div data-astro-cid-j7pv25f6>
+    <!-- Head Start -->
+    <div class="relative" data-astro-cid-j7pv25f6>
+        <!-- Title Start -->
+        <div class="text-white text-4xl font-semibold absolute top-12 text-center w-full z-10" data-astro-cid-j7pv25f6><a href="@newsList.FirstOrDefault().BlockCategorySlug" target="_blank">@newsList.FirstOrDefault().BlockCategoryName</a></div> <!-- Title End -->
+        <div class="relative before:absolute before:inset-0 before:bg-black/10 before:rounded-b-[20px]" data-astro-cid-j7pv25f6> <img src="@newsList.FirstOrDefault().BlockCategoryBackgroundPhotoUrl" class="w-full h-44 object-cover rounded-b-[20px]" alt="" loading="lazy" data-astro-cid-j7pv25f6> </div>
+    </div> <!-- Head End --> <!-- Items Start -->
+    <div class="grid xs:grid-cols-3 gap-5 max-w-[810px] mx-auto -mt-14 z-10 relative px-5 lg:px-0" data-astro-cid-j7pv25f6>
+        @foreach (var news in newsList)
+        {
+            <a target="_blank" href="@news.NewsSlug" data-astro-cid-j7pv25f6>
+                <!-- Thumbnail Start -->
+                <div class="overflow-hidden border-4 border-white aspect-[16/9]	" data-astro-cid-j7pv25f6>
+                    <img src="@news.NewsPhoto" class="w-full h-full object-cover animate-img" alt="@news.NewsHeadline" loading="lazy" data-astro-cid-j7pv25f6>
+                </div> <!-- Thumbnail End --> <!-- Title Start -->
+                <div class="text-center text-slate-900 text-sm font-semibold px-5" data-astro-cid-j7pv25f6>
+                    @news.NewsHeadline
+                </div> <!-- Title End -->
+            </a>
+        }
+    </div> <!-- Items End -->
+</div>

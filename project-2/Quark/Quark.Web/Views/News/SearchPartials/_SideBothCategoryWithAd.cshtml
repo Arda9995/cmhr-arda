@@ -1,0 +1,7 @@
+﻿@using Quark.Web.ViewComponents.Models
+@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsListSearchedResponse
+
+
+@await Component.InvokeAsync("News", new NewsViewComponentModel { MethodName = "MostViewedNews", NewsCount = 8 })
+
+

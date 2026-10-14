@@ -1,0 +1,15 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div class="card card-flush mb-10" role="button" data-kt-drawer-show="true" data-kt-drawer-target="#drawerHistory">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>@_localizer["History"]</h2>
+        </div>
+        <div class="card-toolbar">
+            <partial name="Icons/History2"/>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        @string.Format(_localizer["NewsHistoryText"], Model.Versions.Count)
+    </div>
+</div>

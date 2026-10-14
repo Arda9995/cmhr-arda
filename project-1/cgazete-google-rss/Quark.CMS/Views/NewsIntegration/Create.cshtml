@@ -1,0 +1,55 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["NewsIntegration"];
+    ViewData[ViewDataNames.AsideMenu] = "NewsIntegration";
+    ViewData[ViewDataNames.AsideSubMenu] = "NewsIntegration";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["NewsIntegration"], string.Empty)
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.NewsIntegrationRequest.CreateNewsIntegrationRequest
+
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">Haber Merkezi</h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="@Model.NewsID"/>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-2 col-form-label fw-bold fs-6 required">Başlık</label>
+                <div class="col-lg-10 fv-row">
+                    <input type="text" asp-for="Title" class="form-control form-control-lg form-control-solid"/>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Title"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-2 col-form-label fw-bold fs-6 required">İçerik</label>
+                <div class="col-lg-10 fv-row">
+                    <textarea asp-for="@Model.Content" class="form-control content tinymce"></textarea>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-2 col-form-label fw-bold fs-6 required">Kategori</label>
+                <div class="col-lg-10 fv-row">
+                    <select asp-for="CategoryID" asp-items="@Model.Categories" class="form-select form-select-lg form-select-solid" data-control="select2">
+                    </select>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="CategoryID"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/NewsIntegration/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts
+{
+    <partial name="_CKEditorScripts"/>
+}

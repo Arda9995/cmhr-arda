@@ -1,0 +1,231 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div class="d-flex flex-wrap flex-stack">
+    <div class="d-flex flex-wrap">
+        Sola Hizalı
+    </div>
+    <input type="hidden" id="status-check" value="@Model.StatusID" />
+    <div class="d-flex flex-wrap">
+        @switch ((NewsStatusEnum)Model.StatusID)
+        {
+            case NewsStatusEnum.Draft:
+                <div class="btn btn-primary" data-kt-menu-trigger="{default: 'click'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                    <i class="ki-duotone ki-check-square fs-1">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    Yayına Al
+                </div>
+                <div class="menu menu-sub menu-sub-dropdown menu-column w-100 w-sm-300px mt-1" data-kt-menu="true">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Yayına Al</div>
+                        </div>
+                        <div class="card-body card-body p-0">
+                            <div class="mh-450px">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a href="/CreativeStudio2/CreateCreative?creativeTypeId=1" class="d-flex flex-column text-start text-gray-800 text-hover-primary bg-hover-light rounded py-4 px-3">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <i class="ki-duotone ki-check-square fs-4x text-primary">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </div>
+                                                <div class="col-9 mt-3">
+                                                    <span class="d-block fw-semibold">
+                                                        <span class="text-dark fw-bold d-block fs-3">Hemen Yayına Al</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mh-450px">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a href="/CreativeStudio2/CreateCreative?creativeTypeId=2" class="d-flex flex-column text-start text-gray-800 text-hover-primary bg-hover-light rounded py-4 px-3">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <i class="ki-duotone ki-time fs-4x text-primary">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </div>
+                                                <div class="col-9 mt-3">
+                                                    <span class="d-block fw-semibold">
+                                                        <span class="text-dark fw-bold d-block fs-3">Zamanlı Yayına Al</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                break;
+            case NewsStatusEnum.Published:
+                break;
+            case NewsStatusEnum.Scheduled:
+                break;
+            case NewsStatusEnum.Unpublished:
+                break;
+        }
+    </div>
+</div>
+
+
+<div class="row justify-content-between">
+    @if (Model.StatusID == 2)
+    {
+        <div class="col-auto">
+            <div class="app-navbar-item ms-1 ms-md-4">
+                <div class="btn btn-danger btn-sm" id="kt_docs_sweetalert_html_unpublish">
+                    <partial name="Icons/Delete"/>
+                    Yayından Kaldır
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.StatusID == 4)
+    {
+        <div class="col-auto">
+            <div class="app-navbar-item ms-1 ms-md-4">
+                <div class="btn btn-primary btn-sm" data-kt-menu-trigger="{default: 'click'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                    <partial name="Icons/Add"/>
+                    Yayın Zamanını Değiştir
+                </div>
+                <div class="menu menu-sub menu-sub-dropdown menu-column w-100 w-sm-350px mt-2" data-kt-menu="true" style="">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Yayın Tipi</div>
+                        </div>
+                        <div class="card-body py-5">
+                            <div class="mh-450px">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex flex-column text-start text-gray-800 text-hover-primary bg-hover-light rounded py-4" id="kt_docs_sweetalert_html">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <i class="ki-duotone ki-double-check fs-4x text-primary">
+                                                        <i class="path1"></i>
+                                                        <i class="path2"></i>
+                                                    </i>
+                                                </div>
+                                                <div class="col-9">
+                                                    <span class="d-block fw-semibold">
+                                                        <span class="text-dark fw-bold d-block fs-3">Hemen Yayına Al</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mh-450px">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex flex-column text-start text-gray-800 text-hover-primary bg-hover-light rounded py-4" id="kt_docs_sweetalert_html_scheduled">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <i class="ki-outline ki-calendar-add fs-4x text-primary"></i>
+                                                </div>
+                                                <div class="col-9">
+                                                    <span class="d-block fw-semibold">
+                                                        <span class="text-dark fw-bold d-block fs-3">Farklı Zaman Seç</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mh-450px">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex flex-column text-start text-gray-800 text-hover-primary bg-hover-light rounded py-4" id="kt_docs_sweetalert_html_unschedule">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <i class="ki-outline ki-calendar-add fs-4x text-primary"></i>
+                                                </div>
+                                                <div class="col-9">
+                                                    <span class="d-block fw-semibold">
+                                                        <span class="text-dark fw-bold d-block fs-3">Taslağa Al</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-auto">
+            <div class="app-navbar-item ms-1 ms-md-4">
+                <div class="btn btn-primary btn-sm" data-kt-menu-trigger="{default: 'click'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                    <partial name="Icons/Add"/>
+                    Yayına Al
+                </div>
+
+                <div class="menu menu-sub menu-sub-dropdown menu-column w-100 w-sm-350px mt-2" data-kt-menu="true" style="">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Yayın Tipi</div>
+                        </div>
+                        <div class="card-body py-5">
+                            <div class="mh-450px">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex flex-column text-start text-gray-800 text-hover-primary bg-hover-light rounded py-4" id="kt_docs_sweetalert_html">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <i class="ki-duotone ki-double-check fs-4x text-primary">
+                                                        <i class="path1"></i>
+                                                        <i class="path2"></i>
+                                                    </i>
+                                                </div>
+                                                <div class="col-9">
+                                                    <span class="d-block fw-semibold">
+                                                        <span class="text-dark fw-bold d-block fs-3">Hemen Yayına Al</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mh-450px">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex flex-column text-start text-gray-800 text-hover-primary bg-hover-light rounded py-4" id="kt_docs_sweetalert_html_scheduled">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <i class="ki-outline ki-calendar-add fs-4x text-primary"></i>
+                                                </div>
+                                                <div class="col-9">
+                                                    <span class="d-block fw-semibold">
+                                                        <span class="text-dark fw-bold d-block fs-3">Zamanlı Yayına Al</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

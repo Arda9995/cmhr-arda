@@ -1,0 +1,51 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["Plans"];
+    ViewData[ViewDataNames.AsideMenu] = "PaymentManagements";
+    ViewData[ViewDataNames.AsideSubMenu] = "Plans";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["PaymentManagements"], string.Empty),
+        new BreadcrumbItem(_localizer["Plans"], "/PaymentManagement/Plans"),
+    };
+}
+
+@model Quark.Business.Common.PaymentServices.Models.Requests.UpdateCumhuriyetPlanRequest
+
+<div class="card mb-5 mb-xl-10 col-8">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">Ödeme Planı Güncellee</h3>
+        </div>
+    </div>
+
+    <form class="form" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="@Model.PlanID"/>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label fw-bold fs-6 required">Ödeme Planı İsmi</label>
+                <div class="col-lg-8 fv-row">
+                    <input asp-for="@Model.Name" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"/>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label fw-bold fs-6 required">Plan Referans Kodu</label>
+                <div class="col-lg-8 fv-row">
+                    <input asp-for="@Model.PricingPlanReferenceCode" readonly class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"/>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label fw-bold fs-6">@_localizer["Status"]</label>
+                <div class="col-lg-8 fv-row">
+                    <div class=" form-check form-switch form-check-custom form-check-solid">
+                        <input asp-for="@Model.IsEnabled" type="checkbox" class="form-check-input w-40px h-25px" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary">@_localizer["Save"]</button>
+            <a href="/PaymentManagement/Plans" class="btn btn-white btn-active-light-primary me-2">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

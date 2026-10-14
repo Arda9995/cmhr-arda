@@ -1,0 +1,34 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Quark.Hangfire.Api",
+    "version": "1.0"
+  },
+  "paths": {
+    "/Index/GetAANews": {
+      "get": {
+        "tags": [
+          "Index"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Index/GetRssItems": {
+      "get": {
+        "tags": [
+          "Index"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": { }
+}

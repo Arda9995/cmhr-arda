@@ -1,0 +1,130 @@
+﻿using System.Reflection;
+using System.Xml.Linq;
+using AvvaMobile.Core.Caching;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using Quark.Business.Caching.Services;
+using Quark.Business.ElasticSearch.Abstractions;
+using Quark.Data;
+using Quark.Data.Models;
+using Quark.Resources;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+
+if (args.Length != 2 || args[1] != "--write-archive")
+    throw new ArgumentException("Usage: GoogleAiArchiveCheck <workspace-root> --write-archive. Reads SQL only; replaces the last three daily archive files; never contacts Elasticsearch.");
+
+var root = Path.GetFullPath(args[0]);
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Path.Combine(root, "Quark.CMS"))
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.Development.json")
+    .Build();
+var connectionString = configuration.GetConnectionString("ConnectionString");
+var target = new SqlConnectionStringBuilder(connectionString);
+if (target.DataSource != "192.168.35.32" || target.InitialCatalog != "News-Migration")
+    throw new InvalidOperationException("Only the approved development database is allowed.");
+
+var options = new DbContextOptionsBuilder<QuarkDataContext>()
+    .UseSqlServer(connectionString)
+    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+    .AddInterceptors(new RejectDatabaseWrites())
+    .Options;
+await using var context = new QuarkDataContext(options);
+var services = new ServiceCollection();
+services.AddMemoryCache();
+services.AddScoped<ICacheManager, MemoryCacheManager>();
+services.AddLocalization();
+services.AddLogging(builder => builder.AddConsole());
+using var provider = services.BuildServiceProvider();
+using var scope = provider.CreateScope();
+var cache = scope.ServiceProvider.GetRequiredService<ICacheManager>();
+var keys = new[] { "Common_ClientWebSite", "CDN_BaseUrl", "CDN_MediaGalleryFolder" };
+foreach (var setting in await context.AppSettings.Where(x => keys.Contains(x.Key)).ToListAsync())
+    await cache.Set(setting.Key, setting.Value);
+var settings = new AppSettingsKeys(cache);
+var siteUrl = settings.Common_ClientWebSite;
+if (string.IsNullOrWhiteSpace(siteUrl))
+    throw new InvalidOperationException("The website URL setting is missing.");
+
+var today = DateTime.Now.Date;
+var since = today.AddDays(-2);
+var until = today.AddDays(1);
+var expected = await context.NewsPublished
+    .Where(x => x.PublishedDate >= since && x.PublishedDate < until &&
+                x.AllowToSendRSS && !x.ExcludeFromGoogleAiFeed &&
+                (x.NewsTypeID == (int)NewsTypesEnum.News || x.NewsTypeID == (int)NewsTypesEnum.ColumnArticles))
+    .Select(x => new { x.NewsID, x.PublishedDate, x.Slug })
+    .ToListAsync();
+var articleBefore = await context.NewsPublished.Where(x => x.NewsID == 2440937)
+    .Select(x => new { x.NewsID, x.ExcludeFromGoogleAiFeed, x.AllowToSendRSS, x.PublishedDate, x.Slug })
+    .SingleOrDefaultAsync();
+
+var elastic = DispatchProxy.Create<IElasticSearchService, FailingElasticProxy>();
+var service = new XmlFeedCachingService(
+    new HttpContextAccessor { HttpContext = new DefaultHttpContext() }, context,
+    scope.ServiceProvider.GetRequiredService<IStringLocalizer<CommonResource>>(), settings, cache, elastic,
+    scope.ServiceProvider.GetRequiredService<ILogger<XmlFeedCachingService>>());
+var result = await service.RefreshGoogleAiRSS();
+if (((FailingElasticProxy)(object)elastic).UpdateCalls != 1 || result.IsSuccess)
+    throw new InvalidOperationException("The expected isolated Elasticsearch failure was not reported; inspect logs.");
+
+for (var day = since; day <= today; day = day.AddDays(1))
+{
+    var path = Path.Combine(root, "GoogleAiFeedArchive", day.Year.ToString(), $"feed-{day:yyyy-MM-dd}.xml");
+    var file = new FileInfo(path);
+    if (!file.Exists || file.Length == 0)
+        throw new InvalidOperationException($"Archive is missing or empty: {path}");
+    var document = XDocument.Load(path);
+    if (document.Root?.Name != "rss" || (string)document.Root.Attribute("version") != "2.0")
+        throw new InvalidOperationException($"Invalid RSS document: {path}");
+    var items = document.Root.Element("channel")?.Elements("item").ToList()
+        ?? throw new InvalidOperationException("RSS channel is missing.");
+    var expectedUrls = expected.Where(x => x.PublishedDate.Date == day)
+        .GroupBy(x => x.NewsID).Select(x => x.First())
+        .Select(x => $"{siteUrl.TrimEnd('/')}/{(x.Slug ?? string.Empty).TrimStart('/')}")
+        .OrderBy(x => x, StringComparer.Ordinal);
+    var actualUrls = items.Select(x => (string)x.Element("guid")).OrderBy(x => x, StringComparer.Ordinal);
+    if (!expectedUrls.SequenceEqual(actualUrls))
+        throw new InvalidOperationException($"Archive items do not match eligible published records: {path}");
+    XNamespace content = "http://purl.org/rss/1.0/modules/content/";
+    if (items.Any(x => x.Element("title") == null || x.Element("pubDate") == null || x.Element(content + "encoded") == null))
+        throw new InvalidOperationException("An archive item is missing its title, date, or content.");
+    Console.WriteLine($"PASS {path}: valid RSS, {items.Count} eligible items, {file.Length} bytes.");
+}
+var articleAfter = await context.NewsPublished.Where(x => x.NewsID == 2440937)
+    .Select(x => new { x.NewsID, x.ExcludeFromGoogleAiFeed, x.AllowToSendRSS, x.PublishedDate, x.Slug })
+    .SingleOrDefaultAsync();
+if (!Equals(articleBefore, articleAfter))
+    throw new InvalidOperationException("Article state changed during validation; repeat on a stable database.");
+Console.WriteLine($"PASS article 2440937 exclusion unchanged: {articleAfter?.ExcludeFromGoogleAiFeed}.");
+Console.WriteLine("PASS local archives exist despite the simulated Elasticsearch outage. No publication or database settings were changed.");
+
+public class FailingElasticProxy : DispatchProxy
+{
+    public int UpdateCalls { get; private set; }
+
+    protected override object Invoke(MethodInfo targetMethod, object[] args)
+    {
+        if (targetMethod.Name == nameof(IElasticSearchService.UpdateDocumentAsync))
+        {
+            UpdateCalls++;
+            return Task.FromException<bool>(new InvalidOperationException("Simulated Elasticsearch outage for archive validation; no network request was made."));
+        }
+        throw new InvalidOperationException("Unexpected Elasticsearch operation in archive check.");
+    }
+}
+
+public class RejectDatabaseWrites : SaveChangesInterceptor
+{
+    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+        => throw new InvalidOperationException("Database writes are not allowed in this check.");
+
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        => throw new InvalidOperationException("Database writes are not allowed in this check.");
+}

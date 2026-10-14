@@ -1,0 +1,73 @@
+﻿@using Quark.Business.Caching.Models.Responses.NewsCachingResponses
+@model MainPageResponse
+@section MetaTags {
+<title>Cumhuriyet - Haberler, Spor, Ekonomi, Gündem Haberleri, Güncel Son Dakika Haberleri, </title>
+<meta name="description" content="Cumhuriyet, en güncel haberler, 100 yıllık tarihiyle güvenilir ve gündeme dair haberler, son dakika haberleri Cumhuriyet'de!">
+<meta name="keywords" content="cumhuriyet, gazete, haber, haberler, son dakika, güncel, yazar, yazarlar, köşeyazısı, siyaset, türkiye, dünya, ekonomi, kültür sanat, çizerler, spor, yaşam, teknoloji">
+<meta http-equiv="refresh" content="180">
+<link rel="canonical" href="https://www.cumhuriyet.com.tr" />
+
+<meta property="og:title" content="Cumhuriyet Haber Verir - Güncel Son Dakika Haberleri" />
+<meta property="og:description" content="Cumhuriyet haber, 90 yılı aşkın birikimiyle Türkiye'deki doğru haberin tek adresidir. Son dakika haberlerinden, güncel haberlerin tümü Cumhuriyet'te!" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://www.cumhuriyet.com.tr" />
+    <meta property="og:image:url" content="https://www.cumhuriyet.com.tr/assets/img/cumhuriyet-ana-foto-101-yasinda.jpg" />
+    <meta property="og:image" content="https://www.cumhuriyet.com.tr/assets/img/cumhuriyet-ana-foto-101-yasinda.jpg" />
+}
+
+@{
+    var hasPremiumMembership = "False";
+
+    var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    if (id != null)
+    {
+        hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+    }
+}
+@if (hasPremiumMembership == "False")
+{
+
+    @section AdScripts {
+        <!-- Google -->
+        <!-- Start GPT Tag -->
+        <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+        <script data-cfasync="false" async src="https://media.cumhuriyet.com.tr/assets/js/cmhads.js?v=1.01"></script>
+        <script>
+            PageCategories.push("Anasayfa");
+        </script>
+    }
+}
+<partial name="~/Views/Shared/_Header.cshtml" />
+<partial name="~/Views/Shared/AdContainers/_HomePageFloatingAdArea.cshtml" />
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <div class="max-w-container mx-auto space-y-6 relative">
+        <partial name="~/Views/Shared/AdContainers/_HomePageHeaderAdArea.cshtml" />
+        <partial name="~/Views/Shared/BlockContainers/_SubHeadingSliderJournal.cshtml" model="Model" />
+        <partial name="~/Views/Shared/BlockContainers/_SubHeadingBox.cshtml" model="Model" />
+        <partial name="~/Views/Shared/BlockContainers/_MainSliderLifeSliderSurvey.cshtml" model="Model" />
+        <partial name="~/Views/Shared/CommonContainers/_WeatherCrypto.cshtml" />
+        <partial name="~/Views/Shared/BlockContainers/_UnderSlider.cshtml" model="Model" />
+        <partial name="~/Views/Shared/AdContainers/_HomePageUnderSliderDesktopAdArea.cshtml" />
+        <partial name="~/Views/Shared/BlockContainers/_AuthorAdSixNewsSocial.cshtml" model="Model" />
+        <partial name="~/Views/Shared/BlockContainers/_AdAgendaSixNews.cshtml" model="Model" />
+        <partial name="~/Views/Shared/AdContainers/_HomePage970x250_1_AdArea.cshtml" />
+        <partial name="~/Views/Shared/BlockContainers/_CategoryNews.cshtml" model="Model" />
+        <partial name="~/Views/Shared/BlockContainers/_Sustainability.cshtml" model="Model" />
+        <partial name="~/Views/Shared/BlockContainers/_CategoryWorldNews.cshtml" model="Model" />
+        <partial name="~/Views/Shared/AdContainers/_HomePage970x250_2_AdArea.cshtml" />
+        <partial name="~/Views/Shared/BlockContainers/_CategoryNewsAdAstrology.cshtml" model="Model" />
+        <partial name="~/Views/Shared/BlockContainers/_CategoryRelativeGroups.cshtml" model="Model" />
+        @if (Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup == (int)GovernmentOrderGroupEnum.Remaining).Any())
+        {
+            var governmentModel = new GovernmentFilledBlock
+                {
+                    GovernmentAnnouncementItems = Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup == (int)GovernmentOrderGroupEnum.Remaining).ToList(),
+                    FillerBlockNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-BlokDoldurucu").ToList(),
+                };
+
+            <partial name="~/Views/Shared/BlockContainers/_RemainingGovernmentAnnouncements.cshtml" model="governmentModel" />
+        }
+        <partial name="~/Views/Shared/AdContainers/_HomePage970x250_2_AdArea.cshtml" />
+        <partial name="~/Views/Shared/BlockContainers/_NewNewsAdBooks.cshtml" model="Model" />
+    </div>
+</main>

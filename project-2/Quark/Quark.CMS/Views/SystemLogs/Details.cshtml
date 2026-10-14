@@ -1,0 +1,69 @@
+@{
+ViewData[ViewDataNames.Title] = _localizer["SystemLog"] + " " + _localizer["Details"];
+ViewData[ViewDataNames.AsideMenu] = "Management";
+ViewData[ViewDataNames.AsideSubMenu] = "SystemLogs";
+ViewData["ShowBackButton"] = true;
+ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+{
+new BreadcrumbItem(_localizer["Management"], string.Empty),
+new BreadcrumbItem(_localizer["SystemLogs"], "/SystemLogs/List")
+};
+}
+
+@using Quark.Data.Models.LogModels
+@model Quark.CMS.Business.Models.Responses.SystemLogResponses.DetailsResponse
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["SystemLog"] @_localizer["Informations"] </h3>
+        </div>
+    </div>
+    <div class="card-body border-top p-9">
+        @if (Model.LogTypeID != (int)LogTypesEnum.LogIn)
+        {
+            <div class="row mb-6">
+                <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Page"]</label>
+                <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+                    <a href="@Model.Url" target="_blank">@Model.Url</a>
+                </div>
+            </div>
+        }
+        <div class="row mb-6">
+            <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Type"]</label>
+            <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+                @Model.LogType
+            </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Name"]</label>
+            <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+                @Model.UserName
+            </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Credential"]</label>
+            <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+                @Model.Credentials
+            </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["IPAdress"]</label>
+            <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+                @Model.IpAdress
+            </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["CreatedDate"]</label>
+            <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+                @Model.CreatedDate
+            </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Message"]</label>
+            <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+                @Model.Message
+            </div>
+        </div>
+    </div>
+</div>

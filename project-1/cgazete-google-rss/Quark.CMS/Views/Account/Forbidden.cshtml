@@ -1,0 +1,24 @@
+﻿@{
+    Layout = "_LayoutError";
+    ViewData[ViewDataNames.Title] = _localizer["Forbidden"];
+}
+
+<div class="d-flex flex-column flex-center flex-column-fluid">
+    <div class="d-flex flex-column flex-center text-center p-10">
+        <div class="card card-flush w-lg-650px py-5">
+            <div class="card-body py-15 py-lg-20">
+                <h1 class="fw-bolder fs-2hx text-gray-900 mb-4">@_localizer["Forbidden"]</h1>
+                <div class="fw-semibold fs-6 text-gray-500 mb-7">
+                    @_localizer["ForbiddenPageText"]
+                </div>
+                <div class="mb-3">
+                    <img src="https://metronic.avvamobile.com/8.1.5/assets/media/illustrations/dozzy-1/9.png" class="mw-100 mh-300px" />
+                </div>
+                <div class="mb-0">
+                    <a href="/" class="btn btn-sm btn-primary me-5">@_localizer["GoToHome"]</a>
+                    <a href="/Account/SignIn" class="btn btn-sm btn-info">@_localizer["GoToSignIn"]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

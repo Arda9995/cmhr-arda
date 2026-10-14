@@ -1,0 +1,66 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["New"] + " " + _localizer["Menu"];
+    ViewData[ViewDataNames.AsideMenu] = "Content";
+    ViewData[ViewDataNames.AsideSubMenu] = "Menus";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Content"], string.Empty),
+        new BreadcrumbItem(_localizer["MenuManagement"], "/Menus/List")
+    };
+}
+@model Quark.CMS.Business.Models.Requests.MenuRequests.CreateUpdateRequest
+
+<div class=" card mb-5 mb-xl-10 col-lg-12 col-md-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Menu"] @_localizer["Informations"]</h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="ParentID" />
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label required fw-bold fs-6">@_localizer["Name"]</label>
+                <div class="col-lg-8 fv-row">
+                    <input asp-for="Name" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.Name"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label required fw-bold fs-6">@_localizer["Key"]</label>
+                <div class="col-lg-8 fv-row">
+                    <input asp-for="Key" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.Key"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label fw-bold fs-6">@_localizer["Order"]</label>
+                <div class="col-lg-8 fv-row">
+                    <input asp-for="Order" type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.Order"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label fw-bold fs-6">URL</label>
+                <div class="col-lg-8 fv-row">
+                    <input asp-for="URL" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.URL"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label fw-bold fs-6">@_localizer["OpenInNewWindow"]</label>
+                <div class="col-lg-8 fv-row">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <input asp-for="OpenInNewWindow" class="form-check-input" type="checkbox" />
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/Menus/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,407 @@
+﻿
+<div class="hidden lg:block">
+    <!-- HEADER START -->
+    <header id="header" class="relative z-30">
+        <!-- Top Start -->
+        <div class="relative bg-white top py-5 lg:py-0 min-h-14 z-50">
+            <div class="max-w-container mx-auto flex justify-center  items-center">
+                
+                <a href="/" class="inline-block mx-auto">
+                    
+                    <img src="~/assets/img/logo.svg" asp-append-version="true" class="mx-auto h-10 lg:h-auto" alt="Cumhuriyet">
+                </a>  <!-- Icons Start -->
+                <div class="absolute top-1/2 -translate-y-1/2 right-6 gap-6 flex items-menu">
+                    <a href="/arama">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4.99999 10C4.99999 8.67392 5.52677 7.40215 6.46446 6.46447C7.40214 5.52678 8.67391 5 9.99999 5C11.3261 5 12.5978 5.52678 13.5355 6.46447C14.4732 7.40215 15 8.67392 15 10C15 11.3261 14.4732 12.5979 13.5355 13.5355C12.5978 14.4732 11.3261 15 9.99999 15C8.67391 15 7.40214 14.4732 6.46446 13.5355C5.52677 12.5979 4.99999 11.3261 4.99999 10ZM9.99999 3C8.89125 3 7.79837 3.26338 6.81134 3.76843C5.82431 4.27349 4.97138 5.00578 4.32276 5.90501C3.67415 6.80423 3.24842 7.84467 3.08063 8.94064C2.91283 10.0366 3.00778 11.1568 3.35764 12.2089C3.7075 13.2609 4.30228 14.2149 5.09298 14.9921C5.88369 15.7693 6.84771 16.3476 7.90567 16.6794C8.96362 17.0111 10.0852 17.0868 11.1782 16.9001C12.2711 16.7135 13.304 16.27 14.192 15.606L19.292 20.707C19.4795 20.8946 19.7339 21.0001 19.9991 21.0002C20.2644 21.0003 20.5188 20.895 20.7065 20.7075C20.8941 20.52 20.9996 20.2656 20.9997 20.0004C20.9998 19.7351 20.8945 19.4806 20.707 19.293L15.607 14.193C16.3853 13.1525 16.8587 11.9159 16.9741 10.6217C17.0895 9.32741 16.8424 8.02658 16.2604 6.86481C15.6784 5.70304 14.7846 4.72618 13.6789 4.0436C12.5732 3.36103 11.2994 2.99967 9.99999 3Z" fill="#393952"></path>
+                        </svg>
+                    </a>
+                    @{
+                        var nameIdentifierClaim = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                    }
+                    @if (nameIdentifierClaim != null)
+                    {
+                        <div class="user-button relative">
+                            <button class="hidden md:block" data-toggle="user-menu">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.7549 14C18.3513 14.0005 18.9231 14.2378 19.3446 14.6597C19.7661 15.0816 20.0029 15.6536 20.0029 16.25V17.168C20.0029 17.741 19.8239 18.2997 19.4909 18.766C17.9449 20.93 15.4209 22.001 12.0009 22.001C8.57891 22.001 6.05591 20.929 4.51391 18.765C4.18203 18.299 4.00376 17.7411 4.00391 17.169V16.249C4.00417 15.6526 4.2412 15.0807 4.66292 14.659C5.08463 14.2373 5.65652 14.0003 6.25291 14H17.7549ZM11.9999 2.005C12.6565 2.005 13.3067 2.13433 13.9133 2.38561C14.52 2.63688 15.0711 3.00518 15.5354 3.46947C15.9997 3.93376 16.368 4.48496 16.6193 5.09159C16.8706 5.69822 16.9999 6.3484 16.9999 7.005C16.9999 7.66161 16.8706 8.31179 16.6193 8.91842C16.368 9.52505 15.9997 10.0762 15.5354 10.5405C15.0711 11.0048 14.52 11.3731 13.9133 11.6244C13.3067 11.8757 12.6565 12.005 11.9999 12.005C10.6738 12.005 9.40205 11.4782 8.46437 10.5405C7.52669 9.60286 6.99991 8.33109 6.99991 7.005C6.99991 5.67892 7.52669 4.40715 8.46437 3.46947C9.40205 2.53179 10.6738 2.005 11.9999 2.005Z" fill="#393952"></path>
+                                </svg>
+                            </button> <!-- Dropdown Menu -->
+                            <div class="user-dropdown hidden absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-[999] font-helvetica">
+                                <a href="/uye/anasayfa" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
+                                    </svg> <span class="text-sm text-gray-700">Anasayfa</span>
+                                </a> <a href="/uye/abonelik-bilgileri" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"></path>
+                                    </svg> <span class="text-sm text-gray-700">Üyelik Bilgileri</span>
+                                </a>
+                                @*      <a href="./reklamsiz/bildirim-ayarlari" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
+                            </svg> <span class="text-sm text-gray-700">Bildirim Ayarları</span>
+                            </a>  *@
+                                <a href="/uye/sifremi-degistir" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path>
+                                    </svg> <span class="text-sm text-gray-700">Parola Değiştir</span>
+                                </a> <a href="/uye/destek" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"></path>
+                                    </svg> <span class="text-sm text-gray-700">Destek</span>
+                                </a> <a href="/uye/cikis-yap" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"></path>
+                                    </svg> <span class="text-sm text-gray-700">Çıkış Yap</span>
+                                </a>
+                            </div>
+                        </div>
+                    }
+
+                    <button data-toggle="desktop-menu">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.00085 17H21.0008C21.2557 17.0003 21.5009 17.0979 21.6862 17.2728C21.8715 17.4478 21.9831 17.687 21.998 17.9414C22.013 18.1958 21.9302 18.4464 21.7666 18.6418C21.603 18.8373 21.3709 18.9629 21.1178 18.993L21.0008 19H3.00085C2.74597 18.9997 2.50081 18.9021 2.31548 18.7272C2.13014 18.5522 2.01861 18.313 2.00367 18.0586C1.98874 17.8042 2.07152 17.5536 2.23511 17.3582C2.3987 17.1627 2.63075 17.0371 2.88385 17.007L3.00085 17ZM3.00085 11L21.0008 10.998C21.2557 10.9983 21.5009 11.0959 21.6862 11.2708C21.8715 11.4458 21.9831 11.685 21.998 11.9394C22.013 12.1938 21.9302 12.4444 21.7666 12.6398C21.603 12.8353 21.3709 12.9609 21.1178 12.991L21.0008 12.998L3.00085 13C2.74597 12.9997 2.50081 12.9021 2.31548 12.7272C2.13014 12.5522 2.01861 12.313 2.00367 12.0586C1.98874 11.8042 2.07152 11.5536 2.23511 11.3582C2.3987 11.1627 2.63075 11.0371 2.88385 11.007L3.00085 11ZM3.00085 5H21.0008C21.2557 5.00028 21.5009 5.09788 21.6862 5.27285C21.8715 5.44782 21.9831 5.68695 21.998 5.94139C22.013 6.19584 21.9302 6.44638 21.7666 6.64183C21.603 6.83729 21.3709 6.9629 21.1178 6.993L21.0008 7H3.00085C2.74597 6.99972 2.50081 6.90212 2.31548 6.72715C2.13014 6.55218 2.01861 6.31305 2.00367 6.05861C1.98874 5.80416 2.07152 5.55362 2.23511 5.35817C2.3987 5.16271 2.63075 5.0371 2.88385 5.007L3.00085 5Z" fill="#393952"></path>
+                        </svg>
+                    </button>
+                </div> <!-- Icons End -->
+            </div>
+        </div> <!-- Top End --> <!-- Menu Start -->
+        <div class="bg-white z-30 relative pb-1.5 menu">
+            <div class="max-w-container mx-auto pt-1">
+                @await Component.InvokeAsync("Menu", new { methodName = "Header_MenuUst" })
+            </div>
+        </div> <!-- Menu End --> <!-- Bar Start -->
+        <div class="bar bg-[#F2F2F7] text-sm border-t border-gray-200 py-2 relative after:absolute after:top-0 after:right-0 after:bottom-0 after:w-40 after:bg-gradient-to-l after:from-[#F2F2F7] from-40% after:to-transparent z-30 hidden lg:block">
+            <div class="flex justify-center xl:justify-between items-center relative">
+                <!-- Weather Start -->
+                <div class="hidden xl:flex items-center font-bold text-secondary-400 gap-1 shrink-0 pl-5 w-auto xl:w-64 2xl:w-96 justify-start ">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.5601 6.76572C4.73464 5.71419 5.27671 4.75875 6.0898 4.0695C6.90288 3.38026 7.93419 3.00195 9.0001 3.00195C10.066 3.00195 11.0973 3.38026 11.9104 4.0695C12.7235 4.75875 13.2656 5.71419 13.4401 6.76572C14.3036 6.84739 15.1024 7.25835 15.671 7.91333C16.2395 8.56831 16.5341 9.41702 16.4936 10.2834C16.4531 11.1498 16.0806 11.9673 15.4534 12.5663C14.8262 13.1654 13.9924 13.5 13.1251 13.5007H4.8751C4.00778 13.5 3.17404 13.1654 2.54684 12.5663C1.91964 11.9673 1.54714 11.1498 1.50662 10.2834C1.4661 9.41702 1.76067 8.56831 2.32921 7.91333C2.89776 7.25835 3.69664 6.84739 4.5601 6.76572Z" fill="#393952"></path>
+                    </svg>
+
+                    @await Component.InvokeAsync("Common", new { methodName = "Weather" })
+
+                </div> <!-- Weather End --> <!-- Menu Start -->
+                @await Component.InvokeAsync("Menu", new { methodName = "Header_MenuAlt" })<!-- Menu End -->
+                @await Component.InvokeAsync("Common", new { methodName = "Currency" })
+
+            </div>
+        </div> <!-- Bar End -->
+        <div class="bg-white border-b border-[#E5E5EA] py-4 px-9 z-30 flex justify-between transition-all duration-500 sticky-bar hidden relative">
+             <a href="/">
+                <svg width="138" height="32" viewBox="0 0 138 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_2667_1537)">
+                        <path d="M56.8081 7.61869L60.6762 5.15231V11.2187C60.7526 11.2902 60.8801 11.1932 60.9514 11.1523C62.837 9.96252 64.9316 9.40592 67.016 11.1523C68.7436 12.7149 68.7233 14.7268 68.7233 17.5608V23.8723H64.9775V17.5659C65.0386 15.2732 64.8959 14.1395 62.888 13.874C61.0329 13.874 60.6354 15.1506 60.6099 17.5659V23.8672H56.8132L56.8081 7.61869ZM19.7377 8.15486C18.8198 7.13765 17.6934 6.33127 16.4355 5.79099C15.1777 5.25071 13.8181 4.98929 12.45 5.02465C6.98163 5.02465 2.54785 9.28337 2.54785 14.5378C2.54785 19.7923 6.98163 24.0459 12.4449 24.0459C13.96 24.0557 15.4577 23.7218 16.8257 23.0692C18.1937 22.4165 19.3966 21.4621 20.3441 20.2774L17.4749 17.9846C16.8478 18.7105 16.0767 19.2974 15.2106 19.708C14.3446 20.1186 13.4026 20.3438 12.4449 20.3693C10.8683 20.4022 9.34323 19.8063 8.20501 18.7128C7.0668 17.6192 6.40861 16.1175 6.37517 14.5378C6.41392 12.9608 7.07514 11.4636 8.21388 10.3743C9.35262 9.28496 10.876 8.6925 12.45 8.72678C14.2456 8.7507 15.9637 9.46344 17.2507 10.7183L19.7377 8.15486ZM21.078 19.9608C21.078 19.9608 21.2054 23.1012 23.937 23.76C27.428 24.4749 28.274 23.1676 30.3838 23.137C31.4996 23.138 32.5926 23.4529 33.5384 24.0459L33.569 9.92678H29.7417L29.6449 18.3166C29.6449 20.4306 26.7553 20.9566 25.4659 19.9046C25.0541 19.3265 24.8444 18.6281 24.8696 17.9183V9.94209H21.078V19.9608ZM34.6902 23.8774H38.2066L38.171 17.5761C38.171 15.4417 39.1902 14.4817 40.8261 14.4561C42.6608 14.5123 43.3998 15.5438 43.3998 17.5761V23.8672H47.1251V17.5659C47.1251 15.5234 48.0272 14.4715 49.5306 14.4715C51.1614 14.5532 51.9819 15.4927 51.9819 17.5659V23.8672H55.7328V14.7676C55.7328 10.3251 50.0759 8.5889 46.2027 11.6374C46.1203 11.7127 46.0254 11.7732 45.9224 11.8161C45.7339 11.7753 45.7339 11.6783 45.6676 11.617C44.6076 10.5957 43.6291 9.97273 42.2582 10.0238C40.8873 10.0749 39.6489 10.9123 37.6715 11.0195C36.5476 10.904 35.4911 10.4276 34.6596 9.66124L34.6902 23.8774ZM69.8546 19.9455C69.8546 19.9455 69.9769 23.0859 72.7085 23.7446C76.1995 24.4595 77.0455 23.1523 79.1503 23.1217C80.2624 23.1293 81.3501 23.4495 82.2896 24.0459L82.3202 9.94209H78.4877L78.3909 18.3166C78.3909 20.4306 75.5064 20.9566 74.212 19.9046C73.7977 19.3277 73.5878 18.6285 73.6157 17.9183V9.94209H69.8139L69.8546 19.9455ZM87.5031 23.8621V18.337C87.5031 17.0604 89.2613 13.9864 90.199 14.2519C90.6189 14.4434 91.0059 14.7002 91.3457 15.0127C92.0031 15.3549 92.3904 15.5693 93.3027 15.1863C93.7096 15.0246 94.0704 14.7646 94.3528 14.4294C94.6352 14.0942 94.8305 13.6942 94.9213 13.2651C95.0121 12.836 94.9956 12.391 94.8732 11.9698C94.7509 11.5486 94.5265 11.1643 94.22 10.851C93.8982 10.5238 93.514 10.2648 93.0903 10.0893C92.6665 9.91388 92.2119 9.8256 91.7534 9.82975C90.3264 9.7838 89.2053 10.5651 87.6254 12.2757C87.6254 12.3268 87.6254 9.99316 87.6254 9.96763H83.5891V23.8263L87.5031 23.8621ZM105.503 20.5991V22.9889C105.476 23.6698 105.262 24.0238 104.861 24.051H103.536L103.567 27.2681H106.726C108.179 27.1761 109.015 26.3132 109.244 24.6638V20.6093L114.34 9.93699H110.059L107.435 16.0646L104.311 9.93699H99.989L105.503 20.5991ZM97.4715 8.81358C97.8418 8.81561 98.2044 8.70742 98.5133 8.50273C98.8222 8.29804 99.0635 8.00606 99.2067 7.66381C99.3498 7.32156 99.3883 6.94443 99.3173 6.58023C99.2463 6.21604 99.0689 5.88116 98.8078 5.61805C98.5466 5.35493 98.2134 5.17543 97.8503 5.10229C97.4872 5.02915 97.1106 5.06566 96.7683 5.2072C96.4259 5.34873 96.1332 5.58892 95.9272 5.89733C95.7213 6.20573 95.6113 6.56846 95.6113 6.93954C95.61 7.18516 95.6571 7.42862 95.75 7.65594C95.8428 7.88325 95.9797 8.08992 96.1525 8.26408C96.3254 8.43823 96.5309 8.57643 96.7572 8.67074C96.9836 8.76504 97.2263 8.81359 97.4715 8.81358ZM95.5858 23.8723H99.3112V9.94209H95.5858V23.8723ZM129.425 14.497V21.2885C129.486 22.9021 130.444 23.8008 132.34 23.9642L135.286 23.9081L135.235 20.7319C133.828 20.9055 133.125 20.6246 133.13 19.8893V11.8723L134.899 10.5293V6.33699L133.146 7.64422V5.15231L129.425 7.7055V10.417L127.896 11.5557V15.6715L129.425 14.497ZM120.145 23.8212C121.352 23.7825 122.539 23.4992 123.634 22.9884C124.728 22.4776 125.709 21.75 126.515 20.8493C125.778 20.0445 124.999 19.2792 124.181 18.5566C123.386 19.5778 121.261 20.5021 119.457 20.0885C116.853 19.4093 116.735 17.5353 116.751 17.5353H127.157C127.173 17.2512 127.173 16.9666 127.157 16.6825C127.127 13.5778 125.17 9.92167 120.145 9.86039C116.068 9.80933 112.811 12.9753 112.811 16.8204C112.811 20.6655 116.093 23.8212 120.145 23.8212ZM120.145 13.1591C120.637 13.1852 121.117 13.3229 121.549 13.5617C121.981 13.8005 122.353 14.1342 122.637 14.5378H117.398C117.398 14.5378 118.122 13.1949 120.145 13.1591Z" fill="#FF0101"></path>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_2667_1537">
+                            <rect width="137.6" height="32" fill="white"></rect>
+                        </clipPath>
+                    </defs>
+                </svg>
+            </a>  <!-- Nav Start -->
+            <nav class="hidden xl:flex items-center text-sm gap-8 *:py-1 justify-center">
+                @await Component.InvokeAsync("Menu", new { methodName = "Header_MenuUst" })
+            </nav>
+            <!-- Nav End --> <!-- Icons Start -->
+            <div class="gap-6 flex items-center">
+                <button data-toggle="desktop-menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.00085 17H21.0008C21.2557 17.0003 21.5009 17.0979 21.6862 17.2728C21.8715 17.4478 21.9831 17.687 21.998 17.9414C22.013 18.1958 21.9302 18.4464 21.7666 18.6418C21.603 18.8373 21.3709 18.9629 21.1178 18.993L21.0008 19H3.00085C2.74597 18.9997 2.50081 18.9021 2.31548 18.7272C2.13014 18.5522 2.01861 18.313 2.00367 18.0586C1.98874 17.8042 2.07152 17.5536 2.23511 17.3582C2.3987 17.1627 2.63075 17.0371 2.88385 17.007L3.00085 17ZM3.00085 11L21.0008 10.998C21.2557 10.9983 21.5009 11.0959 21.6862 11.2708C21.8715 11.4458 21.9831 11.685 21.998 11.9394C22.013 12.1938 21.9302 12.4444 21.7666 12.6398C21.603 12.8353 21.3709 12.9609 21.1178 12.991L21.0008 12.998L3.00085 13C2.74597 12.9997 2.50081 12.9021 2.31548 12.7272C2.13014 12.5522 2.01861 12.313 2.00367 12.0586C1.98874 11.8042 2.07152 11.5536 2.23511 11.3582C2.3987 11.1627 2.63075 11.0371 2.88385 11.007L3.00085 11ZM3.00085 5H21.0008C21.2557 5.00028 21.5009 5.09788 21.6862 5.27285C21.8715 5.44782 21.9831 5.68695 21.998 5.94139C22.013 6.19584 21.9302 6.44638 21.7666 6.64183C21.603 6.83729 21.3709 6.9629 21.1178 6.993L21.0008 7H3.00085C2.74597 6.99972 2.50081 6.90212 2.31548 6.72715C2.13014 6.55218 2.01861 6.31305 2.00367 6.05861C1.98874 5.80416 2.07152 5.55362 2.23511 5.35817C2.3987 5.16271 2.63075 5.0371 2.88385 5.007L3.00085 5Z" fill="#393952"></path>
+                    </svg>
+                </button>
+            </div>  <!-- Icons End -->
+        </div> <!-- Cumhuriyet Modal Start -->
+        <div class="absolute top-full left-0 right-0 -translate-y-full transition-all c-modal pointer-events-none z-20 opacity-0 overflow-hidden lg:overflow-auto">
+            <div class="p-5 [box-shadow:0px_24px_50px_0px_rgba(0,_0,_0,_0.24)] bg-white lg:max-w-[955px] lg:w-full mx-auto">
+                <div class="grid grid-cols-2 gap-3 items-center">
+                    <div>
+                        <nav class="space-y-6">
+                            
+
+                            <a href="https://www.cumhuriyetdaily.com" target="_blank" rel="nofollow" class="flex gap-3 items-center">
+                                <img src="/assets/img/c-daily.png" alt="" loading="lazy" />
+                                <div class="space-y-1">
+                                    <div class="text-slate-900 font-semibold">Cumhuriyet Daily</div>
+                                </div>
+                            </a>
+                            <a href="https://www.youtube.com/CumhuriyetTVtr" target="_blank" rel="nofollow" class="flex gap-3 items-center">
+                                <img src="/assets/img/c-tv.png" alt="" loading="lazy" />
+                                <div class="space-y-1">
+                                    <div class="text-slate-900 font-semibold">Cumhuriyet TV</div>
+                                </div>
+                            </a>
+
+                            <a href="/cumhuriyetin-egesi" target="_blank" class="flex gap-3 items-center">
+                                <img src="/assets/img/c-ege.png" alt="" loading="lazy" />
+                                <div class="space-y-1">
+                                    <div class="text-slate-900 font-semibold">Cumhuriyet'in' Egesi</div>
+                                </div>
+                            </a>
+                            <a href="/kitap" target="_blank" class="flex gap-3 items-center">
+                                <img src="/assets/img/c-kitap.png" alt="" loading="lazy" />
+                                <div class="space-y-1">
+                                    <div class="text-slate-900 font-semibold">Cumhuriyet Kitap</div>
+                                </div>
+                            </a>
+
+                            <a href="/cumhuriyet-pazar" target="_blank" class="flex gap-3 items-center">
+                                <img src="/assets/img/c-pazar.png" alt="" loading="lazy" />
+                                <div class="space-y-1">
+                                    <div class="text-slate-900 font-semibold">Cumhuriyet Pazar</div>
+                                    @*<p class="text-[#6B6B7D] font-helvetica text-xs">Previous sky functional door future.</p>*@
+                                </div>
+                            </a>
+                            <a href="/pazar-yazilari" target="_blank" class="flex gap-3 items-center">
+                                <img src="/assets/img/c-logo.png" alt="" loading="lazy" />
+                                <div class="space-y-1">
+                                    <div class="text-slate-900 font-semibold">Pazar Yazıları</div>
+                                </div>
+                            </a>
+                            <a href="/gurme" target="_blank" class="flex gap-3 items-center">
+                                <img src="/assets/img/c-logo.png" alt="" loading="lazy" />
+                                <div class="space-y-1">
+                                    <div class="text-slate-900 font-semibold">Gurme</div>
+                                </div>
+                            </a>
+                            
+                            <a href="/kesfet" target="_blank" class="flex gap-3 items-center">
+                                <img src="/assets/img/c-logo.png" alt="" loading="lazy" />
+                                <div class="space-y-1">
+                                    <div class="text-slate-900 font-semibold">Keşfet</div>
+                                </div>
+                            </a>
+                            
+
+                        </nav>
+                    </div>
+                    <div class="space-y-10">
+                        <!-- App Box Start -->
+                        <div class="px-5 py-2 bg-neutral-100">
+                            
+                            <div class="text-slate-900 font-semibold"> Bütün Cumhuriyet arşivi her yerde ve her an yanınızda! İster telefondan, ister bilgisayardan. </div>  <!-- List Start -->
+                            <ul class="flex text-xs space-x-2 *:border-r *:border-gray-200 *:pr-2 mt-2 mb-4">
+                                <li>Cumhuriyet Arşiv</li>
+                                <li>1930 Yılından Bugüne</li>
+                                <li class="!border-r-0 !pr-0">5.485.115+ Haber Kupürü</li>
+                            </ul> <!-- List End --> <!-- Apps Start -->
+                            <div class="flex items-center justify-center gap-4">
+                                <a href="@_appSettings.MobileApp_AppStoreUrl" target="_blank" rel="nofollow" class="px-2 py-1 bg-gray-700 hover:bg-gray-900 transition-all rounded-lg flex items-center gap-1 text-xs font-semibold text-white">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <g clip-path="url(#clip0_2575_6858)">
+                                            <path d="M3.60499 12.6344L3.26367 13.2317" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M12.7359 13.2326L9.24805 7.1422" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M6.92285 3.10001L8.00014 4.97725" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M9.07634 3.10001L4.85254 10.4703" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M8.66138 10.4719H2.66699" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M13.333 10.4719H11.1465" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_2575_6858">
+                                                <rect width="16" height="16" fill="white"></rect>
+                                            </clipPath>
+                                        </defs>
+                                    </svg> App Store
+                                </a> <a href="@_appSettings.MobileApp_GooglePlayUrl" target="_blank" rel="nofollow" class="px-2 py-1 bg-gray-700 hover:bg-gray-900 transition-all rounded-lg flex items-center gap-1 text-xs font-semibold text-white">
+                                    <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <g clip-path="url(#clip0_2575_6869)">
+                                            <path d="M3.10645 2.95902V13.0417C3.10645 13.7757 3.89845 14.237 4.53645 13.8744L13.4084 8.83302C14.0544 8.46636 14.0544 7.53502 13.4084 7.16836L4.53645 2.12636C3.89845 1.76369 3.10645 2.22502 3.10645 2.95902Z" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M10.3008 5.39999L3.49414 13.8" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            <path d="M3.49414 2.2L10.3008 10.6" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_2575_6869">
+                                                <rect width="16" height="16" fill="white" transform="translate(0.5)"></rect>
+                                            </clipPath>
+                                        </defs>
+                                    </svg> Google Play
+                                </a>
+                            </div> <!-- Apps End --> <!-- Features Start -->
+                            <div class="grid grid-cols-4 mt-5 gap-3">
+                                <div class="bg-white py-1.5 px-1 relative h-24">
+                                    <div class="text-slate-900 text-xs font-semibold"> 50 BİN + <br> <span class="text-[10px]">İndirme</span> </div> <img src="/assets/img/feature-1.png" class="absolute bottom-0 right-0" alt="" loading="lazy">
+                                </div>
+                                <div class="bg-white py-1.5 px-1 relative h-24">
+                                    <div class="text-slate-900 text-xs font-semibold text-[10px]"> Size En <br> Uygun Paketi <br> Seçin </div> <img src="/assets/img/feature-2.png" class="absolute bottom-0 right-0" alt="" loading="lazy">
+                                </div>
+                                <div class="bg-white py-1.5 px-1 relative h-24">
+                                    <div class="text-slate-900 text-xs font-semibold text-[10px] flex flex-wrap">
+                                        <svg class="shrink-0" width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5.1135 2.04156C5.29708 1.66958 5.82745 1.66958 6.01069 2.04156L6.93962 3.92288L9.01591 4.22481C9.42655 4.28451 9.59011 4.78865 9.29335 5.07817L7.79057 6.54264L8.1453 8.61063C8.21569 9.01954 7.78642 9.33114 7.41961 9.13824L5.56244 8.1617L3.70526 9.13824C3.33811 9.33114 2.90918 9.01954 2.97923 8.61063L3.33397 6.54264L1.83118 5.07817C1.53442 4.78865 1.69833 4.28451 2.10862 4.22481L4.18491 3.92288L5.1135 2.04156Z" fill="#FF8800"></path>
+                                        </svg> 4.5 <br> <span class="text-[10px]">değerlendirme</span>
+                                    </div> <img src="/assets/img/feature-3.png" class="absolute bottom-0 right-0" alt="" loading="lazy">
+                                </div>
+                                <div class="bg-white py-1.5 px-1 relative h-24">
+                                    <div class="text-slate-900 text-xs font-semibold text-[10px]"> Abonelik <br> Seçeneklerini <br> İnceleyin </div> <img src="/assets/img/feature-2.png" class="absolute bottom-0 right-0" alt="" loading="lazy">
+                                </div>
+                            </div> <!-- Features End -->
+                        </div> <!-- App Box End --> <!-- Books Start -->
+                        <div class="px-5 py-2 bg-neutral-100">
+                            
+                            <div class="font-semibold">Edebiyatın ve Kültürün Nabzı</div>  
+                            <p class="mt-2 leading-5 text-xs"> Kitap dünyasına açılan kapınızı aralayın! En sevdiğiniz kitapları indirimli fiyatlarla keşfedin ve hayal gücünüzü genişletin. </p>  <!-- Flex Start -->
+                            <div class="grid grid-cols-4 gap-3 mt-4 items-end">
+                                <div class="col-span-3"> <img class="w-full" src="/assets/img/books.png" alt="" loading="lazy"> </div>
+                                <div class="col-span-1"> 
+                                    <a href="https://www.cumhuriyetkitap.com.tr" target="_blank" rel="nofollow" class="px-4 py-1 mb-5 bg-gray-700 hover:bg-gray-900 transition-all rounded-lg inline-flex items-center gap-1 text-xs font-semibold text-white">İncele</a> 
+                                </div>
+                            </div> <!-- Flex End -->
+                        </div> <!-- Books End -->
+                    </div>
+                </div>
+            </div>
+        </div> <!-- Cumhuriyet Modal End --> 
+
+
+    </header> <!-- HEADER END --> <!-- Menü Arkaplanı -->
+    <div id="menuBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 z-40 opacity-0 pointer-events-none" data-astro-cid-7j4fal7x></div> <!-- Menü -->
+    <div id="desktopMenu" class="font-helvetica fixed top-0 right-0 w-[400px] h-full bg-white shadow-2xl transition-transform duration-300 ease-in-out transform translate-x-full z-50" data-astro-cid-7j4fal7x>
+        <!-- Menü Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b" data-astro-cid-7j4fal7x>
+            <h3 class="text-xl font-bold text-gray-900" data-astro-cid-7j4fal7x>Menü</h3> <button type="button" class="close-drawer text-gray-500 hover:text-gray-700 focus:outline-none" data-astro-cid-7j4fal7x>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" data-astro-cid-7j4fal7x>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" data-astro-cid-7j4fal7x></path>
+                </svg>
+            </button>
+        </div> <!-- Giriş/Kayıt Butonları -->
+        @if (nameIdentifierClaim == null)
+        {
+            <div class="flex gap-3 px-6 py-4 border-b" data-astro-cid-7j4fal7x>
+                <a href="/uye/giris" class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200 hover:scale-[1.02]" data-astro-cid-7j4fal7x>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" data-astro-cid-7j4fal7x>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" data-astro-cid-7j4fal7x></path>
+                    </svg> Giriş Yap
+                </a>
+                <a href="/uye/kayit-ol" class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 hover:scale-[1.02]" data-astro-cid-7j4fal7x>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" data-astro-cid-7j4fal7x>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" data-astro-cid-7j4fal7x></path>
+                    </svg> Kayıt Ol
+                </a>
+            </div>
+        }
+        <!-- Menü İçeriği -->
+        @await Component.InvokeAsync("Menu", new { methodName = "Desktop_HamburgerMenu" })
+    </div>
+</div>
+<div class="lg:hidden" id="mobileHeaderArea">
+    <!-- HEADER START -->
+    <header class="bg-white border-b border-[#E5E5EA] py-3 z-50 transition-all sticky top-0 left-0 right-0 mobile-header undefined lg:hidden">
+        <div class="max-w-md mx-auto px-5 md:px-0">
+            <div class="flex relative">
+                 <a href="/" class="mx-auto"> <img src="~/assets/img/logo.svg" class="h-10 mx-auto" alt="Cumhuriyet"> </a>  <!-- Buttons Start -->
+                <div class="flex items-center gap-3 absolute right-0 top-1/2 -translate-y-1/2">
+                    <button>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4.99999 10C4.99999 8.67392 5.52677 7.40215 6.46446 6.46447C7.40214 5.52678 8.67391 5 9.99999 5C11.3261 5 12.5978 5.52678 13.5355 6.46447C14.4732 7.40215 15 8.67392 15 10C15 11.3261 14.4732 12.5979 13.5355 13.5355C12.5978 14.4732 11.3261 15 9.99999 15C8.67391 15 7.40214 14.4732 6.46446 13.5355C5.52677 12.5979 4.99999 11.3261 4.99999 10ZM9.99999 3C8.89125 3 7.79837 3.26338 6.81134 3.76843C5.82431 4.27349 4.97138 5.00578 4.32276 5.90501C3.67415 6.80423 3.24842 7.84467 3.08063 8.94064C2.91283 10.0366 3.00778 11.1568 3.35764 12.2089C3.7075 13.2609 4.30228 14.2149 5.09298 14.9921C5.88369 15.7693 6.84771 16.3476 7.90567 16.6794C8.96362 17.0111 10.0852 17.0868 11.1782 16.9001C12.2711 16.7135 13.304 16.27 14.192 15.606L19.292 20.707C19.4795 20.8946 19.7339 21.0001 19.9991 21.0002C20.2644 21.0003 20.5188 20.895 20.7065 20.7075C20.8941 20.52 20.9996 20.2656 20.9997 20.0004C20.9998 19.7351 20.8945 19.4806 20.707 19.293L15.607 14.193C16.3853 13.1525 16.8587 11.9159 16.9741 10.6217C17.0895 9.32741 16.8424 8.02658 16.2604 6.86481C15.6784 5.70304 14.7846 4.72618 13.6789 4.0436C12.5732 3.36103 11.2994 2.99967 9.99999 3Z" fill="#393952"></path>
+                        </svg>
+                    </button> <button id="toggleMenu">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.00085 17H21.0008C21.2557 17.0003 21.5009 17.0979 21.6862 17.2728C21.8715 17.4478 21.9831 17.687 21.998 17.9414C22.013 18.1958 21.9302 18.4464 21.7666 18.6418C21.603 18.8373 21.3709 18.9629 21.1178 18.993L21.0008 19H3.00085C2.74597 18.9997 2.50081 18.9021 2.31548 18.7272C2.13014 18.5522 2.01861 18.313 2.00367 18.0586C1.98874 17.8042 2.07152 17.5536 2.23511 17.3582C2.3987 17.1627 2.63075 17.0371 2.88385 17.007L3.00085 17ZM3.00085 11L21.0008 10.998C21.2557 10.9983 21.5009 11.0959 21.6862 11.2708C21.8715 11.4458 21.9831 11.685 21.998 11.9394C22.013 12.1938 21.9302 12.4444 21.7666 12.6398C21.603 12.8353 21.3709 12.9609 21.1178 12.991L21.0008 12.998L3.00085 13C2.74597 12.9997 2.50081 12.9021 2.31548 12.7272C2.13014 12.5522 2.01861 12.313 2.00367 12.0586C1.98874 11.8042 2.07152 11.5536 2.23511 11.3582C2.3987 11.1627 2.63075 11.0371 2.88385 11.007L3.00085 11ZM3.00085 5H21.0008C21.2557 5.00028 21.5009 5.09788 21.6862 5.27285C21.8715 5.44782 21.9831 5.68695 21.998 5.94139C22.013 6.19584 21.9302 6.44638 21.7666 6.64183C21.603 6.83729 21.3709 6.9629 21.1178 6.993L21.0008 7H3.00085C2.74597 6.99972 2.50081 6.90212 2.31548 6.72715C2.13014 6.55218 2.01861 6.31305 2.00367 6.05861C1.98874 5.80416 2.07152 5.55362 2.23511 5.35817C2.3987 5.16271 2.63075 5.0371 2.88385 5.007L3.00085 5Z" fill="#393952"></path>
+                        </svg>
+                    </button>
+                </div> <!-- Buttons End -->
+            </div>
+        </div>
+    </header> <!-- HEADER END -->
+    <div id="placeholder" class="hidden lg:hidden"></div>
+    <div class="menu-area pointer-events-none select-none" id="siteMenu">
+        <div class="bg-white/40 fixed inset-0 z-50 overlay opacity-0 transition-all"></div>
+        <div class="bg-white w-full max-w-80 h-full fixed top-0 right-0 bottom-0 z-50 p-4 translate-x-full transition-all" id="mobileSlideMenu">
+            <!-- Toggle Menu Start --> <button class="toggleMenu absolute top-4 right-4" id="toggleMenu">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_2577_11377)">
+                        <path d="M5.33059 4.26992C5.18994 4.12927 4.99918 4.05025 4.80026 4.05025C4.60135 4.05025 4.41059 4.12927 4.26993 4.26992C4.12928 4.41057 4.05026 4.60134 4.05026 4.80025C4.05026 4.99916 4.12928 5.18993 4.26993 5.33058L8.68935 9.75L4.26993 14.1694C4.12928 14.3101 4.05026 14.5008 4.05026 14.6997C4.05026 14.8987 4.12928 15.0894 4.26993 15.2301C4.41059 15.3707 4.60135 15.4497 4.80026 15.4497C4.99918 15.4497 5.18994 15.3707 5.33059 15.2301L9.75001 10.8107L14.1694 15.2301C14.3101 15.3707 14.5008 15.4497 14.6998 15.4497C14.8987 15.4497 15.0894 15.3707 15.2301 15.2301C15.3707 15.0894 15.4498 14.8987 15.4498 14.6997C15.4498 14.5008 15.3707 14.3101 15.2301 14.1694L10.8107 9.75L15.2301 5.33058C15.3707 5.18993 15.4498 4.99916 15.4498 4.80025C15.4498 4.60134 15.3707 4.41057 15.2301 4.26992C15.0894 4.12927 14.8987 4.05025 14.6998 4.05025C14.5008 4.05025 14.3101 4.12927 14.1694 4.26992L9.75001 8.68934L5.33059 4.26992Z" fill="#393952"></path>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_2577_11377">
+                            <rect width="20" height="20" fill="white"></rect>
+                        </clipPath>
+                    </defs>
+                </svg>
+            </button> <!-- Toggle Menu End -->
+            <div class="flex flex-col h-full">
+                <!-- Special Item Start --> <a href="#" class="flex items-center gap-2 py-2.5 mb-2" id="avva_special_link">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="28" height="28" rx="14" fill="#FF0101"></rect>
+                        <rect x="1.5" y="1.5" width="25" height="25" rx="12.5" stroke="white"></rect>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M17.6448 7.56627C18.1796 7.79766 18.6818 8.09537 19.1404 8.4514C19.6993 8.88521 19.6774 9.7 19.1866 10.2096C18.6655 10.7507 17.8076 10.743 17.1522 10.3759C16.4174 9.96449 15.5874 9.73815 14.7334 9.72668C13.5836 9.70146 12.4708 10.1374 11.639 10.939C10.8071 11.7406 10.3241 12.8425 10.2958 14.003C10.3202 15.1654 10.801 16.2705 11.6325 17.0752C12.464 17.88 13.578 18.3184 14.7297 18.2943C15.4293 18.2755 16.1174 18.1097 16.75 17.8076C16.9823 17.6967 17.2053 17.5682 17.4171 17.4237C18.0288 17.0062 18.8624 16.9084 19.4393 17.3728C20.0263 17.8453 20.1289 18.7151 19.56 19.2092C19.0677 19.6366 18.5198 19.9975 17.9299 20.2811C16.9305 20.7613 15.8365 21.0071 14.7297 20.9998C10.7388 20.9998 7.5 17.8697 7.5 14.003C7.5 10.1363 10.7388 7.00233 14.7334 7.00233C15.7328 6.97631 16.7259 7.16868 17.6448 7.56627Z" fill="white"></path>
+                    </svg> <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF0101] to-[#0D4ABC] font-semibold block"> Cumhuriyete Özel </span>
+                </a> <span class="block h-px w-full bg-gray-200"></span> <!-- Link Start -->
+                <a href="/uye/giris" class="p-2 bg-blue-600 text-white font-medium flex items-center justify-center text-center gap-2 my-3">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2.40039C10.727 2.40039 9.50606 2.9061 8.60589 3.80628C7.70571 4.70645 7.2 5.92735 7.2 7.20039C7.2 8.47343 7.70571 9.69433 8.60589 10.5945C9.50606 11.4947 10.727 12.0004 12 12.0004C13.273 12.0004 14.4939 11.4947 15.3941 10.5945C16.2943 9.69433 16.8 8.47343 16.8 7.20039C16.8 5.92735 16.2943 4.70645 15.3941 3.80628C14.4939 2.9061 13.273 2.40039 12 2.40039ZM6.0108 13.2004C5.69472 13.199 5.38147 13.26 5.08904 13.38C4.79661 13.4999 4.53076 13.6765 4.30676 13.8995C4.08275 14.1225 3.905 14.3876 3.78372 14.6795C3.66243 14.9713 3.6 15.2843 3.6 15.6004C3.6 17.6296 4.5996 19.1596 6.162 20.1568C7.7004 21.1372 9.774 21.6004 12 21.6004C14.226 21.6004 16.2996 21.1372 17.838 20.1568C19.4004 19.1608 20.4 17.6284 20.4 15.6004C20.4 14.9639 20.1471 14.3534 19.6971 13.9033C19.247 13.4532 18.6365 13.2004 18 13.2004H6.0108Z" fill="white"></path>
+                    </svg> Giriş Yap
+                </a> <!-- Link End  -->
+                <div class="flex-1 overflow-y-auto">
+                    <nav class="dropdown-list mt-2 pl-6 space-y-6 hidden">
+                        <a href="https://www.cumhuriyetdaily.com" target="_blank" rel="nofollow" class="text-gray-700 font-semibold flex items-center gap-2"> <img src="/assets/img/c-daily.png" class="size-6 rounded-full" alt="" loading="lazy" /> Cumhuriyet Daily </a>
+                        <a href="https://www.youtube.com/CumhuriyetTVtr" target="_blank" rel="nofollow" class="text-gray-700 font-semibold flex items-center gap-2"> <img src="/assets/img/c-tv.png" class="size-6 rounded-full" alt="" loading="lazy" /> Cumhuriyet TV </a>
+                        <a href="/cumhuriyetin-egesi" class="text-gray-700 font-semibold flex items-center gap-2"> <img src="/assets/img/c-ege.png" class="size-6 rounded-full" alt="" loading="lazy" /> Cumhuriyet'in Egesi </a>
+                        <a href="/kitap" target="_blank" class="text-gray-700 font-semibold flex items-center gap-2"> <img src="/assets/img/c-kitap.png" class="size-6 rounded-full" alt="" loading="lazy" /> Cumhuriyet Kitap </a>
+                        <a href="/cumhuriyet-pazar" target="_blank" class="text-gray-700 font-semibold flex items-center gap-2"> <img src="/assets/img/c-pazar.png" class="size-6 rounded-full" alt="" loading="lazy" /> Cumhuriyet Pazar </a>
+                        <a href="/pazar-yazilari" target="_blank" class="text-gray-700 font-semibold flex items-center gap-2"> <img src="/assets/img/c-logo.png" class="size-6 rounded-full" alt="" loading="lazy" /> Pazar Yazıları </a>
+                        <a href="/gurme" target="_blank" class="text-gray-700 font-semibold flex items-center gap-2"> <img src="/assets/img/c-logo.png" class="size-6 rounded-full" alt="" loading="lazy" /> Gurme </a>
+                        <a href="/kesfet" target="_blank" class="text-gray-700 font-semibold flex items-center gap-2"> <img src="/assets/img/c-logo.png" class="size-6 rounded-full" alt="" loading="lazy" /> Keşfet </a>
+
+
+                    </nav> <!-- Special Item End --> <!-- Menu Start -->
+                    @await Component.InvokeAsync("Menu", new { methodName = "MobileHeader_HamburgerMenu" })<!-- Menu End  --> <!-- Social Start -->
+                    <nav class="flex justify-end mt-5 gap-3">
+                        <a class="bg-blue-800/5 size-8 flex items-center justify-center rounded-full" rel="nofollow" target="_blank" href="@_appSettings.Social_Youtube">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_2577_10584)">
+                                    <path d="M8 0C3.58176 0 0 3.58176 0 8C0 11.7517 2.58304 14.8998 6.06752 15.7645V10.4448H4.41792V8H6.06752V6.94656C6.06752 4.22368 7.29984 2.9616 9.97312 2.9616C10.48 2.9616 11.3546 3.06112 11.7123 3.16032V5.37632C11.5235 5.35648 11.1955 5.34656 10.7882 5.34656C9.47648 5.34656 8.9696 5.84352 8.9696 7.13536V8H11.5827L11.1338 10.4448H8.9696V15.9414C12.9309 15.463 16.0003 12.0902 16.0003 8C16 3.58176 12.4182 0 8 0Z" fill="#3D6EC9" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_2577_10584">
+                                        <rect width="16" height="16" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </a><a class="bg-blue-800/5 size-8 flex items-center justify-center rounded-full" rel="nofollow" target="_blank" href="@_appSettings.Social_Linkedin">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_2577_10586)">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.33386 0.666992H11.6704C13.6936 0.666992 15.3339 2.30721 15.3339 4.3304V11.6711C15.3339 13.6934 13.6936 15.3337 11.6704 15.3337H4.3306C2.30741 15.3337 0.667191 13.6934 0.667191 11.6703V4.33366C0.667191 2.30884 2.30904 0.666992 4.33386 0.666992Z" fill="#3D6EC9" stroke="#3D6EC9" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M4.66719 7.33301V11.333" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M7.77032 11.6656V9.09896C7.77032 8.08614 8.59084 7.26562 9.60366 7.26562C10.6165 7.26562 11.437 8.08614 11.437 9.09896V11.6656" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M4.83722 4.60742C4.73618 4.60742 4.65388 4.68972 4.6547 4.79076C4.6547 4.89179 4.737 4.97409 4.83803 4.97409C4.93907 4.97409 5.02137 4.89179 5.02137 4.79076C5.02137 4.6889 4.93907 4.60742 4.83722 4.60742Z" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_2577_10586">
+                                        <rect width="16" height="16" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </a><a class="bg-blue-800/5 size-8 flex items-center justify-center rounded-full" rel="nofollow" target="_blank" href="@_appSettings.Social_Instagram">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_2577_10594)">
+                                    <path d="M8 1.44063C10.1375 1.44063 10.3906 1.45 11.2313 1.4875C12.0125 1.52188 12.4344 1.65313 12.7156 1.7625C13.0875 1.90625 13.3563 2.08125 13.6344 2.35938C13.9156 2.64063 14.0875 2.90625 14.2313 3.27813C14.3406 3.55938 14.4719 3.98438 14.5063 4.7625C14.5438 5.60625 14.5531 5.85938 14.5531 7.99375C14.5531 10.1313 14.5438 10.3844 14.5063 11.225C14.4719 12.0063 14.3406 12.4281 14.2313 12.7094C14.0875 13.0813 13.9125 13.35 13.6344 13.6281C13.3531 13.9094 13.0875 14.0813 12.7156 14.225C12.4344 14.3344 12.0094 14.4656 11.2313 14.5C10.3875 14.5375 10.1344 14.5469 8 14.5469C5.8625 14.5469 5.60938 14.5375 4.76875 14.5C3.9875 14.4656 3.56563 14.3344 3.28438 14.225C2.9125 14.0813 2.64375 13.9063 2.36563 13.6281C2.08438 13.3469 1.9125 13.0813 1.76875 12.7094C1.65938 12.4281 1.52813 12.0031 1.49375 11.225C1.45625 10.3813 1.44688 10.1281 1.44688 7.99375C1.44688 5.85625 1.45625 5.60313 1.49375 4.7625C1.52813 3.98125 1.65938 3.55938 1.76875 3.27813C1.9125 2.90625 2.0875 2.6375 2.36563 2.35938C2.64688 2.07813 2.9125 1.90625 3.28438 1.7625C3.56563 1.65313 3.99063 1.52188 4.76875 1.4875C5.60938 1.45 5.8625 1.44063 8 1.44063ZM8 0C5.82813 0 5.55625 0.009375 4.70313 0.046875C3.85313 0.084375 3.26875 0.221875 2.7625 0.41875C2.23438 0.625 1.7875 0.896875 1.34375 1.34375C0.896875 1.7875 0.625 2.23438 0.41875 2.75938C0.221875 3.26875 0.084375 3.85 0.046875 4.7C0.009375 5.55625 0 5.82813 0 8C0 10.1719 0.009375 10.4438 0.046875 11.2969C0.084375 12.1469 0.221875 12.7313 0.41875 13.2375C0.625 13.7656 0.896875 14.2125 1.34375 14.6563C1.7875 15.1 2.23438 15.375 2.75938 15.5781C3.26875 15.775 3.85 15.9125 4.7 15.95C5.55313 15.9875 5.825 15.9969 7.99688 15.9969C10.1688 15.9969 10.4406 15.9875 11.2938 15.95C12.1438 15.9125 12.7281 15.775 13.2344 15.5781C13.7594 15.375 14.2063 15.1 14.65 14.6563C15.0938 14.2125 15.3688 13.7656 15.5719 13.2406C15.7688 12.7313 15.9063 12.15 15.9438 11.3C15.9813 10.4469 15.9906 10.175 15.9906 8.00313C15.9906 5.83125 15.9813 5.55938 15.9438 4.70625C15.9063 3.85625 15.7688 3.27188 15.5719 2.76563C15.375 2.23438 15.1031 1.7875 14.6563 1.34375C14.2125 0.9 13.7656 0.625 13.2406 0.421875C12.7313 0.225 12.15 0.0875 11.3 0.05C10.4438 0.00937501 10.1719 0 8 0Z" fill="#3D6EC9" />
+                                    <path d="M8 3.89062C5.73125 3.89062 3.89062 5.73125 3.89062 8C3.89062 10.2688 5.73125 12.1094 8 12.1094C10.2688 12.1094 12.1094 10.2688 12.1094 8C12.1094 5.73125 10.2688 3.89062 8 3.89062ZM8 10.6656C6.52813 10.6656 5.33438 9.47188 5.33438 8C5.33438 6.52813 6.52813 5.33438 8 5.33438C9.47188 5.33438 10.6656 6.52813 10.6656 8C10.6656 9.47188 9.47188 10.6656 8 10.6656Z" fill="#3D6EC9" />
+                                    <path d="M13.2312 3.72891C13.2312 4.26016 12.8 4.68828 12.2719 4.68828C11.7406 4.68828 11.3125 4.25703 11.3125 3.72891C11.3125 3.19766 11.7438 2.76953 12.2719 2.76953C12.8 2.76953 13.2312 3.20078 13.2312 3.72891Z" fill="#3D6EC9" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_2577_10594">
+                                        <rect width="16" height="16" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </a><a class="bg-blue-800/5 size-8 flex items-center justify-center rounded-full" rel="nofollow" target="_blank" href="@_appSettings.Social_Youtube">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_2577_10596)">
+                                    <path d="M9.46666 7.99792L6.89999 9.46458V6.53125L9.46666 7.99792Z" fill="#3D6EC9" stroke="#3D6EC9" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M0.665619 8.51786V7.47946C0.665619 5.35646 0.665619 4.29459 1.32929 3.61186C1.99369 2.92839 3.03942 2.89906 5.13015 2.83966C6.12015 2.81179 7.13215 2.79199 7.99895 2.79199C8.86575 2.79199 9.87702 2.81179 10.8678 2.83966C12.9585 2.89906 14.0042 2.92839 14.6679 3.61186C15.3316 4.29533 15.3323 5.35719 15.3323 7.47946V8.51713C15.3323 10.6409 15.3323 11.702 14.6686 12.3855C14.0042 13.0682 12.9592 13.0983 10.8678 13.1569C9.87775 13.1855 8.86575 13.2053 7.99895 13.2053C7.13215 13.2053 6.12089 13.1855 5.13015 13.1569C3.03942 13.0983 1.99369 13.0689 1.32929 12.3855C0.664886 11.702 0.665619 10.6401 0.665619 8.51786Z" stroke="#3D6EC9" stroke-width="1.66667" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_2577_10596">
+                                        <rect width="16" height="16" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </a>
+                    </nav> <!-- Social End -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

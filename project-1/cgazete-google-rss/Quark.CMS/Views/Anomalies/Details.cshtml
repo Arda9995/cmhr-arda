@@ -1,0 +1,73 @@
+@{
+	ViewData[ViewDataNames.Title] = _localizer["Anomaly"] + " " + _localizer["List"];
+	ViewData[ViewDataNames.AsideMenu] = "Management";
+	ViewData[ViewDataNames.AsideSubMenu] = "Anomalies";
+	ViewData["ShowBackButton"] = true;
+	ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+	{
+		new BreadcrumbItem(_localizer["Management"], string.Empty),
+		new BreadcrumbItem(_localizer["Anomalies"], "/Anomalies/List")
+	};
+}
+
+@model Quark.CMS.Business.Models.Responses.AnomalyResponses.DetailsResponse
+
+@section Scripts {
+    <script src="/Scripts/Anomalies/Details.js" asp-append-version="true"></script>
+}
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+	    <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Anomaly"] @_localizer["Informations"] </h3>
+	    </div>
+	    <div class="card-toolbar">
+		    @if (!Model.IsSolved)
+		    {
+			    <button class="btn btn-sm btn-success" onclick="markAsResolved(@Model.ID)">@_localizer["MarkAsSolved"]</button>
+		    }
+		    else
+		    {
+			    <span class="badge badge-lg badge-success">@_localizer["Solved"]</span>
+		    }
+	    </div>
+    </div>
+    <div class="card-body border-top p-9">
+        <div class="row mb-6">
+        	<label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Page"]</label>
+        	<div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+        		<a href="@Model.DataURL" target="_blank">@Model.DataURL</a>
+        	</div>
+        </div>
+        <div class="row mb-6">
+        	<label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["CreatedDate"]</label>
+        	<div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+        		@Model.CreatedDate
+        	</div>
+        </div>
+        <div class="row mb-6">
+	        <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["CreatedBy"]</label>
+	        <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+		        @Model.CreatedBy
+	        </div>
+        </div>
+        <div class="row mb-6">
+	        <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["DataType"]</label>
+	        <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+		        @Model.DataType
+	        </div>
+        </div>
+        <div class="row mb-6">
+            <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Issue"]</label>
+            <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+                @Model.Issue
+            </div>
+        </div>
+        <div class="row mb-6">
+	        <label class="col-lg-2 col-form-label fw-bold fs-6">@_localizer["Description"]</label>
+	        <div class="col-lg-10 fv-row col-form-label fw-bold fs-6">
+		        @Model.Description
+	        </div>
+        </div>
+    </div>
+</div>

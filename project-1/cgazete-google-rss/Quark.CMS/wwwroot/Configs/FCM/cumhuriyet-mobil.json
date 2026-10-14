@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "cumhuriyet-mobil",
+  "private_key_id": "cee72468d38e69ab705bd2e540b40f66734b8f18",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEugIBADANBgkqhkiG9w0BAQEFAASCBKQwggSgAgEAAoIBAQCiuFnyWjj9g6Rj\nbRMaGSbCVpE5QKSXxCPQieyjwpVXWlo23ZeO+2nXJksn/AqR7TLTPhk48GTP9zV+\nyaPzrEg0NsbXQwiysXzZfuFz/U9jgMAMwJv+mBHP03JWLo8jY4/0m5pYKe1PJtNG\neSJyvFS4CoQT0cKsONEVLEfFJ8Wmq2TPUKVZuDNgUA5/WnGQ5A71jH26GE/JR9kc\npsSlo7i37tG09POUGWw+AjGCeZJx4fmObY/99I6sHvRQL6VQFKpUEmQf+jO7gViI\nG1ZfWSmeVJHMB5ErMhFd4DSkl7MVpECjs28sv56PqRksffOYGAwjBVzUwU1NhnXF\nfL/AgoBtAgMBAAECgf9w8gVEHhTUVQSiVCj1QscdZM522afXWtS6HTsrcBa5BExT\nLIq4V/UYMAN60uIuBJpmTVfQ/CgaFcvMA+NCVWiP8gPLypg34l4/mYQrWvaqoZAB\n9K+oAS0GjWHk8CVADrgPJrm7akJVYEE397JN/87qt0V2Jv+OmYwVgq35JFPpmzmS\nKtUa3CfVFyunwAiBGr4+qZQLSjG39oAaulOneLFHr300L6knV7t9GLx0XF1hhG/w\nWWCX7YmdOpi3zohO0pXKtwP1DCVYSIdvJq+NImaAjtgnnJutWIp5WdK+ZPKimzNC\neUxpCRy37mso8kYgpFpRKrobrcsMDO+6HC2jxUECgYEA1ghXdhlQORFo6OQCxMO6\nhsgoiu6HsvKM8z30N0cEPPI7t1Woqj/pO+JrC290o4n8TnskdjVeyCL3Xlcxbbbw\nbLHuZtfIh4iIOhQM7UZGk6KVkp+p332qayZczTc+foWnEJNi9xrhnBTmWTADNR56\nGpFozShUkvBImBc6HCHpEMECgYEAwqBPe+99u5oQUm8Tc5uzZnVmccHeyT9aVliB\ngiJdg2npioEPu6cuodqTgNfaF+WgN68vrGo4qcge1plyjRK6L2HCJBekBI485G7V\nnHh00kuF/bTQK1GiEVOP8R2Oy25BYHCCP6Z0sB10UNe8lxH4LJ2MfYJM72x5UUuW\nS3Vfrq0CgYBOLJPNZeeAQJSh444DUj4Rto/gVsknmiHTQkCt4/lvTUZ0awwEyv0k\nS0mvzpC6ns6R17Z0mn+499SEF7LNEPF1sfOSiqQKpNqk4+fozi8/AzZAbKK+J4cU\nRdnFdrUTvztK+Zo/CQl4WcXcs4WoZC5S/+NYc6+YT70kF++4kMYwwQKBgCn0Ao41\npsW8xQ3v8aJ3CqnoXqfg4ZRB+sgoFeqmW8ALIZOAlJKfzBaJlkgsv09taSb3tXAW\nCZbXk4Yw15d/VPEHwqCjE/EDdC7NkXBEKvJ14zE4O7NKyoOvnpScCX7iimcueXUc\n/YRFJSCUEIwEDJoZcAJSByGJIXGbuI8VgwWVAoGAfD2NqVAhvIuwtO8gcdos1Tb7\nmBbtY9NUaFO7W40lf4w/zx4KMdwdzpmLBQzO+1GKunlEXCpQwcO3GR6hg40+vuYE\n+pZ5V8sq58T1apRcfUtTrBYoygkWVWxpOlgQ/181kMFl85jKRbkhuysqUdKn+/mw\ntm3/x950Y2wzA/r0eeQ=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-i042g@cumhuriyet-mobil.iam.gserviceaccount.com",
+  "client_id": "108567718809214894360",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-i042g%40cumhuriyet-mobil.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

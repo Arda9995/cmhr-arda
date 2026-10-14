@@ -1,0 +1,53 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["New"] + " " + _localizer["Source"];
+    ViewData[ViewDataNames.AsideMenu] = "Content";
+    ViewData[ViewDataNames.AsideSubMenu] = "Sources";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+{
+new BreadcrumbItem(_localizer["Content"], string.Empty),
+new BreadcrumbItem(_localizer["NewsSourceManagement"], "/Sources/List")
+};
+}
+
+@model Quark.CMS.Business.Models.Requests.SourceRequests.MergeSourceRequest
+
+@section Scripts
+{
+    <script src="/Scripts/Sources/Merge.js" asp-append-version="true"></script>
+}
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Source"] @_localizer["Informations"]</h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="@Model.Sources"/>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="fv-row mb-0 fv-plugins-icon-container">
+                        <label class="form-label fs-6 fw-bold mb-3 required">Kaynak</label>
+                        <select asp-items="@Model.Sources" asp-for="SelectedSourceSourceID" class="form-select form-select-solid ajax-search-select2" data-control="select2"></select>
+                        <span asp-validation-for="@Model.SelectedSourceSourceID" class="fv-plugins-message-container invalid-feedback"></span>
+                        <div class="form-text">@_localizer["Source_SourceText"]</div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="fv-row mb-0 fv-plugins-icon-container">
+                        <label class="form-label fs-6 fw-bold mb-3 required">Hedef Kaynak</label>
+                        <select asp-items="@Model.Sources" asp-for="SelectedTargetSourceID" class="form-select form-select-solid ajax-search-select2" data-control="select2"></select>
+                        <span asp-validation-for="@Model.SelectedTargetSourceID" class="fv-plugins-message-container invalid-feedback"></span>
+                        <div class="form-text">@_localizer["Source_TargetText"]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button onclick="return confirmMerge(this.form)" type="button" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/Sources/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,65 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["SendPushNotification"];
+    ViewData[ViewDataNames.AsideMenu] = "Members";
+    ViewData[ViewDataNames.AsideSubMenu] = "Members";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Members"], "/Members/List")
+    };
+}
+@model Quark.CMS.Business.Models.Requests.MemberRequests.SendPushNotificationRequest
+
+<div class="card mb-5 mb-xl-10 col-8">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["SendPushNotification"]</h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data">
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Title2"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input type="text" asp-for="Title" class="form-control form-control-lg form-control-solid " />
+                    <input type="hidden" name="CustomerID" value="@Model.CustomerID" />
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Content"]</label>
+                <div class="col-lg-9 fv-row">
+                    <textarea asp-for="Message" class="form-control form-control-lg form-control-solid" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["Image"]</label>
+                <div class="col-lg-9">
+                    <div class="image-input image-input-outline" data-kt-image-input="true">
+                        <div id="backgroundPhoto" class="image-input-wrapper w-125px h-125px bgi-position-center" style="background-size: 75%;
+                            background-image: url('')"></div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="@_localizer["Update"]">
+                            <i class="bi bi-pencil-fill fs-7"></i>
+                            <input type="file" name="Image" accept=".png, .jpg, .jpeg" />
+                            <input type="hidden" name="avatar_remove" />
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="@_localizer["Cancel"]">
+                            <i class="bi bi-x fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">@_localizer["UploadImageHelpText"]</div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            @if (Model.CustomerID > 0)
+            {
+                <a href="/Members/Details/@Model.CustomerID" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+            }
+            else
+            {
+                <a href="/Members/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+            }
+
+        </div>
+    </form>
+</div>

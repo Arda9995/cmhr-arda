@@ -1,0 +1,27 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div class="card card-flush mb-10">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>@_localizer["Photos"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0 text-center">
+        <div class="row">
+            @foreach (var photo in Model.Photos)
+            {
+                <div class="col-4 px-5">
+                    <div class="rounded border p-5 position-relative">
+                        <div class="fs-5 fw-semibold mt-2 mb-7">@photo.PhotoTypeName</div>
+                        <div class="image-input image-input-empty image-input-outline image-input-placeholder mb-3">
+                            <div class="image-input-wrapper w-150px h-150px" style="background: url(@photo.PhotoURL); background-size: contain; background-repeat: no-repeat;"></div>
+                        </div>
+                        <div class="text-muted fs-7 mb-3">@photo.Description</div>
+                        <span class="badge badge-primary badge">@photo.Width x @photo.Height</span>
+                    </div>
+                </div>
+                
+            }
+        </div>
+    </div>
+</div>

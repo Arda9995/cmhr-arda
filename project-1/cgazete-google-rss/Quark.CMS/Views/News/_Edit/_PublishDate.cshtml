@@ -1,0 +1,41 @@
+﻿@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="w-100 mb-10">
+
+    <div class="d-flex justify-content-between align-items-center gap-5">
+        <div class="fv-row w-100">
+            <label class="form-label">@_localizer["NewsPublishStartDate"]</label>
+            <div id="datetimetest">
+                <input asp-for="@Model.PublishDate" class="form-control datetimepicker flatpickr-input active" id="publishDateTimePicker" placeholder="@_localizer["NewsPublishStartDate"]" type="text" readonly="readonly">
+            </div>
+
+        </div>
+
+        <div class="fv-row w-100">
+            <label class="form-label">@_localizer["NewsPublishEndDate"]</label>
+            <div id="datetimetest">
+                <input asp-for="@Model.PublishEndDate" class="form-control datetimepicker flatpickr-input active" placeholder="@_localizer["NewsPublishEndDate"]" type="text" readonly="readonly">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-check form-switch form-check-custom form-check-solid mt-3">
+        <input asp-for="@Model.PublishNow" id="publishNow" class="form-check-input" type="checkbox" />
+        <span style="margin-left:10px;">@_localizer["DontSendDate"]</span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var publishNowCheckbox = document.getElementById("publishNow");
+        var dateTimePicker = document.getElementById("publishDateTimePicker");
+
+        function toggleDateTimePicker() {
+            dateTimePicker.disabled = publishNowCheckbox.checked;
+        }
+
+        toggleDateTimePicker();
+
+        publishNowCheckbox.addEventListener("change", toggleDateTimePicker);
+    });
+</script>

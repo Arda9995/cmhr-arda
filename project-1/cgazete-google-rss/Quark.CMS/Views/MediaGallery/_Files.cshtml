@@ -1,0 +1,112 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Quark.CMS.Business.Constants
+
+<div class="card card-flush card-stretch">
+    <div class="card-header pt-8">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <div class="position-relative w-md-400px me-md-2">
+                    <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+                            <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+                        </svg>
+                    </span>
+                    <input id="search-value" type="text" data-kt-filter="datatable-search" class="form-control form-control-solid ps-10" name="search" value="" placeholder="@_localizer["Search"]" />
+                </div>
+                <div class="d-flex align-items-center">
+                    <button onclick="applyFilterData()" class="btn btn-primary me-5">@_localizer["Search"]</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-toolbar">
+            <div class="d-flex justify-content-end">
+                <div>
+                    @if (User.HasClaim(ClaimTypes.Role, SecurityClaimKeys.MEDIA_GALLERY))
+                    {
+                        <input multiple class="d-none" id="photoInput" type="file" accept="image/png,image/jpg,image/jpeg" onchange="uploadPhotos(this)">
+                        <label class="btn btn-sm btn-flex btn-primary" for="photoInput">
+                            <i class="ki-duotone ki-folder-up fs-2">
+                                <span class="path1"></span><span class="path2"></span>
+                            </i>
+                            @_localizer["New"] @_localizer["Photo"]
+                        </label>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="filePath" class="d-flex flex-stack">
+        </div>
+        <table id="filesDatatable" class="table align-middle table-row-dashed fs-6 mt-10">
+            <thead>
+                <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                    <th class="min-w-250px">@_localizer["File"]</th>
+                    <th class="min-w-250px">@_localizer["UploadDate"]</th>
+                    <th class="w-100px"></th>
+                </tr>
+            </thead>
+            <tbody class="fw-semibold text-gray-600">
+                <div style="display: none">
+                    <div id="Col1">
+                        <div class="d-flex align-items-center">
+                            <div class="overlay overflow-hidden w-100px me-3">
+                                <div class="overlay-wrapper">
+                                    <img class="w-100px me-3 rounded" src="{0}" alt="{1}" />
+                                </div>
+                                <div class="overlay-layer bg-dark bg-opacity-25 w-100px">
+                                    <div class="overlay btn btn-primary btn-shadow custom-lightbox" data-src="{0}">
+                                        <i class="bi bi-eye pe-0 fs-4"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="text-gray-800 text-hover-primary" onclick="convertToInput(this,'{2}')">{1}</span>
+                        </div>
+                    </div>
+                    <div id="Col2">{1}</div>
+                    <div id="Col4">
+                        <div class="d-flex justify-content-end flex-shrink-0">
+                            {1}
+                            <a onclick="openTransferModal({0})" class="text-gray-800 text-hover-primary fs-5 fw-bold d-flex align-items-center">
+                                <i class="ki-duotone ki-exit-right-corner fs-2x">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="folderSelectModal" tabindex="-1" aria-labelledby="folderSelectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="folderSelectModalLabel">Klasör Seç</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+
+            <div class="modal-body">
+                <label for="folderSelect" class="mb-2">Bir klasör seçin:</label>
+                <select id="folderSelect" class="form-select">
+                    <option value="">-- Seçiniz --</option>
+                </select>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="handleFolderSelection()">Kopyala</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+

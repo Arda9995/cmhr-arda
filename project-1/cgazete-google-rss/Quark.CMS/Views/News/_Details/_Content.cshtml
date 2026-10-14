@@ -1,0 +1,82 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div class="card card-flush mb-10 mt-5">
+    <div class="card-body m-5">
+
+        <div class="row g-3">
+
+            <partial name="_Details/_Type" />
+
+            @if (!string.IsNullOrEmpty(Model.MainCategory) || (Model.SecondaryCategories != null && Model.SecondaryCategories.Any()))
+            {
+                <partial name="_Details/_Category" />
+            }
+            @if (!string.IsNullOrEmpty(Model.Tags))
+            {
+                <partial name="_Details/_Tags" model="Model" />
+            }
+            @if (!Model.AuthorName.IsNullOrEmtpy())
+            {
+                <partial name="_Details/_Author" model="Model" />
+            }
+            @if (!Model.CaricaturistName.IsNullOrEmtpy())
+            {
+                <partial name="_Details/_Caricaturist" model="Model" />
+            }
+            @if (!Model.SourceName.IsNullOrEmtpy())
+            {
+                <partial name="_Details/_Source" model="Model" />
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Title))
+        {
+            <partial name="_Details/_Title" model="Model" />
+        }
+        @if (!string.IsNullOrEmpty(Model.UpHeadline))
+        {
+            <partial name="_Details/_UpHeadline" model="Model" />
+        }
+        @if (!string.IsNullOrEmpty(Model.Headline) && Model.ShowHeadline)
+        {
+            <partial name="_Details/_Headline" model="Model" />
+        }
+        @if (!string.IsNullOrEmpty(Model.UpSubHeading) && Model.ShowUpSubHeading)
+        {
+            <partial name="_Details/_UpSubHeading" model="Model" />
+        }
+        @if (!string.IsNullOrEmpty(Model.SubHeading) && Model.ShowSubHeading)
+        {
+            <partial name="_Details/_SubHeading" model="Model" />
+        }
+        @if (!string.IsNullOrEmpty(Model.UpSubTitle))
+        {
+            <partial name="_Details/_UpSubTitle" model="Model" />
+        }
+        @if (!string.IsNullOrEmpty(Model.SubTitle))
+        {
+            <partial name="_Details/_Subtitle" model="Model" />
+        }
+        @if (Model.NewsTypeID != (int)NewsTypesEnum.GovernmentAnnouncement)
+        {
+            @if (!string.IsNullOrEmpty(Model.Photos.First(i => i.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto).PhotoURL))
+            {
+                <div class="mb-10 fv-row">
+                    <label class="form-label">@Model.Photos.First(i => i.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto).PhotoTypeName</label>
+                    <div class="input-group p-5 d-flex justify-content-center align-items-center" style="border-radius:10px; border:1px solid #DBDFE9">
+                        <img src="@Model.Photos.First(i => i.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto).PhotoURL" alt="@Model.Title" style="max-width: 100%; max-height: 300px; object-fit: contain;" />
+                    </div>
+                </div>
+            }
+        }
+        @if (!string.IsNullOrEmpty(Model.Content))
+        {
+            <div class="mb-10 fv-row">
+                <label class="form-label">@_localizer["Content"]</label>
+                <div class="input-group p-5" style="border-radius:10px; border:1px solid #DBDFE9">
+                    @Html.Raw(Model.Content)
+                </div>
+            </div>
+        }
+    </div>
+</div>

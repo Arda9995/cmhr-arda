@@ -1,0 +1,216 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Quark.Data.Models;
+using Quark.Data.Models.News;
+using Quark.Data.Models.AI;
+using Quark.Data.Models.Anomaly;
+using Quark.Data.Models.BlockLog;
+using Quark.Data.Models.Common;
+using Quark.Data.Models.LogModels;
+using Quark.Data.Models.MediaGallery;
+using Quark.Data.Models.Payment;
+using Quark.Data.Models.PhotoEditor;
+using Quark.Data.Models.Survey;
+using Quark.Data.Models.SystemLog;
+using Quark.Data.Models.UserContracts;
+
+namespace Quark.Data;
+
+public class QuarkDataContext : DbContext
+{
+    public QuarkDataContext(DbContextOptions<QuarkDataContext> options) : base(options)
+    {
+    }
+
+    #region Account
+    public DbSet<SecurityClaim> SecurityClaims { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<Books> Books { get; set; }
+    public DbSet<RoleClaim> RoleClaims { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<UserCategory> UserCategories { get; set; }
+    #endregion
+
+    #region Content
+    public DbSet<Category> Categories { get; set; }
+
+    public DbSet<Page> Pages { get; set; }
+    #endregion
+
+    #region Address
+    public DbSet<City> Cities { get; set; }
+    public DbSet<Country> Countries { get; set; }
+    public DbSet<District> Districts { get; set; }
+    public DbSet<Neighbourhood> Neighbourhoods { get; set; }
+    #endregion
+
+    #region Customer
+    public DbSet<Member> Members { get; set; }
+    public DbSet<MemberType> MemberTypes { get; set; }
+    public DbSet<MemberSubscription> Subscriptions { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<CreditCard> CreditCards { get; set; }
+
+    #endregion
+
+    #region AppSettings
+    public DbSet<AppSettings> AppSettings { get; set; }
+    public DbSet<AppSettingsGroup> AppSettingsGroups { get; set; }
+
+    #endregion
+
+    #region Common
+    public DbSet<Gender> Genders { get; set; }
+    public DbSet<Currency> Currencies { get; set; }
+    public DbSet<CurrencyDailyValue> CurrencyDailyValues { get; set; }
+    public DbSet<CurrencyDailyData> CurrencyDailyDatas { get; set; }
+    public DbSet<CurrencyState> CurrencyStates { get; set; }
+    public DbSet<EntityType> EntityTypes{ get; set; }
+    public DbSet<UrlMapping> UrlMappings{ get; set; }
+    public DbSet<WeatherData> WeatherData { get; set; }
+    public DbSet<PrayerTimes> PrayerTimes { get; set; }
+    #endregion
+
+    #region Menu
+    public DbSet<Menu> Menus { get; set; }
+    #endregion
+
+    #region News
+    public DbSet<Tag> Tags { get; set; }
+    public DbSet<PrintingNews> PrintingNews { get; set; }
+    public DbSet<NewsPages> NewsPages { get; set; }
+    public DbSet<NewsStatus> NewsStatus { get; set; }
+    public DbSet<NewsPublished> NewsPublished { get; set; }
+    public DbSet<NewsVersion> NewsVersions { get; set; }
+    public DbSet<RelatedNews> RelatedNews { get; set; }
+    public DbSet<News> News { get; set; }
+    public DbSet<NewsType> NewsTypes { get; set; }
+    public DbSet<NewsPhotoType> NewsPhotoTypes { get; set; }
+    public DbSet<NewsPhoto> NewsPhotos { get; set; }
+    public DbSet<Author> Authors { get; set; }
+    public DbSet<AuthorCategory> AuthorCategories { get; set; }
+    public DbSet<NewsTag> NewsTags { get; set; }
+    public DbSet<NewsPhotoGalleryItem> NewsPhotoGalleryItems { get; set; }
+    public DbSet<NewsVersionsPhotoGalleryItem> NewsVersionsPhotoGalleryItems { get; set; }
+    public DbSet<NewsPublishedPhotoGalleryItem> NewsPublishedPhotoGalleryItems { get; set; }
+    public DbSet<NewsPublishedPhoto> NewsPublishedPhotos { get; set; }
+    public DbSet<NewsVersionsPhoto> NewsVersionsPhotos { get; set; }
+    public DbSet<Source> Sources { get; set; }
+    public DbSet<NewsSource> NewsSources { get; set; }
+    public DbSet<NewsSecondaryCategory> NewsSecondaryCategories { get; set; }
+    public DbSet<NewsSocialMedia> NewsSocialMedias { get; set; }
+    public DbSet<Caricaturist> Caricaturists { get; set; }
+    public DbSet<Astrologer> Astrologers { get; set; }
+    public DbSet<VideoPlayer> VideoPlayers { get; set; }
+    #endregion
+
+    #region MediaGallery
+
+    public DbSet<Folder> Folders { get; set; }
+    public DbSet<FolderPermission> FolderPermissions { get; set; }
+    public DbSet<FolderImage> FolderImages { get; set; }
+    public DbSet<Favourite> Favourites { get; set; }
+    public DbSet<ArchiveFolder> ArchiveFolders { get; set; }
+    public DbSet<ArchiveImage> ArchiveImages { get; set; }
+    
+    #endregion
+
+    #region PhotoEditor
+
+    public DbSet<Template> Templates { get; set; }
+    public DbSet<LocationPadding> LocationPaddings { get; set; }
+
+    #endregion
+
+    #region Blocks
+    public DbSet<Block> Blocks { get; set; }
+    public DbSet<BlockItem> BlockItems { get; set; }
+    public DbSet<BlockType> BlockTypes { get; set; }
+    public DbSet<BlockUser> BlockUsers { get; set; }
+    public DbSet<BlockLog> BlockLogs { get; set; }
+    #endregion
+
+    #region AI
+
+    public DbSet<Prompt> Prompts { get; set; }
+    public DbSet<PromptType> PromptTypes { get; set; }
+    public DbSet<RequestType> RequestTypes { get; set; }
+
+    #endregion
+
+    #region Log
+    public DbSet<SystemLog> SystemLogs { get; set; }
+    public DbSet<LogType> LogTypes { get; set; }
+    public DbSet<HangfireLog> HangfireLogs { get; set; }
+    #endregion
+
+    #region Anomalies
+
+    public DbSet<Anomaly> Anomalies { get; set; }
+    public DbSet<AnomalyDataType> AnomalyDataTypes { get; set; }
+    public DbSet<AnomalyIssueType> AnomalyIssueTypes { get; set; }
+    #endregion
+
+    #region UserContracts
+
+    public DbSet<UserContract> UserContracts { get; set; }
+
+    #endregion
+
+    #region Surveys
+
+    public DbSet<Survey> Surveys { get; set; }
+    public DbSet<SurveyOptions> SurveyOptions { get; set; }
+    public DbSet<Answer> Answers { get; set; }
+
+    #endregion
+
+    #region Payment
+
+    public DbSet<PaymentLog> PaymentLogs { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Plan> Plans { get; set; }
+    public DbSet<PaymentSubscriptionOrder> SubscriptionOrders { get; set; }
+    public DbSet<PaymentSubscriptionOrderPaymentAttempt> SubscriptionOrderPaymentAttempts { get; set; }
+
+    #endregion
+
+    public DbSet<AgencyNews> AgencyNews { get; set; }
+    public DbSet<RssLink> RssLinks { get; set; }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        //modelBuilder.ApplyConfiguration(new CategoryLanguageValueConfiguration());
+
+        modelBuilder.Entity<FolderPermission>()
+            .HasKey(x => new { x.UserID, x.FolderID });
+
+        modelBuilder.Entity<NewsTag>()
+            .HasKey(x => new { x.NewsID, x.TagID });    
+        
+        modelBuilder.Entity<NewsSource>()
+            .HasKey(x => new { x.NewsID, x.SourceID });
+
+		modelBuilder.Entity<NewsSecondaryCategory>()
+	   .HasKey(x => new { x.NewsID, x.SecondaryCategoryID });
+
+		modelBuilder.Entity<UserCategory>()
+            .HasKey(x => new { x.UserID, x.CategoryID });
+        
+        modelBuilder.Entity<AuthorCategory>()
+            .HasKey(x => new { x.AuthorID, x.CategoryID });
+
+        modelBuilder.Entity<NewsSocialMedia>()
+            .HasKey(x => new { x.NewsID });
+
+        // ExcludeFromGoogleAiFeed column: 0 = included in Google AI feed (selected), 1 = not included.
+        var googleAiFeedConverter = new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<bool, bool>(
+            v => !v, v => !v);
+        modelBuilder.Entity<Quark.Data.Models.News.News>()
+            .Property(x => x.AllowGoogleAiFeed).HasConversion(googleAiFeedConverter).HasDefaultValue(false).HasSentinel(true);
+        modelBuilder.Entity<Quark.Data.Models.News.NewsPublished>()
+            .Property(x => x.AllowGoogleAiFeed).HasConversion(googleAiFeedConverter);
+        modelBuilder.Entity<Quark.Data.Models.News.NewsVersion>()
+            .Property(x => x.AllowGoogleAiFeed).HasConversion(googleAiFeedConverter);
+
+        base.OnModelCreating(modelBuilder);
+    }
+}

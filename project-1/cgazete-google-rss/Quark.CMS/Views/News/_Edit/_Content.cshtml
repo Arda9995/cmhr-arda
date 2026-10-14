@@ -1,0 +1,6 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="mb-10 fv-row">
+    <label class="required form-label">@_localizer["Content"]</label>
+    <textarea asp-for="@Model.Content" class="form-control content tinymce"></textarea>
+</div>

@@ -1,0 +1,105 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+@if (!(Model.IsLocked && Model.IsLockedByCurrentUser == false))
+{
+    <input id="authorize-check" type="hidden" value="true" />
+
+    if (Model.StatusID == (int)NewsStatusEnum.Published)
+    {
+        <a class="btn btn-sm btn-success pe-none">
+            @Model.StatusName
+        </a>
+    }
+    else if (Model.StatusID == (int)NewsStatusEnum.Draft)
+    {
+        <a class="btn btn-sm btn-primary pe-none">
+            @Model.StatusName
+        </a>
+    }
+    else if (Model.StatusID == (int)NewsStatusEnum.Unpublished)
+    {
+        <a class="btn btn-sm btn-danger pe-none">
+            @Model.StatusName
+        </a>
+    }
+    else if (Model.StatusID == (int)NewsStatusEnum.Scheduled)
+    {
+        <a class="btn btn-sm btn-info pe-none">
+            @Model.StatusName
+        </a>
+    }
+
+    if (!string.IsNullOrEmpty(Model.PublishDate))
+    {
+        <a class="btn btn-sm btn-primary pe-none">
+            <partial name="Icons/Publish" />
+            @_localizer["PublishDate"] : @Model.PublishDate
+        </a>
+    }
+    if (!string.IsNullOrEmpty(Model.PublishEndDate))
+    {
+        <a class="btn btn-sm btn-primary pe-none">
+            <partial name="Icons/Publish" />
+            @_localizer["PublishEndDate"] : @Model.PublishEndDate
+        </a>
+    }
+
+    if (Model.StatusID == (int)NewsStatusEnum.Published && Model.HasRights.UnPublish)
+    {
+        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#unpublishModal">
+            <partial name="Icons/UnPublish" />
+            @_localizer["UnPublish"]
+        </a>
+    }
+    else if (Model.StatusID == (int)NewsStatusEnum.Draft && !string.IsNullOrEmpty(Model.PublishDate) && Model.HasRights.Publish)
+    {
+        <a id="publish" class="btn btn-sm btn-warning">
+            <partial name="Icons/Publish" />
+            @_localizer["UpdatedPublish"]
+        </a>
+    }
+    else if (Model.StatusID == (int)NewsStatusEnum.Draft && Model.HasRights.Publish)
+    {
+        <a id="publish" class="btn btn-sm btn-primary">
+            <partial name="Icons/Publish" />
+            @_localizer["Publish"]
+        </a>
+    }
+
+    else if (Model.StatusID == (int)NewsStatusEnum.Draft && Model.HasRights.Publish)
+    {
+        <a id="publish" class="btn btn-sm btn-primary">
+            <partial name="Icons/Publish" />
+            @_localizer["Publish"]
+        </a>
+    }
+
+
+
+    else if (Model.StatusID == (int)NewsStatusEnum.Unpublished && Model.HasRights.Publish)
+    {
+        <a id="publish" class="btn btn-sm btn-primary">
+            <partial name="Icons/Publish" />
+            @_localizer["Publish"]
+        </a>
+    }
+    else if (Model.StatusID == (int)NewsStatusEnum.Scheduled && Model.HasRights.Publish)
+    {
+        @* <a id="publish" class="btn btn-sm btn-primary">
+            <partial name="Icons/Publish"/>
+            @_localizer["Publish"]
+        </a>
+       <a id="scheduled" class="btn btn-sm btn-primary">
+            <partial name="Icons/Schedule"/>
+            @_localizer["ReSchedule"]
+        </a> *@
+        <a id="unschedule" class="btn btn-sm btn-danger">
+            <partial name="Icons/UnPublish" />
+            @_localizer["ToDraft"]
+        </a>
+    }
+}
+else
+{
+    <input id="authorize-check" type="hidden" value="false" />
+}

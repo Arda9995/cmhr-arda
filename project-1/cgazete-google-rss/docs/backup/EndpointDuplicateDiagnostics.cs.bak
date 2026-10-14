@@ -1,0 +1,584 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Routing;
+using System.Collections;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
+
+namespace Quark.Web.Diagnostics;
+
+/// <summary>
+/// TEMPORARY: proves which call creates the second ControllerActionEndpointDataSource.
+/// Remove after pilot diagnosis.
+/// </summary>
+public static class EndpointDuplicateDiagnostics
+{
+    private static int _seq;
+
+    public static void Log(IServiceProvider services, string stage)
+    {
+        var logger = GetLogger(services);
+        if (logger == null)
+        {
+            return;
+        }
+
+        try
+        {
+            LogServiceRegistrations(services, logger, stage);
+            LogApplicationParts(services, logger, stage);
+            LogActionDescriptors(services, logger, stage);
+            LogEndpointDataSources(services, logger, stage);
+            LogMatchingEndpoints(services, logger, stage);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "[EndpointDup][{Stage}] diagnostic failed", stage);
+        }
+    }
+
+    /// <summary>
+    /// Snapshot ControllerActionEndpointDataSource instances on a specific builder
+    /// and on the global CompositeEndpointDataSource. Call before/after each Map*.
+    /// </summary>
+    public static void LogBuilderSnapshot(
+        IServiceProvider services,
+        IEndpointRouteBuilder? useEndpointsBuilder,
+        WebApplication? webApp,
+        string stage,
+        string callSite)
+    {
+        var logger = GetLogger(services);
+        if (logger == null)
+        {
+            return;
+        }
+
+        var seq = Interlocked.Increment(ref _seq);
+        var threadId = Environment.CurrentManagedThreadId;
+
+        try
+        {
+            logger.LogWarning(
+                "[EndpointDup][{Stage}] SNAPSHOT seq={Seq} thread={Thread} callSite={CallSite} utc={Utc}",
+                stage,
+                seq,
+                threadId,
+                callSite,
+                DateTime.UtcNow.ToString("O"));
+
+            if (useEndpointsBuilder != null && webApp != null)
+            {
+                logger.LogWarning(
+                    "[EndpointDup][{Stage}] BuilderIdentity ReferenceEquals(useEndpoints, webApp)={Same} useEndpointsType={UseType} useEndpointsHash={UseHash} webAppType={AppType} webAppHash={AppHash} useEndpoints.DataSourcesRefHash={UseDsHash} webApp.DataSourcesRefHash={AppDsHash} DataSourcesCollectionReferenceEquals={DsSame}",
+                    stage,
+                    ReferenceEquals(useEndpointsBuilder, webApp),
+                    useEndpointsBuilder.GetType().FullName,
+                    RuntimeHelpersHash(useEndpointsBuilder),
+                    webApp.GetType().FullName,
+                    RuntimeHelpersHash(webApp),
+                    RuntimeHelpersHash(useEndpointsBuilder.DataSources),
+                    RuntimeHelpersHash(((IEndpointRouteBuilder)webApp).DataSources),
+                    ReferenceEquals(useEndpointsBuilder.DataSources, ((IEndpointRouteBuilder)webApp).DataSources));
+            }
+
+            if (useEndpointsBuilder != null)
+            {
+                DumpBuilderDataSources(logger, stage, "UseEndpoints.endpoints", useEndpointsBuilder);
+            }
+
+            if (webApp != null)
+            {
+                DumpBuilderDataSources(logger, stage, "WebApplication.app", webApp);
+            }
+
+            var accessor = services.GetService<IEndpointRouteBuilder>();
+            if (accessor != null)
+            {
+                logger.LogWarning(
+                    "[EndpointDup][{Stage}] DI IEndpointRouteBuilder Type={Type} Hash={Hash} ReferenceEquals(useEndpoints)={EqUse} ReferenceEquals(webApp)={EqApp}",
+                    stage,
+                    accessor.GetType().FullName,
+                    RuntimeHelpersHash(accessor),
+                    useEndpointsBuilder != null && ReferenceEquals(accessor, useEndpointsBuilder),
+                    webApp != null && ReferenceEquals(accessor, webApp));
+
+                try
+                {
+                    DumpBuilderDataSources(logger, stage, "DI.IEndpointRouteBuilder", accessor);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "[EndpointDup][{Stage}] DI IEndpointRouteBuilder.DataSources dump failed", stage);
+                }
+            }
+
+            LogEndpointDataSources(services, logger, stage);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "[EndpointDup][{Stage}] LogBuilderSnapshot failed callSite={CallSite}", stage, callSite);
+        }
+    }
+
+    public static void LogAfterAddControllersWithViews(IServiceCollection services)
+    {
+        // Called right after AddControllersWithViews — descriptors do not exist yet (no provider built).
+        // Log MVC-related service descriptor counts instead.
+        try
+        {
+            var mvcRelated = services
+                .Where(d =>
+                    d.ServiceType.FullName?.Contains("ControllerAction", StringComparison.Ordinal) == true ||
+                    d.ServiceType.FullName?.Contains("ActionDescriptor", StringComparison.Ordinal) == true ||
+                    d.ServiceType.FullName?.Contains("EndpointDataSource", StringComparison.Ordinal) == true ||
+                    d.ServiceType.Name.Contains("ControllerAction", StringComparison.Ordinal) ||
+                    d.ImplementationType?.Name.Contains("ControllerAction", StringComparison.Ordinal) == true)
+                .ToList();
+
+            // ILogger may not be built yet; use console as fallback for this early stage.
+            Console.WriteLine($"[EndpointDup][after-AddControllersWithViews] MVC-related IServiceCollection descriptors={mvcRelated.Count}");
+            foreach (var d in mvcRelated)
+            {
+                Console.WriteLine(
+                    $"[EndpointDup][after-AddControllersWithViews] ServiceType={d.ServiceType.FullName} Lifetime={d.Lifetime} ImplType={d.ImplementationType?.FullName} ImplFactory={(d.ImplementationFactory != null)} ImplInstanceType={d.ImplementationInstance?.GetType().FullName}");
+            }
+
+            var actionDescriptorChangeProviders = services
+                .Where(d => typeof(IActionDescriptorChangeProvider).IsAssignableFrom(d.ServiceType) ||
+                            (d.ImplementationType != null && typeof(IActionDescriptorChangeProvider).IsAssignableFrom(d.ImplementationType)))
+                .ToList();
+
+            Console.WriteLine(
+                $"[EndpointDup][after-AddControllersWithViews] IActionDescriptorChangeProvider registrations={actionDescriptorChangeProviders.Count}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[EndpointDup][after-AddControllersWithViews] failed: {ex}");
+        }
+    }
+
+    private static ILogger? GetLogger(IServiceProvider services)
+    {
+        return services.GetService<ILoggerFactory>()?.CreateLogger("EndpointDuplicateDiagnostics");
+    }
+
+    private static void LogServiceRegistrations(IServiceProvider services, ILogger logger, string stage)
+    {
+        try
+        {
+            var changeProviders = services.GetServices<IActionDescriptorChangeProvider>().ToList();
+            logger.LogWarning(
+                "[EndpointDup][{Stage}] IActionDescriptorChangeProvider resolved count={Count} Types={Types}",
+                stage,
+                changeProviders.Count,
+                string.Join(", ", changeProviders.Select(p => $"{p.GetType().FullName}#{RuntimeHelpersHash(p)}")));
+
+            var endpointDataSources = services.GetServices<EndpointDataSource>().ToList();
+            logger.LogWarning(
+                "[EndpointDup][{Stage}] GetServices<EndpointDataSource> count={Count} Types={Types}",
+                stage,
+                endpointDataSources.Count,
+                string.Join(", ", endpointDataSources.Select(p => $"{p.GetType().FullName}#{RuntimeHelpersHash(p)}")));
+
+            // ControllerActionEndpointDataSource is not always registered in DI; factory creates instances.
+            var cadType = Type.GetType("Microsoft.AspNetCore.Mvc.Routing.ControllerActionEndpointDataSource, Microsoft.AspNetCore.Mvc.Core");
+            if (cadType != null)
+            {
+                var allServices = services.GetServices(cadType).Cast<object>().ToList();
+                logger.LogWarning(
+                    "[EndpointDup][{Stage}] GetServices<ControllerActionEndpointDataSource> count={Count} Hashes={Hashes}",
+                    stage,
+                    allServices.Count,
+                    string.Join(", ", allServices.Select(RuntimeHelpersHash)));
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "[EndpointDup][{Stage}] LogServiceRegistrations failed", stage);
+        }
+    }
+
+    private static void LogApplicationParts(IServiceProvider services, ILogger logger, string stage)
+    {
+        var partManager = services.GetService<ApplicationPartManager>();
+        if (partManager == null)
+        {
+            logger.LogWarning("[EndpointDup][{Stage}] ApplicationPartManager not found", stage);
+            return;
+        }
+
+        var homeControllerHits = new List<string>();
+        foreach (var part in partManager.ApplicationParts)
+        {
+            IEnumerable<TypeInfo>? types = null;
+            var assemblyHint = part.Name;
+            if (part is AssemblyPart assemblyPart)
+            {
+                types = assemblyPart.Types;
+                assemblyHint = $"{assemblyPart.Assembly.GetName().Name}|{assemblyPart.Assembly.Location}";
+            }
+            else if (part is IApplicationPartTypeProvider typeProvider)
+            {
+                types = typeProvider.Types;
+            }
+
+            if (types == null)
+            {
+                continue;
+            }
+
+            foreach (var type in types)
+            {
+                if (type.Name == "HomeController" && typeof(ControllerBase).IsAssignableFrom(type))
+                {
+                    homeControllerHits.Add(
+                        $"Part={part.Name} AssemblyHint={assemblyHint} FullName={type.FullName} MetadataToken={type.MetadataToken}");
+                }
+            }
+        }
+
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] HomeController type hits={Count}\n{Hits}",
+            stage,
+            homeControllerHits.Count,
+            string.Join("\n", homeControllerHits));
+    }
+
+    private static void LogActionDescriptors(IServiceProvider services, ILogger logger, string stage)
+    {
+        var provider = services.GetService<IActionDescriptorCollectionProvider>();
+        if (provider == null)
+        {
+            return;
+        }
+
+        var allControllerActions = provider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>().ToList();
+        var pageActions = allControllerActions
+            .Where(a =>
+                a.ControllerName == "Home" &&
+                (a.ActionName == "PageSystemError" || a.ActionName == "PageNotFound"))
+            .ToList();
+
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] ControllerActionDescriptor TOTAL={Total} PageNotFound/PageSystemError={PageCount}",
+            stage,
+            allControllerActions.Count,
+            pageActions.Count);
+
+        foreach (var action in pageActions)
+        {
+            logger.LogWarning(
+                "[EndpointDup][{Stage}] ActionDescriptor Id={Id} Action={Action} DisplayName={DisplayName} AttributeRoute={AttributeRoute} DeclaringType={DeclaringType} Assembly={Assembly} MethodToken={MethodToken}",
+                stage,
+                action.Id,
+                action.ActionName,
+                action.DisplayName,
+                action.AttributeRouteInfo?.Template,
+                action.ControllerTypeInfo?.FullName,
+                action.ControllerTypeInfo?.Assembly.GetName().Name,
+                action.MethodInfo?.MetadataToken);
+        }
+    }
+
+    private static void LogEndpointDataSources(IServiceProvider services, ILogger logger, string stage)
+    {
+        var dataSources = services.GetService<EndpointDataSource>();
+        if (dataSources == null)
+        {
+            logger.LogWarning("[EndpointDup][{Stage}] EndpointDataSource not found", stage);
+            return;
+        }
+
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] Root EndpointDataSource Type={Type} Hash={Hash}",
+            stage,
+            dataSources.GetType().FullName,
+            RuntimeHelpersHash(dataSources));
+
+        var sources = FlattenDataSources(dataSources);
+        var controllerSources = sources
+            .Where(s => s.GetType().Name == "ControllerActionEndpointDataSource")
+            .ToList();
+
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] Flattened DataSources count={Count} ControllerActionEndpointDataSource count={CadCount}",
+            stage,
+            sources.Count,
+            controllerSources.Count);
+
+        for (var i = 0; i < sources.Count; i++)
+        {
+            DumpSingleDataSource(logger, stage, $"CompositeChild[{i}]", sources[i]);
+        }
+    }
+
+    private static void DumpBuilderDataSources(ILogger logger, string stage, string builderLabel, IEndpointRouteBuilder builder)
+    {
+        ICollection<EndpointDataSource>? dataSources;
+        try
+        {
+            dataSources = builder.DataSources;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "[EndpointDup][{Stage}] {Label} DataSources access failed", stage, builderLabel);
+            return;
+        }
+
+        if (dataSources == null)
+        {
+            logger.LogWarning("[EndpointDup][{Stage}] {Label} DataSources=null", stage, builderLabel);
+            return;
+        }
+
+        var list = dataSources.ToList();
+        var cadCount = list.Count(s => s.GetType().Name == "ControllerActionEndpointDataSource");
+
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] {Label} DataSources.Count={Count} ControllerActionEndpointDataSourceCount={CadCount} CollectionType={CollectionType} CollectionHash={CollectionHash}",
+            stage,
+            builderLabel,
+            list.Count,
+            cadCount,
+            dataSources.GetType().FullName,
+            RuntimeHelpersHash(dataSources));
+
+        for (var i = 0; i < list.Count; i++)
+        {
+            DumpSingleDataSource(logger, stage, $"{builderLabel}[{i}]", list[i]);
+        }
+    }
+
+    private static void DumpSingleDataSource(ILogger logger, string stage, string label, EndpointDataSource source)
+    {
+        var endpoints = source.Endpoints;
+        var pageMatches = endpoints
+            .Where(e =>
+                e.DisplayName?.Contains("PageSystemError", StringComparison.Ordinal) == true ||
+                e.DisplayName?.Contains("PageNotFound", StringComparison.Ordinal) == true)
+            .ToList();
+
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] {Label} Type={Type} HashCode={Hash} RuntimeHelpersHash={Rh} DataSourceId={DataSourceId} TotalEndpoints={Total} PageErrorOrNotFound={MatchCount}",
+            stage,
+            label,
+            source.GetType().FullName,
+            source.GetHashCode(),
+            RuntimeHelpersHash(source),
+            TryGetDataSourceId(source),
+            endpoints.Count,
+            pageMatches.Count);
+
+        var conventionalRoutes = TryGetConventionalRoutes(source);
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] {Label} ConventionalRouteCount={Count}\n{Routes}",
+            stage,
+            label,
+            conventionalRoutes.Count,
+            string.Join("\n", conventionalRoutes));
+
+        // Sample of route patterns in this data source (helps fingerprint which MapControllerRoute set landed here)
+        var patternSample = endpoints
+            .OfType<RouteEndpoint>()
+            .Select(e => e.RoutePattern?.RawText)
+            .Where(p => !string.IsNullOrEmpty(p))
+            .Distinct()
+            .OrderBy(p => p)
+            .Take(40)
+            .ToList();
+
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] {Label} RoutePatternSample(count={Count}):\n{Patterns}",
+            stage,
+            label,
+            patternSample.Count,
+            string.Join("\n", patternSample));
+
+        for (var i = 0; i < pageMatches.Count; i++)
+        {
+            DumpEndpointMetadata(logger, stage, $"{label}.PageMatch[{i}]", pageMatches[i]);
+        }
+    }
+
+    private static void DumpEndpointMetadata(ILogger logger, string stage, string label, Endpoint endpoint)
+    {
+        var routeEndpoint = endpoint as RouteEndpoint;
+        var descriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+        var sb = new StringBuilder();
+        sb.AppendLine($"DisplayName={endpoint.DisplayName}");
+        sb.AppendLine($"RoutePattern={routeEndpoint?.RoutePattern?.RawText}");
+        sb.AppendLine($"Order={routeEndpoint?.Order}");
+        sb.AppendLine($"EndpointHash={RuntimeHelpersHash(endpoint)}");
+
+        foreach (var meta in endpoint.Metadata)
+        {
+            sb.AppendLine($"  MetadataType={meta.GetType().FullName} MetaHash={RuntimeHelpersHash(meta)} ToString={Truncate(meta.ToString(), 200)}");
+
+            // Route name / conventional route metadata if present
+            if (meta.GetType().Name.Contains("RouteName", StringComparison.Ordinal) ||
+                meta.GetType().Name.Contains("RouteValues", StringComparison.Ordinal) ||
+                meta.GetType().Name == "HttpMethodMetadata")
+            {
+                sb.AppendLine($"    Detail={Truncate(meta.ToString(), 400)}");
+            }
+        }
+
+        if (descriptor != null)
+        {
+            sb.AppendLine($"ControllerActionDescriptor.Id={descriptor.Id}");
+            sb.AppendLine($"ControllerActionDescriptor.DisplayName={descriptor.DisplayName}");
+            sb.AppendLine($"ControllerActionDescriptor.ActionName={descriptor.ActionName}");
+            sb.AppendLine($"ControllerActionDescriptor.AttributeRouteInfo.Template={descriptor.AttributeRouteInfo?.Template}");
+            sb.AppendLine($"ControllerActionDescriptor.Hash={RuntimeHelpersHash(descriptor)}");
+        }
+
+        logger.LogWarning("[EndpointDup][{Stage}] {Label} FULL METADATA:\n{Dump}", stage, label, sb.ToString());
+    }
+
+    private static void LogMatchingEndpoints(IServiceProvider services, ILogger logger, string stage)
+    {
+        var dataSource = services.GetService<EndpointDataSource>();
+        if (dataSource == null)
+        {
+            return;
+        }
+
+        var matches = dataSource.Endpoints
+            .Where(e =>
+                e.DisplayName?.Contains("PageSystemError", StringComparison.Ordinal) == true ||
+                e.DisplayName?.Contains("PageNotFound", StringComparison.Ordinal) == true ||
+                (GetRoutePattern(e)?.Contains("Home/500", StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (GetRoutePattern(e)?.Contains("Home/404", StringComparison.OrdinalIgnoreCase) ?? false))
+            .ToList();
+
+        logger.LogWarning(
+            "[EndpointDup][{Stage}] Matching endpoints count={Count}",
+            stage,
+            matches.Count);
+
+        for (var i = 0; i < matches.Count; i++)
+        {
+            DumpEndpointMetadata(logger, stage, $"GlobalMatch[{i}]", matches[i]);
+        }
+    }
+
+    private static List<EndpointDataSource> FlattenDataSources(EndpointDataSource root)
+    {
+        var result = new List<EndpointDataSource>();
+        void Visit(EndpointDataSource ds)
+        {
+            if (ds is CompositeEndpointDataSource composite)
+            {
+                foreach (var child in GetCompositeSources(composite))
+                {
+                    Visit(child);
+                }
+            }
+            else
+            {
+                result.Add(ds);
+            }
+        }
+
+        Visit(root);
+        return result;
+    }
+
+    private static List<EndpointDataSource> GetCompositeSources(CompositeEndpointDataSource composite)
+    {
+        var prop = typeof(CompositeEndpointDataSource).GetProperty(
+            "DataSources",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        if (prop?.GetValue(composite) is IEnumerable<EndpointDataSource> sources)
+        {
+            return sources.ToList();
+        }
+
+        return new List<EndpointDataSource> { composite };
+    }
+
+    private static List<string> TryGetConventionalRoutes(EndpointDataSource source)
+    {
+        var result = new List<string>();
+        try
+        {
+            // ControllerActionEndpointDataSource._routes : List<ConventionalRouteEntry>
+            var routesField = source.GetType().GetField("_routes", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (routesField?.GetValue(source) is not IEnumerable routes)
+            {
+                return result;
+            }
+
+            foreach (var entry in routes)
+            {
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                var entryType = entry.GetType();
+                var routeName = entryType.GetProperty("RouteName")?.GetValue(entry)?.ToString()
+                                ?? entryType.GetField("RouteName", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(entry)?.ToString();
+                var pattern = entryType.GetProperty("Pattern")?.GetValue(entry)?.ToString()
+                              ?? entryType.GetField("Pattern", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(entry)?.ToString();
+                var order = entryType.GetProperty("Order")?.GetValue(entry)
+                            ?? entryType.GetField("Order", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(entry);
+
+                // Pattern may be RoutePattern
+                if (pattern == null)
+                {
+                    var patternObj = entryType.GetProperty("Pattern")?.GetValue(entry);
+                    pattern = patternObj?.GetType().GetProperty("RawText")?.GetValue(patternObj)?.ToString()
+                              ?? patternObj?.ToString();
+                }
+
+                result.Add($"RouteName={routeName} Pattern={pattern} Order={order}");
+            }
+        }
+        catch (Exception ex)
+        {
+            result.Add($"reflection-failed:{ex.GetType().Name}:{ex.Message}");
+        }
+
+        return result;
+    }
+
+    private static string TryGetDataSourceId(EndpointDataSource source)
+    {
+        try
+        {
+            var prop = source.GetType().GetProperty("DataSourceId", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            return prop?.GetValue(source)?.ToString() ?? "n/a";
+        }
+        catch
+        {
+            return "n/a";
+        }
+    }
+
+    private static string? GetRoutePattern(Endpoint endpoint)
+    {
+        return (endpoint as RouteEndpoint)?.RoutePattern?.RawText;
+    }
+
+    private static int RuntimeHelpersHash(object? obj)
+    {
+        return obj == null ? 0 : RuntimeHelpers.GetHashCode(obj);
+    }
+
+    private static string Truncate(string? value, int max)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return string.Empty;
+        }
+
+        return value.Length <= max ? value : value.Substring(0, max) + "...";
+    }
+}

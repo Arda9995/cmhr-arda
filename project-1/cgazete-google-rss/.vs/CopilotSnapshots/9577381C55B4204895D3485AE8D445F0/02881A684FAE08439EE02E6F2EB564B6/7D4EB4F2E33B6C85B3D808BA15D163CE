@@ -1,0 +1,177 @@
+﻿using System.Reflection;
+using System.Security.Cryptography;
+using System.Xml.Linq;
+using AvvaMobile.Core.Caching;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using Quark.Business.Caching.Services;
+using Quark.Business.ElasticSearch.Abstractions;
+using Quark.Data;
+using Quark.Data.Models;
+using Quark.Resources;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+
+if (args.Length != 3 || args[1] != "--write-archive" || !long.TryParse(args[2], out var newsId) || newsId <= 0)
+    throw new ArgumentException("Usage: GoogleAiArchiveCheck <workspace-root> --write-archive <news-id>. Reads SQL only; rebuilds the article's daily archive twice to verify same-file updates; never contacts Elasticsearch.");
+
+var root = Path.GetFullPath(args[0]);
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Path.Combine(root, "Quark.CMS"))
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.Development.json")
+    .Build();
+var connectionString = configuration.GetConnectionString("ConnectionString");
+var target = new SqlConnectionStringBuilder(connectionString);
+if (target.DataSource != "192.168.35.32" || target.InitialCatalog != "News-Migration")
+    throw new InvalidOperationException("Only the approved development database is allowed.");
+
+var options = new DbContextOptionsBuilder<QuarkDataContext>()
+    .UseSqlServer(connectionString)
+    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+    .AddInterceptors(new RejectDatabaseWrites())
+    .Options;
+await using var context = new QuarkDataContext(options);
+var services = new ServiceCollection();
+services.AddMemoryCache();
+services.AddScoped<ICacheManager, MemoryCacheManager>();
+services.AddLocalization();
+services.AddLogging(builder => builder.AddConsole());
+using var provider = services.BuildServiceProvider();
+using var scope = provider.CreateScope();
+var cache = scope.ServiceProvider.GetRequiredService<ICacheManager>();
+var keys = new[] { "Common_ClientWebSite", "CDN_BaseUrl", "CDN_MediaGalleryFolder" };
+foreach (var setting in await context.AppSettings.Where(x => keys.Contains(x.Key)).ToListAsync())
+    await cache.Set(setting.Key, setting.Value);
+var settings = new AppSettingsKeys(cache);
+var siteUrl = settings.Common_ClientWebSite;
+if (string.IsNullOrWhiteSpace(siteUrl))
+    throw new InvalidOperationException("The website URL setting is missing.");
+
+var articleBefore = await context.NewsPublished.Where(x => x.NewsID == newsId)
+    .Select(x => new { x.NewsID, x.ExcludeFromGoogleAiFeed, x.AllowToSendRSS, x.NewsTypeID, x.PublishedDate, x.Slug })
+    .SingleOrDefaultAsync();
+if (articleBefore == null)
+    throw new InvalidOperationException("The requested published article does not exist.");
+var day = articleBefore.PublishedDate.Date;
+var nextDay = day.AddDays(1);
+var expected = await context.NewsPublished
+    .Where(x => x.PublishedDate >= day && x.PublishedDate < nextDay &&
+                x.AllowToSendRSS && !x.ExcludeFromGoogleAiFeed &&
+                (x.NewsTypeID == (int)NewsTypesEnum.News || x.NewsTypeID == (int)NewsTypesEnum.ColumnArticles))
+    .Select(x => new { x.NewsID, x.Slug, x.Content })
+    .ToListAsync();
+var archiveRoot = Path.Combine(root, "GoogleAiFeedArchive");
+var expectedPath = Path.Combine(archiveRoot, day.Year.ToString(), $"feed-{day:yyyy-MM-dd}.xml");
+Dictionary<string, string> SnapshotFiles() => Directory.Exists(archiveRoot)
+    ? Directory.EnumerateFiles(archiveRoot, "*.xml", SearchOption.AllDirectories)
+        .ToDictionary(x => x, x => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(x))))
+    : new Dictionary<string, string>();
+var before = SnapshotFiles();
+
+var elastic = DispatchProxy.Create<IElasticSearchService, FailingElasticProxy>();
+var service = new XmlFeedCachingService(
+    new HttpContextAccessor { HttpContext = new DefaultHttpContext() }, context,
+    scope.ServiceProvider.GetRequiredService<IStringLocalizer<CommonResource>>(), settings, cache, elastic,
+    scope.ServiceProvider.GetRequiredService<ILogger<XmlFeedCachingService>>());
+for (var repetition = 0; repetition < 2; repetition++)
+{
+    var result = await service.ArchiveGoogleAiNewsAsync(newsId);
+    if (!result.IsSuccess)
+        throw new InvalidOperationException($"Archive failed: {result.Message}");
+    var path = result.Data;
+    if (!string.Equals(path, expectedPath, StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException($"Unexpected daily filename: {path}; expected {expectedPath}");
+    var file = new FileInfo(path);
+    if (!file.Exists || file.Length == 0)
+        throw new InvalidOperationException($"Archive is missing or empty: {path}");
+    var document = XDocument.Load(path);
+    if (document.Root?.Name != "rss" || (string)document.Root.Attribute("version") != "2.0")
+        throw new InvalidOperationException($"Invalid RSS document: {path}");
+    if (document.Root.GetNamespaceOfPrefix("atom") != XNamespace.Get("http://www.w3.org/2005/Atom"))
+        throw new InvalidOperationException($"RSS Atom namespace is missing or incorrect: {path}");
+    var items = document.Root.Element("channel")?.Elements("item").ToList()
+        ?? throw new InvalidOperationException("RSS channel is missing.");
+    var expectedUrls = expected.Select(x => $"{siteUrl.TrimEnd('/')}/{(x.Slug ?? string.Empty).TrimStart('/')}")
+        .OrderBy(x => x, StringComparer.Ordinal);
+    var actualUrls = items.Select(x => (string)x.Element("guid")).OrderBy(x => x, StringComparer.Ordinal);
+    if (items.Count != expected.Count || !expectedUrls.SequenceEqual(actualUrls))
+        throw new InvalidOperationException($"Archive must contain every eligible article from {day:yyyy-MM-dd}, with no articles from other days: {path}");
+    XNamespace content = "http://purl.org/rss/1.0/modules/content/";
+    XNamespace media = "http://search.yahoo.com/mrss/";
+    XNamespace atom = "http://www.w3.org/2005/Atom";
+    XNamespace dc = "http://purl.org/dc/elements/1.1/";
+    var channel = document.Root.Element("channel");
+    if (document.Root.GetNamespaceOfPrefix("content") != content ||
+        document.Root.GetNamespaceOfPrefix("media") != media || document.Root.GetNamespaceOfPrefix("dc") != dc ||
+        (string)channel.Element("title") != "Cumhuriyet Gazetesi - Google AI Feed" ||
+        (string)channel.Element("ttl") != "60" || channel.Element("image")?.Element("url") == null ||
+        (string)channel.Element(atom + "link")?.Attribute("rel") != "self")
+        throw new InvalidOperationException("The full feed channel or namespaces are missing.");
+    if (items.Any(x => x.Element("title") == null || x.Element("pubDate") == null || x.Element(content + "encoded") == null))
+        throw new InvalidOperationException("An archive item is missing its title, date, or content.");
+    foreach (var item in items)
+    {
+        var enclosure = item.Element("enclosure");
+        var photo = item.Element(media + "content");
+        if (string.IsNullOrEmpty((string)enclosure?.Attribute("url")) ||
+            (string)enclosure.Attribute("url") != (string)photo?.Attribute("url") ||
+            !int.TryParse((string)photo?.Attribute("width"), out var width) || width <= 0 ||
+            !int.TryParse((string)photo?.Attribute("height"), out var height) || height <= 0)
+            throw new InvalidOperationException("The enclosure or media photo metadata is missing.");
+        if (DateTimeOffset.Parse((string)item.Element("pubDate"), System.Globalization.CultureInfo.InvariantCulture).Date != day)
+            throw new InvalidOperationException("An archive item belongs to a different publication day.");
+        if (!item.Element(content + "encoded").Nodes().OfType<XCData>().Any())
+            throw new InvalidOperationException("Full article content is not enclosed in CDATA.");
+    }
+    Console.WriteLine($"PASS refresh {repetition + 1}: {path}: all {items.Count} eligible daily articles, valid RSS/CDATA, {file.Length} bytes.");
+}
+var afterArchive = SnapshotFiles();
+if (afterArchive.Count != before.Count + (before.ContainsKey(expectedPath) ? 0 : 1) ||
+    before.Where(x => x.Key != expectedPath).Any(x => !afterArchive.TryGetValue(x.Key, out var hash) || hash != x.Value))
+    throw new InvalidOperationException("A numbered file was created or an unrelated archive was changed.");
+var missingArticle = await service.ArchiveGoogleAiNewsAsync(long.MaxValue);
+if (!missingArticle.IsSuccess || missingArticle.Data != null || SnapshotFiles().Count != afterArchive.Count)
+    throw new InvalidOperationException("An absent article must not create an empty archive.");
+var refreshResult = await service.RefreshGoogleAiRSS();
+if (((FailingElasticProxy)(object)elastic).UpdateCalls != 1 || refreshResult.IsSuccess)
+    throw new InvalidOperationException("The simulated Elasticsearch outage was not reported.");
+var afterRefresh = SnapshotFiles();
+if (afterRefresh.Count != afterArchive.Count || afterArchive.Any(x => afterRefresh[x.Key] != x.Value))
+    throw new InvalidOperationException("A live feed refresh must not create or overwrite archives.");
+var articleAfter = await context.NewsPublished.Where(x => x.NewsID == newsId)
+    .Select(x => new { x.NewsID, x.ExcludeFromGoogleAiFeed, x.AllowToSendRSS, x.NewsTypeID, x.PublishedDate, x.Slug })
+    .SingleOrDefaultAsync();
+if (!Equals(articleBefore, articleAfter))
+    throw new InvalidOperationException("Article state changed during validation; repeat on a stable database.");
+Console.WriteLine($"PASS article {newsId} exclusion unchanged: {articleAfter?.ExcludeFromGoogleAiFeed}.");
+Console.WriteLine("PASS the same daily file is reused; no numbered files created; other archives unchanged; live refresh isolated from archives. No database settings were changed.");
+
+public class FailingElasticProxy : DispatchProxy
+{
+    public int UpdateCalls { get; private set; }
+
+    protected override object Invoke(MethodInfo targetMethod, object[] args)
+    {
+        if (targetMethod.Name == nameof(IElasticSearchService.UpdateDocumentAsync))
+        {
+            UpdateCalls++;
+            return Task.FromException<bool>(new InvalidOperationException("Simulated Elasticsearch outage for archive validation; no network request was made."));
+        }
+        throw new InvalidOperationException("Unexpected Elasticsearch operation in archive check.");
+    }
+}
+
+public class RejectDatabaseWrites : SaveChangesInterceptor
+{
+    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+        => throw new InvalidOperationException("Database writes are not allowed in this check.");
+
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        => throw new InvalidOperationException("Database writes are not allowed in this check.");
+}

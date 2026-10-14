@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quark.Business.Caching\Quark.Business.Caching.csproj" />
+    <ProjectReference Include="..\Quark.Business.Common\Quark.Business.Common.csproj" />
+    <ProjectReference Include="..\Quark.Cloudflare.Adapter\Quark.Cloudflare.Adapter.csproj" />
+    <ProjectReference Include="..\Quark.CMS.Business\Quark.CMS.Business.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire.Core" Version="1.8.11" />
+  </ItemGroup>
+
+</Project>

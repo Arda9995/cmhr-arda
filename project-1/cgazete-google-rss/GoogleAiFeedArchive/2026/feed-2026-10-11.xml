@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Cumhuriyet Gazetesi - Google AI Feed</title>
+    <link>http://yenisitetest.cumhuriyet.com.tr/</link>
+    <description>Cumhuriyet Gazetesi Google News AI Pilot Feed</description>
+    <language>tr</language>
+    <category>News</category>
+    <lastBuildDate>Sun, 11 Oct 2026 23:59:59 +0300</lastBuildDate>
+    <pubDate>Sun, 11 Oct 2026 23:59:59 +0300</pubDate>
+    <copyright>Cumhuriyet Gazetesi</copyright>
+    <ttl>60</ttl>
+    <image>
+      <url>https://media.cumhuriyet.com.tr/cumhuriyet-amp-logo.png</url>
+      <title>Cumhuriyet Gazetesi - Google AI Feed</title>
+      <link>http://yenisitetest.cumhuriyet.com.tr/</link>
+      <width>144</width>
+      <height>60</height>
+    </image>
+    <atom:link href="https://www.cumhuriyet.com.tr/feeds/google-ai.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>deneme 40 ve deployment</title>
+      <link>http://yenisitetest.cumhuriyet.com.tr/cevre/deneme-40-ve-deployment-2540358</link>
+      <enclosure url="https://media.cumhuriyet.com.tr/Archive/dd6e89df-e893-43b6-a833-7167c1b8aea4.jpg" length="50000" type="image/jpeg" />
+      <media:content url="https://media.cumhuriyet.com.tr/Archive/dd6e89df-e893-43b6-a833-7167c1b8aea4.jpg" type="image/jpeg" height="1200" width="1600" expression="full" />
+      <guid isPermaLink="false">http://yenisitetest.cumhuriyet.com.tr/cevre/deneme-40-ve-deployment-2540358</guid>
+      <pubDate>Sun, 11 Oct 2026 18:42:00 +0300</pubDate>
+      <dc:creator>Tamay Yüğnük</dc:creator>
+      <description>deneme 40 ve deployment</description>
+      <content:encoded><![CDATA[<p>deneme rss ai</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>

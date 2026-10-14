@@ -1,0 +1,16 @@
+﻿# Copilot Instructions
+
+## Project Guidelines
+- For this repository, Google AI RSS HTML cleanup must apply only to the generated feed/archive content. It must never delete articles, modify their stored HTML, or change their publication status; preserve article text, semantic markup, and images in the feed.
+- Each day for the Google AI RSS feed archive must have its own separate XML file (for example, `<ArchivePath>/<year>/feed-yyyy-MM-dd.xml`). Updates during a day rewrite that day's file; a new day starts a new file.
+- Hangfire job methods must be async (`Task`-returning) and use `await`; never block async calls with `.Result` or `.GetAwaiter().GetResult()`.
+- `QuarkDataContext` is not thread-safe. In Hangfire/background services, do not run concurrent operations on the shared scoped context; for database access in background jobs, create a short-lived context via `IDbContextFactory<QuarkDataContext>` (registered in `Quark.Hangfire/Program.cs`).
+
+## Build & Publish Dependencies
+- The solution contains independently deployed apps: `Quark.CMS` (admin panel), `Quark.Hangfire` / `Quark.Hangfire.Api` (background jobs), `Quark.Web`, and `Quark.API`. Each publish copies its own dependency DLLs; publishing one app does NOT update the others.
+- If a change is only in the `Quark.CMS` UI layer (Razor pages, controllers), publishing CMS alone is enough.
+- If a change is in a shared layer, all apps that reference it must be rebuilt and republished together:
+  - `Quark.CMS.Business` → affects CMS **and** Hangfire (referenced by `Quark.Hangfire.Business`).
+  - `Quark.Business.Common`, `Quark.Data`, `Quark.Core` → affect all apps (CMS, Hangfire, Web, API).
+  - `Quark.Business.Caching`, `Quark.Business.ElasticSearch`, `Quark.Cloudflare.Adapter`, `Quark.Notification.Adapter` → affect CMS, Hangfire, and API.
+- Google AI RSS feed logic lives in `Quark.CMS.Business` and is also executed by Hangfire jobs; changes there require republishing Hangfire as well, otherwise it keeps running with the old DLLs.

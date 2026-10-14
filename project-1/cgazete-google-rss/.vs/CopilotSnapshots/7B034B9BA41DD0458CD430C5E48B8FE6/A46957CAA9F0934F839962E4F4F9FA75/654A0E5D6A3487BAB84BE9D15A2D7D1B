@@ -1,0 +1,201 @@
+﻿@using Quark.Web.ViewComponents.Models
+@using Quark.Core.Extentions
+@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsDetailResponse;
+@{
+	bool isMobile = Context.Request.Headers["User-Agent"].ToString().ToLower().Contains("mobile");
+}
+<div class="grid grid-cols-12 gap-6" id="contentArea">
+	<div class="col-span-12 lg:col-span-8">
+		<!-- Only Mobile Area Start -->
+		<div class="aspect-[16/9]"><img class="w-full h-full object-cover" src="@Model.CoverPhoto"
+		                                alt="@Html.Raw(Model.Title)"></div> <!-- Thumbnail End -->
+		<h2 class="text-xl lg:hidden font-metropolis font-semibold mt-5 description"
+		    data-subtitle-news-id="@Model.ID">@Html.Raw(Model.SubTitle)</h2> <!-- Description End -->
+		<!-- Only Mobile Area End --> <!-- Thumbnail Start -->
+		<div class="flex items-center justify-between lg:hidden my-5">
+			<div class="flex items-center gap-2">
+				<a href="#" class="flex items-center gap-1" data-text="up">
+					<div>
+						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M8.30785 13.4733L12.1329 3.04751C12.3879 2.35167 13.3379 2.32 13.657 2.9525L13.6979 3.04751L18.282 15.5442C18.3534 15.7432 18.3464 15.962 18.2624 16.1561C18.1785 16.3502 18.0239 16.5051 17.8299 16.5895C17.636 16.6738 17.4173 16.6813 17.218 16.6104C17.0188 16.5395 16.854 16.3954 16.757 16.2075L16.7179 16.1183L15.5412 12.9167H10.287L9.08535 16.1833L9.05202 16.2492L8.99119 16.3392L8.92702 16.4142L8.85619 16.4783L8.78702 16.5283L8.74535 16.555L8.67535 16.5908L8.58869 16.6242L8.50119 16.6475L8.39035 16.6642L8.30119 16.665L8.24202 16.6608L8.15619 16.6475L8.03119 16.6108L7.97369 16.5858L7.89035 16.54L7.79785 16.4733L7.72119 16.4017L7.66785 16.3383L7.61702 16.2633L7.57202 16.1783L6.95035 14.5842H3.87869L3.27619 16.1342C3.20227 16.3245 3.06104 16.4811 2.87932 16.5742C2.69759 16.6673 2.48801 16.6904 2.29035 16.6392L2.19785 16.6092C2.00734 16.5352 1.85064 16.3939 1.75754 16.212C1.66443 16.0301 1.64141 15.8203 1.69285 15.6225L1.72285 15.5308L4.63869 8.03334C4.90119 7.35834 5.82202 7.32667 6.14702 7.93667L6.19202 8.03334L8.30785 13.4733ZM5.41535 10.6342L4.52702 12.9167H6.30285L5.41535 10.6342ZM12.9154 5.75417L10.8987 11.2492H14.9304L12.9154 5.75417Z"
+								fill="#6B6B7D"></path>
+						</svg>
+					</div>
+					<div>
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M7.922 2.00467L8 2C8.16329 2.00002 8.32089 2.05997 8.44291 2.16848C8.56494 2.27698 8.6429 2.4265 8.662 2.58867L8.66667 2.66667V7.33333H13.3333C13.4966 7.33335 13.6542 7.3933 13.7762 7.50181C13.8983 7.61032 13.9762 7.75983 13.9953 7.922L14 8C14 8.16329 13.94 8.32089 13.8315 8.44291C13.723 8.56494 13.5735 8.6429 13.4113 8.662L13.3333 8.66667H8.66667V13.3333C8.66665 13.4966 8.6067 13.6542 8.49819 13.7762C8.38968 13.8983 8.24017 13.9762 8.078 13.9953L8 14C7.83671 14 7.67911 13.94 7.55709 13.8315C7.43506 13.723 7.3571 13.5735 7.338 13.4113L7.33333 13.3333V8.66667H2.66667C2.50338 8.66665 2.34578 8.6067 2.22375 8.49819C2.10173 8.38968 2.02377 8.24017 2.00467 8.078L2 8C2.00002 7.83671 2.05997 7.67911 2.16848 7.55709C2.27698 7.43506 2.4265 7.3571 2.58867 7.338L2.66667 7.33333H7.33333V2.66667C7.33335 2.50338 7.3933 2.34578 7.50181 2.22375C7.61032 2.10173 7.75983 2.02377 7.922 2.00467Z"
+								fill="#6B6B7D"></path>
+						</svg>
+					</div>
+				</a>
+				<span class="block w-px h-3 bg-[#C7C7CC] rounded-full"></span>
+				<a href="#" class="flex items-center gap-1" data-text="down">
+					<div>
+						<svg width="18" height="15" viewBox="0 0 18 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M10.6921 11.4733L6.86715 1.04751C6.61215 0.351672 5.66215 0.320005 5.34298 0.952505L5.30215 1.04751L0.717979 13.5442C0.646633 13.7432 0.653641 13.962 0.737587 14.1561C0.821531 14.3502 0.976135 14.5051 1.17006 14.5895C1.36399 14.6738 1.58273 14.6813 1.78195 14.6104C1.98118 14.5395 2.14599 14.3954 2.24298 14.2075L2.28214 14.1183L3.45881 10.9167H8.71298L9.91465 14.1833L9.94798 14.2492L10.0088 14.3392L10.073 14.4142L10.1438 14.4783L10.213 14.5283L10.2546 14.555L10.3246 14.5908L10.4113 14.6242L10.4988 14.6475L10.6096 14.6642L10.6988 14.665L10.758 14.6608L10.8438 14.6475L10.9688 14.6108L11.0263 14.5858L11.1096 14.54L11.2021 14.4733L11.2788 14.4017L11.3321 14.3383L11.383 14.2633L11.428 14.1783L12.0496 12.5842H15.1213L15.7238 14.1342C15.7977 14.3245 15.939 14.4811 16.1207 14.5742C16.3024 14.6673 16.512 14.6904 16.7096 14.6392L16.8021 14.6092C16.9927 14.5352 17.1494 14.3939 17.2425 14.212C17.3356 14.0301 17.3586 13.8203 17.3071 13.6225L17.2771 13.5308L14.3613 6.03334C14.0988 5.35834 13.178 5.32667 12.853 5.93667L12.808 6.03334L10.6921 11.4733ZM13.5846 8.63417L14.473 10.9167H12.6971L13.5846 8.63417ZM6.08465 3.75417L8.10131 9.24917H4.06965L6.08465 3.75417Z"
+								fill="#6B6B7D"></path>
+						</svg>
+					</div>
+					<div>
+						<svg width="14" height="2" viewBox="0 0 14 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M1 1H13" stroke="#6B6B7D" stroke-width="1.5" stroke-linecap="round"></path>
+						</svg>
+					</div>
+				</a>
+			</div>
+			<div>
+				<nav class="flex gap-4 items-center undefined">
+					<a href="#" data-platform="facebook"
+					   data-url="@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)"
+					   data-title="@Html.Raw(Model.Title)" class="share-btn">
+						<svg class="size-5" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100"
+						     viewBox="0 0 24 24">
+							<path class="fill-sky-600"
+							      d="M17.525,9H14V7c0-1.032,0.084-1.682,1.563-1.682h1.868v-3.18C16.522,2.044,15.608,1.998,14.693,2 C11.98,2,10,3.657,10,6.699V9H7v4l3-0.001V22h4v-9.003l3.066-0.001L17.525,9z"></path>
+						</svg>
+					</a>
+					<a data-platform="twitter"
+					   data-url="@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)"
+					   data-title="@Html.Raw(Model.Title)" data-username="cumhuriyetcomtr" data-related="cumhuriyet"
+					   href="#" class="share-btn">
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<g clip-path="url(#clip0_3245_1736)">
+								<path
+									d="M12.5944 0.798828H15.0361L9.70281 6.91083L16 15.1988H11.0522L7.19679 10.1748L2.76305 15.1988H0.321285L6.04016 8.67083L0 0.798828H5.07631L8.57831 5.40683L12.5944 0.798828ZM11.7269 13.7268H13.0763L4.33735 2.17483H2.85944L11.7269 13.7268Z"
+									fill="black"></path>
+							</g>
+							<defs>
+								<clipPath id="clip0_3245_1736">
+									<rect width="16" height="14.4" fill="white"
+									      transform="translate(0 0.799805)"></rect>
+								</clipPath>
+							</defs>
+						</svg>
+					</a>
+					<a data-platform="whatsapp"
+					   data-url="@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)"
+					   data-title="@Html.Raw(Model.Title) | Cumhuriyet" href="#" class="share-btn lg:block">
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<g clip-path="url(#clip0_3245_1741)">
+								<path fill-rule="evenodd" clip-rule="evenodd"
+								      d="M13.6687 2.32334C12.1648 0.825856 10.1647 0.000759757 8.0336 0C3.64227 0 0.068376 3.55377 0.066848 7.92199C0.066084 9.31841 0.433176 10.6814 1.13031 11.8826L0 15.9883L4.22327 14.8867C5.3868 15.5181 6.69702 15.8504 8.03018 15.8508H8.0336C12.4242 15.8508 15.9985 12.2967 16 7.92844C16.0008 5.8114 15.173 3.8212 13.6687 2.32372V2.32334ZM8.0336 14.5129H8.03093C6.84293 14.5125 5.67751 14.1949 4.66067 13.5951L4.41885 13.4523L1.91262 14.106L2.58148 11.6759L2.4241 11.4267C1.76135 10.3783 1.41107 9.16645 1.41183 7.92239C1.41336 4.29187 4.38371 1.33793 8.03631 1.33793C9.80489 1.33869 11.4673 2.02438 12.7176 3.26924C13.9678 4.51372 14.6558 6.16849 14.655 7.92769C14.6535 11.5586 11.6832 14.5125 8.0336 14.5125V14.5129ZM11.6656 9.5813C11.4665 9.48217 10.4879 9.00349 10.3053 8.93741C10.1227 8.87129 9.99018 8.83828 9.8576 9.03655C9.72507 9.23487 9.34347 9.68084 9.22733 9.81264C9.1112 9.94484 8.99507 9.96119 8.79604 9.86201C8.59707 9.76287 7.95569 9.55394 7.19516 8.87965C6.60347 8.35465 6.20387 7.70661 6.08778 7.50829C5.97164 7.31001 6.07556 7.20287 6.17484 7.10449C6.26422 7.0156 6.37387 6.87315 6.47356 6.75766C6.57329 6.64217 6.60613 6.55938 6.67258 6.42754C6.73907 6.29534 6.70582 6.17989 6.65618 6.08071C6.60649 5.98157 6.20849 5.00716 6.04231 4.61096C5.88071 4.22501 5.71649 4.27744 5.59462 4.27098C5.47849 4.26528 5.34596 4.26414 5.21302 4.26414C5.08009 4.26414 4.86462 4.31352 4.68204 4.51182C4.49947 4.7101 3.98529 5.18913 3.98529 6.16314C3.98529 7.13715 4.69849 8.07889 4.79818 8.21109C4.89787 8.34329 6.20196 10.3426 8.19862 11.2004C8.67347 11.4043 9.04436 11.5263 9.33351 11.6175C9.81027 11.7683 10.2442 11.747 10.5872 11.6961C10.9696 11.6391 11.7649 11.2171 11.9307 10.7547C12.0964 10.2924 12.0964 9.89582 12.0468 9.81339C11.9972 9.73096 11.8642 9.68119 11.6652 9.58206L11.6656 9.5813Z"
+								      fill="#25D366"></path>
+							</g>
+							<defs>
+								<clipPath id="clip0_3245_1741">
+									<rect width="16" height="16" fill="white"></rect>
+								</clipPath>
+							</defs>
+						</svg>
+					</a>
+					<div class="relative share-dropdown">
+						<button id="shareDropdownButton" class="py-3 px-0 cursor-pointer">
+							<svg width="12" height="4" viewBox="0 0 12 4" fill="none"
+							     xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M2.66667 1.99913C2.66667 2.35275 2.52619 2.69189 2.27614 2.94194C2.02609 3.19199 1.68696 3.33247 1.33333 3.33247C0.979711 3.33247 0.640573 3.19199 0.390524 2.94194C0.140476 2.69189 0 2.35275 0 1.99913C0 1.64551 0.140476 1.30637 0.390524 1.05632C0.640573 0.806275 0.979711 0.665799 1.33333 0.665799C1.68696 0.665799 2.02609 0.806275 2.27614 1.05632C2.52619 1.30637 2.66667 1.64551 2.66667 1.99913ZM7.33333 1.99913C7.33333 2.35275 7.19286 2.69189 6.94281 2.94194C6.69276 3.19199 6.35362 3.33247 6 3.33247C5.64638 3.33247 5.30724 3.19199 5.05719 2.94194C4.80714 2.69189 4.66667 2.35275 4.66667 1.99913C4.66667 1.64551 4.80714 1.30637 5.05719 1.05632C5.30724 0.806275 5.64638 0.665799 6 0.665799C6.35362 0.665799 6.69276 0.806275 6.94281 1.05632C7.19286 1.30637 7.33333 1.64551 7.33333 1.99913ZM12 1.99913C12 2.35275 11.8595 2.69189 11.6095 2.94194C11.3594 3.19199 11.0203 3.33247 10.6667 3.33247C10.313 3.33247 9.97391 3.19199 9.72386 2.94194C9.47381 2.69189 9.33333 2.35275 9.33333 1.99913C9.33333 1.64551 9.47381 1.30637 9.72386 1.05632C9.97391 0.806275 10.313 0.665799 10.6667 0.665799C11.0203 0.665799 11.3594 0.806275 11.6095 1.05632C11.8595 1.30637 12 1.64551 12 1.99913Z"
+									fill="#393952"></path>
+							</svg>
+						</button>
+						<div
+							class="absolute w-52 top-full right-0 bg-white shadow-lg border border-gray-200 rounded content hidden">
+							<a class="text-sm p-2 block hover:bg-zinc-100 font-medium share-btn" href="#"
+							   data-platform="linkedin"
+							   data-url="@Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)"
+							   data-title="@Html.Raw(Model.Title)">Linkedin'de Paylaş</a>
+							<a class="text-sm p-2 block hover:bg-zinc-100 font-medium"
+							   href="mailto:?subject=Cumhuriyet | @Html.Raw(Model.Title) &body=Cumhuriyet - @Html.Raw(Model.Title) @Model.NewsSlug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)">E-Posta
+								Gönder</a>
+						</div>
+					</div>
+				</nav>
+			</div>
+		</div>
+		@if (isMobile)
+		{
+			<partial name="~/Views/Shared/AdContainers/_NewsDetailUnderSpotAdArea.cshtml"/>
+		}
+		@if (string.IsNullOrEmpty(Model.Video))
+		{
+			<partial name="~/Views/Shared/AdContainers/_GeneralMembranaAdArea.cshtml"/>
+		}
+		<div class="mt-6 prose font-helvetica max-w-full text-xl text-content">
+			@if (Model.Video != null && Model.VideoPlayerID != null)
+			{
+				if (Model.VideoPlayerID == 1)
+				{
+					<div class="aspect-[16/9] relative overflow-hidden">
+						<iframe id="videoPlayer"
+						        src="https://www.youtube.com/embed/@Model.Video"
+						        style="
+									width: 100%;
+									height: 100%;
+									position: absolute;
+									left: 0px;
+									top: 0px;
+									overflow: hidden;
+									border: none;"
+						        allowfullscreen
+						        title="YouTube Video Player"
+						        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
+						</iframe>
+					</div>
+				}
+
+				if (Model.VideoPlayerID == 2)
+				{
+					<div class="aspect-[16/9] relative overflow-hidden">
+						<iframe id="videoPlayer" src="https://geo.dailymotion.com/player.html?video=@Model.Video"
+						        style="
+										width: 100%;
+										height: 100%;
+										position: absolute;
+										left: 0px;
+										top: 0px;
+										overflow: hidden;
+										border: none;
+						" allowfullscreen title="Dailymotion Video Player" allow="web-share">
+						</iframe>
+					</div>
+				}
+			}
+			<div class="text-content articleDetails" data-content-news-id="@Model.ID" property="articleBody">
+				@Html.Raw(Model.Content)
+			</div>
+		</div>
+		@if (Model.TagList.Any())
+		{
+			<!-- Related Topics Start -->
+			<div class="flex flex-wrap text-sm font-semibold mt-4 mb-6 gap-2">
+				<span
+					class="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#FF0101] to-[#0D4ABC] shrink-0">İlgili Konular:</span>
+				@foreach (var tag in Model.TagList)
+				{
+					<a href="@tag.Slug" class="text-gray-500 hover:text-black transition-all"> #@Html.Raw(tag.Text) </a>
+				}
+			</div>
+			<!-- Related Topics End -->
+			@if (Model.RelatedNewsList.Any())
+			{
+				<partial name="~/Views/Shared/AdContainers/_GeneralTaboolaTopAdArea.cshtml"/>
+			}
+		}
+		@{
+			var pagesBodyEnd = _appSettings.Pages_Body_End;
+		}
+		@if (!string.IsNullOrWhiteSpace(pagesBodyEnd))
+		{
+			<div class="md:col-span-4" data-astro-cid-j7pv25f6>
+				@Html.Raw(pagesBodyEnd)
+			</div>
+		}
+	</div>
+	@await Component.InvokeAsync("News", new NewsViewComponentModel
+	{
+		MethodName = "MostViewedNews",
+		NewsCount = 4
+	})
+</div>

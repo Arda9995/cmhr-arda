@@ -1,0 +1,166 @@
+﻿-- Google AI Feed
+-- Production tabloları: dbo schema, tablo adları "News.*" (EF [Table("News.News")] ile birebir).
+-- Deploy sonrası CMS'de NewsPhotoTypes cache'inin yenilenmesi gerekir (veya ilk CMS istekte otomatik yenilenir).
+
+IF COL_LENGTH(N'dbo.[News.News]', 'ExcludeFromGoogleAiFeed') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.News]
+    ADD [ExcludeFromGoogleAiFeed] BIT NOT NULL
+        CONSTRAINT DF_News_ExcludeFromGoogleAiFeed DEFAULT (0);
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPublished]', 'ExcludeFromGoogleAiFeed') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPublished]
+    ADD [ExcludeFromGoogleAiFeed] BIT NOT NULL
+        CONSTRAINT DF_NewsPublished_ExcludeFromGoogleAiFeed DEFAULT (0);
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsVersions]', 'ExcludeFromGoogleAiFeed') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsVersions]
+    ADD [ExcludeFromGoogleAiFeed] BIT NOT NULL
+        CONSTRAINT DF_NewsVersions_ExcludeFromGoogleAiFeed DEFAULT (0);
+END
+GO
+
+-- ExcludeFromGoogleAiFeed -> AllowGoogleAiFeed (varsayılan 0, seçildiğinde 1). Mevcut değerler tersine çevrilir.
+DECLARE @tables TABLE ([Name] SYSNAME, [Constraint] SYSNAME);
+INSERT INTO @tables VALUES
+    (N'News.News', N'DF_News_AllowGoogleAiFeed'),
+    (N'News.NewsPublished', N'DF_NewsPublished_AllowGoogleAiFeed'),
+    (N'News.NewsVersions', N'DF_NewsVersions_AllowGoogleAiFeed');
+
+DECLARE @table SYSNAME, @constraint SYSNAME, @full NVARCHAR(300), @oldDefault SYSNAME, @sql NVARCHAR(MAX);
+DECLARE table_cursor CURSOR LOCAL FAST_FORWARD FOR SELECT [Name], [Constraint] FROM @tables;
+OPEN table_cursor;
+FETCH NEXT FROM table_cursor INTO @table, @constraint;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @full = N'dbo.' + QUOTENAME(@table);
+
+    IF COL_LENGTH(@full, 'ExcludeFromGoogleAiFeed') IS NOT NULL AND COL_LENGTH(@full, 'AllowGoogleAiFeed') IS NULL
+    BEGIN
+        SELECT @oldDefault = dc.[name]
+        FROM sys.default_constraints dc
+        JOIN sys.columns c ON c.object_id = dc.parent_object_id AND c.column_id = dc.parent_column_id
+        WHERE dc.parent_object_id = OBJECT_ID(@full) AND c.[name] = 'ExcludeFromGoogleAiFeed';
+
+        IF @oldDefault IS NOT NULL
+        BEGIN
+            SET @sql = N'ALTER TABLE ' + @full + N' DROP CONSTRAINT ' + QUOTENAME(@oldDefault);
+            EXEC sp_executesql @sql;
+        END
+
+        SET @sql = N'UPDATE ' + @full + N' SET [ExcludeFromGoogleAiFeed] = CASE WHEN [ExcludeFromGoogleAiFeed] = 1 THEN 0 ELSE 1 END';
+        EXEC sp_executesql @sql;
+
+        SET @sql = @full + N'.ExcludeFromGoogleAiFeed';
+        EXEC sp_rename @sql, N'AllowGoogleAiFeed', N'COLUMN';
+    END
+
+    IF COL_LENGTH(@full, 'AllowGoogleAiFeed') IS NULL
+    BEGIN
+        SET @sql = N'ALTER TABLE ' + @full + N' ADD [AllowGoogleAiFeed] BIT NOT NULL CONSTRAINT ' + QUOTENAME(@constraint) + N' DEFAULT (0)';
+        EXEC sp_executesql @sql;
+    END
+    ELSE IF NOT EXISTS (
+        SELECT 1 FROM sys.default_constraints dc
+        JOIN sys.columns c ON c.object_id = dc.parent_object_id AND c.column_id = dc.parent_column_id
+        WHERE dc.parent_object_id = OBJECT_ID(@full) AND c.[name] = 'AllowGoogleAiFeed')
+    BEGIN
+        SET @sql = N'ALTER TABLE ' + @full + N' ADD CONSTRAINT ' + QUOTENAME(@constraint) + N' DEFAULT (0) FOR [AllowGoogleAiFeed]';
+        EXEC sp_executesql @sql;
+    END
+
+    SET @oldDefault = NULL;
+    FETCH NEXT FROM table_cursor INTO @table, @constraint;
+END
+CLOSE table_cursor;
+DEALLOCATE table_cursor;
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPhotos]', 'Width') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPhotos] ADD [Width] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPhotos]', 'Height') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPhotos] ADD [Height] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsVersionsPhotos]', 'Width') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsVersionsPhotos] ADD [Width] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsVersionsPhotos]', 'Height') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsVersionsPhotos] ADD [Height] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPublishedPhotos]', 'Width') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPublishedPhotos] ADD [Width] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPublishedPhotos]', 'Height') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPublishedPhotos] ADD [Height] INT NULL;
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM [dbo].[News.NewsPhotoTypes]
+    WHERE [ID] = 10
+)
+BEGIN
+    SET IDENTITY_INSERT [dbo].[News.NewsPhotoTypes] ON;
+
+    INSERT INTO [dbo].[News.NewsPhotoTypes] (
+        [ID],
+        [Key],
+        [Name],
+        [Description],
+        [Width],
+        [Height],
+        [IsEnabled],
+        [IsRequired],
+        [Order]
+    )
+    VALUES (
+        10,
+        'GoogleAiHighResPhoto',
+        N'Google AI Yüksek Çözünürlüklü Görsel',
+        N'Google AI Feed için yüksek çözünürlüklü görsel. Minimum 1600x1200, maksimum 3200x3200.',
+        1600,
+        1200,
+        1,
+        0,
+        50
+    );
+
+    SET IDENTITY_INSERT [dbo].[News.NewsPhotoTypes] OFF;
+END
+ELSE
+BEGIN
+    UPDATE [dbo].[News.NewsPhotoTypes]
+    SET [Key] = 'GoogleAiHighResPhoto',
+        [Name] = N'Google AI Yüksek Çözünürlüklü Görsel',
+        [Description] = N'Google AI Feed için yüksek çözünürlüklü görsel. Minimum 1600x1200, maksimum 3200x3200.',
+        [Width] = 1600,
+        [Height] = 1200,
+        [IsEnabled] = 1,
+        [IsRequired] = 0
+    WHERE [ID] = 10;
+END
+GO

@@ -1,0 +1,26 @@
+@{
+    Layout = null;
+}
+
+@model Quark.CMS.Business.Models.Responses.MediaGalleryResponses.GetFolderViewCardInformationResponse
+
+<div class="badge badge-lg badge-light-primary">
+    <div class="d-flex align-items-center flex-wrap pe-2">
+        <i class="ki-duotone ki-folder fs-2 text-primary me-3">
+            <span class="path1"></span>
+            <span class="path2"></span>
+        </i>
+        @if(@Model.Paths.Count > 0)
+        {
+            @Model.Paths[0]
+        }
+        @foreach (var path in @Model.Paths.Skip(1))
+        {
+            <i class="ki-duotone ki-right fs-2x text-primary mx-1"></i>
+            @path
+        }
+    </div>
+</div>
+<div class="badge badge-lg badge-primary">
+    <span id="kt_file_manager_items_counter">@Model.FilesCount @_localizer["File"]</span>
+</div>

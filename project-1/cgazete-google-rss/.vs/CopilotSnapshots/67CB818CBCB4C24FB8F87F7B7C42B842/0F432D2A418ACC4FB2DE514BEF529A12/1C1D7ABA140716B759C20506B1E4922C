@@ -1,0 +1,13 @@
+﻿{
+    "ConnectionStrings": {
+        Server=192.168.35.32;Database=News-Migration
+    },
+    "RedisConnectionString": "192.168.35.33:6390,password=redispw",
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "AllowedHosts": "*"
+}

@@ -1,0 +1,23 @@
+﻿@model PageCachingResponse
+
+@{
+    Layout = "~/Views/Shared/_LayoutNoAds.cshtml";
+}
+
+<partial name="~/Views/Shared/_Header.cshtml" />
+<!-- MAIN START -->
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <div class="max-w-container mx-auto space-y-6 undefined">
+        <!-- Breadcrumb Start -->
+        <nav class="flex items-center gap-2 text-xs undefined">
+            <a href="/" class="text-gray-500 hover:text-gray-600 transition-all font-medium"> Anasayfa </a><span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 12L10 8L6 4" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </span><a href="/@Model.Slug" class="text-red-600 font-semibold "> @Model.Breadcrumb </a>
+        </nav> <!-- Breadcrumb End -->
+        <div class="container mx-auto">
+            @Html.Raw(Model.Content)
+        </div>
+    </div>
+</main>

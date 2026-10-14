@@ -1,0 +1,13 @@
+using AvvaMobile.Core.Handlers.JwtToken;
+
+namespace Quark.API.Business.Models.Responses.LoginResponses
+{
+    public class EmailLoginResponse
+    {
+        public bool IsNewUser { get; set; }
+        public Token Token { get; set; }
+        public bool HasPremiumMembership { get; set; }
+        public DateTime? PremiumMembershipExpirationDate { get; set; }
+        public int RemainingDays { get; set; }
+    }
+} 

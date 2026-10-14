@@ -1,0 +1,17 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+@{
+    var tagNameList = Model.Tags.Split(",");
+}
+
+<div class="fv-row">
+    <label class="form-label">@_localizer["Tags"] : </label>
+    @foreach (var tagName in tagNameList)
+    {
+        <div class="badge badge-light-primary rounded-pill badge-lg mb-3">@tagName</div>
+    }
+    
+</div>
+
+
+

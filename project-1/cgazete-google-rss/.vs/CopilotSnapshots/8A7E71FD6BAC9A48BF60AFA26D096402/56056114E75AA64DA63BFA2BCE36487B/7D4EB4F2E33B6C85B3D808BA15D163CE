@@ -1,0 +1,336 @@
+﻿using System.Reflection;
+using System.Security.Cryptography;
+using System.Xml.Linq;
+using AvvaMobile.Core.Caching;
+using HtmlAgilityPack;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using Quark.Business.Caching.Services;
+using Quark.Business.ElasticSearch.Abstractions;
+using Quark.Data;
+using Quark.Data.Models;
+using Quark.Resources;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+
+if (args.Length == 1 && args[0] == "--check-refactor")
+{
+    await XmlFeedRefactorChecks.RunAsync();
+    return;
+}
+
+var cleanContent = typeof(XmlFeedCachingService).GetMethod("CleanGoogleAiContent", BindingFlags.NonPublic | BindingFlags.Static)
+    ?? throw new InvalidOperationException("Google AI content cleanup method is missing.");
+string CleanContent(string html) => (string)cleanContent.Invoke(null, new object[] { html });
+
+void CheckContent(string expected, string cleaned)
+{
+    // XML readers normalize CRLF and CR to LF, including text inside CDATA.
+    string NormalizeXmlLineEndings(string text) => (text ?? string.Empty).Replace("\r\n", "\n").Replace('\r', '\n');
+    var beforeHtml = new HtmlDocument();
+    beforeHtml.LoadHtml(NormalizeXmlLineEndings(expected));
+    var afterHtml = new HtmlDocument();
+    afterHtml.LoadHtml(NormalizeXmlLineEndings(cleaned));
+    var beforeNodes = beforeHtml.DocumentNode.Descendants().ToList();
+    var afterNodes = afterHtml.DocumentNode.Descendants().ToList();
+    if (beforeNodes.Count != afterNodes.Count || beforeHtml.DocumentNode.InnerText != afterHtml.DocumentNode.InnerText)
+        throw new InvalidOperationException("HTML structure or article text changed during cleanup.");
+    for (var i = 0; i < beforeNodes.Count; i++)
+    {
+        var expectedAttributes = beforeNodes[i].Attributes
+            .Select(x => (x.Name, x.Value));
+        if (beforeNodes[i].Name != afterNodes[i].Name ||
+            !expectedAttributes.SequenceEqual(afterNodes[i].Attributes.Select(x => (x.Name, x.Value))))
+            throw new InvalidOperationException("Cleaned HTML does not match the expected semantic markup and attributes.");
+    }
+}
+
+if (args.Length == 1 && args[0] == "--check-content")
+{
+    (string Original, string Expected)[] samples =
+    {
+        (null, string.Empty), (string.Empty, string.Empty),
+        ("Plain text: style=example class=example &amp; text", "Plain text: style=example class=example &amp; text"),
+        ("<p style=\"color:red\" class='intro'>Türkçe <strong>bold</strong> <em>italic</em></p>", "<p>Türkçe <strong>bold</strong> <em>italic</em></p>"),
+        ("<p STYLE='color:red' CLASS=lead><a href='https://example.com/?a=1&amp;b=2' title='style=keep' class='link'>Link</a><img src='photo.jpg' alt='Photo &amp; caption' style='width:100%' /></p>",
+         "<p><a href='https://example.com/?a=1&amp;b=2' title='style=keep'>Link</a><img src='photo.jpg' alt='Photo &amp; caption' /></p>"),
+        ("<span style='white-space: pre;'> </span><p class='one' class='two' style='a' style='b'>Text</p>", "<span> </span><p>Text</p>"),
+        ("<p data-style='keep' data-class='keep' title='a > b; class=keep' STYLE='x > y'>Text &bull;</p>", "<p data-style='keep' data-class='keep' title='a > b; class=keep'>Text &bull;</p>"),
+        ("<p style='color:red'>First paragraph</p>\r\n<p class='lead'>Second\rline</p>", "<p>First paragraph</p>\r\n<p>Second\rline</p>"),
+        ("<p class='lead'>Unclosed <strong style='color:red'>formatting", "<p>Unclosed <strong>formatting"),
+        ("<style>p { color:red; }</style><script>alert('x')</script><p>News</p>", "<p>News</p>"),
+        ("<LINK REL='alternate STYLESHEET' href='theme.css'><p onclick='run()'>News<img src='photo.jpg' alt='News' onerror='run()'></p>", "<p>News<img src='photo.jpg' alt='News'></p>"),
+        ("<a href='java&#x73;cript:run()'>Link</a><a href='java&#10;script:run()'>Other</a><a href='/article'>Safe</a>", "<a>Link</a><a>Other</a><a href='/article'>Safe</a>"),
+        ("<p>Text with ]]> and &amp; Turkish: ıİşŞğĞüÜöÖçÇ</p>", "<p>Text with ]]> and &amp; Turkish: ıİşŞğĞüÜöÖçÇ</p>")
+    };
+    foreach (var sample in samples)
+    {
+        var cleaned = CleanContent(sample.Original);
+        CheckContent(sample.Expected, cleaned);
+        CheckContent(sample.Expected, XElement.Parse(new XElement("content", new XCData(cleaned)).ToString()).Value);
+        if (CleanContent(cleaned) != cleaned)
+            throw new InvalidOperationException("Content cleanup must be idempotent.");
+    }
+    var description = typeof(XmlFeedCachingService).GetMethod("GetGoogleAiDescription", BindingFlags.NonPublic | BindingFlags.Static);
+    if ((string)description.Invoke(null, new object[] { "<style>p{color:red}</style><p class='lead'>Türkçe &amp; <strong>news</strong></p><script>run()</script>" }) != "Türkçe & news")
+        throw new InvalidOperationException("Descriptions must be plain article summaries without CSS or scripts.");
+    Console.WriteLine($"PASS {samples.Length} offline HTML/CDATA cleanup cases and description cleanup: CSS/scripts removed; text, semantic markup and images preserved.");
+    return;
+}
+
+if (args.Length == 1 && args[0] == "--check-window")
+{
+    var filter = typeof(XmlFeedCachingService).GetMethod("FilterGoogleAiNews", BindingFlags.NonPublic | BindingFlags.Static)
+        ?? throw new InvalidOperationException("Google AI publication filter is missing.");
+    foreach (var now in new[] { new DateTime(2026, 9, 9, 10, 0, 0, DateTimeKind.Local), new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Local) })
+    {
+        var since = now.Date;
+        NewsPublished Article(long id, DateTime date, bool allow = true, bool excluded = false, NewsTypesEnum type = NewsTypesEnum.News)
+            => new() { NewsID = id, PublishedDate = date, AllowToSendRSS = allow, AllowGoogleAiFeed = !excluded, NewsTypeID = (int)type };
+        var articles = new List<NewsPublished>
+        {
+            Article(1, since), Article(2, since.AddTicks(-1)), Article(3, now), Article(4, now.AddTicks(1)),
+            Article(5, now.AddHours(-24)), Article(6, now.AddHours(-1), allow: false),
+            Article(7, now.AddHours(-1), excluded: true), Article(8, now.AddHours(-1), type: NewsTypesEnum.ColumnArticles),
+            Article(9, now.AddHours(-1), type: NewsTypesEnum.PhotoGallery)
+        };
+        articles.AddRange(Enumerable.Range(100, 150).Select(id => Article(id, now.AddHours(-2))));
+        var actual = ((IQueryable<NewsPublished>)filter.Invoke(null, new object[] { articles.AsQueryable(), now }))
+            .Select(x => x.NewsID).OrderBy(x => x).ToArray();
+        var expected = new long[] { 1, 3, 8 }.Concat(Enumerable.Range(100, 150).Select(x => (long)x)).OrderBy(x => x).ToArray();
+        if (!actual.SequenceEqual(expected))
+            throw new InvalidOperationException("The daily window must include only eligible articles published today (from midnight up to now) and exclude previous-day, future and opted-out articles.");
+        Console.WriteLine($"PASS {now:yyyy-MM-dd HH:mm:ss}: {actual.Length} eligible articles, today-only window, previous day excluded, opt-outs.");
+    }
+    return;
+}
+
+if (args.Length == 1 && args[0] == "--check-creator")
+{
+    var createCreator = typeof(XmlFeedCachingService).GetMethod("CreateGoogleAiCreator", BindingFlags.NonPublic | BindingFlags.Static)
+        ?? throw new InvalidOperationException("Google AI creator method is missing.");
+    (string Author, string Editor, string Expected)[] cases =
+    {
+        (null, "Ayşe Editör", "Ayşe Editör"),
+        (string.Empty, "Ayşe Editör", "Ayşe Editör"),
+        (" \t\n", "Ayşe Editör", "Ayşe Editör"),
+        (" Ahmet Yazar ", "Ayşe Editör", "Ahmet Yazar"),
+        ("Ahmet Yazar", null, "Ahmet Yazar"),
+        (null, " Ayşe ", "Ayşe"),
+        (null, "Ayşe & <Editör>", "Ayşe & <Editör>"),
+        (null, null, null),
+        (string.Empty, string.Empty, null),
+        (" ", " \t ", null)
+    };
+    XNamespace dc = "http://purl.org/dc/elements/1.1/";
+    foreach (var sample in cases)
+    {
+        var creator = (XElement)createCreator.Invoke(null, new object[] { sample.Author, sample.Editor });
+        var rss = new XElement("rss", new XAttribute(XNamespace.Xmlns + "dc", dc.NamespaceName),
+            new XElement("channel", new XElement("item", creator)));
+        var serialized = rss.ToString();
+        var item = XElement.Parse(serialized).Element("channel").Element("item");
+        var actual = item.Element(dc + "creator");
+        if ((string)actual != sample.Expected ||
+            (sample.Expected != null && (!serialized.Contains("<dc:creator>") || item.Elements(dc + "creator").Count() != 1)) ||
+            (sample.Expected == null && item.Elements().Any()))
+            throw new InvalidOperationException("dc:creator must prefer the author, fall back to the creating editor, escape XML and omit unknown names.");
+    }
+    Console.WriteLine($"PASS {cases.Length} creator attribution cases: author priority, editor fallback, trimmed/missing names and XML namespace/escaping.");
+    return;
+}
+
+if (args.Length != 3 || args[1] != "--write-archive" || !long.TryParse(args[2], out var newsId) || newsId <= 0)
+    throw new ArgumentException("Usage: GoogleAiArchiveCheck --check-content OR --check-window OR --check-creator OR --check-refactor OR <workspace-root> --write-archive <news-id>. Reads SQL only; rebuilds today's rolling archive to verify same-file updates; never contacts Elasticsearch.");
+
+var root = Path.GetFullPath(args[0]);
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Path.Combine(root, "Quark.CMS"))
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.Development.json")
+    .Build();
+var connectionString = configuration.GetConnectionString("ConnectionString");
+var target = new SqlConnectionStringBuilder(connectionString);
+if (target.DataSource != "192.168.35.32" || target.InitialCatalog != "News-Migration")
+    throw new InvalidOperationException("Only the approved development database is allowed.");
+
+var options = new DbContextOptionsBuilder<QuarkDataContext>()
+    .UseSqlServer(connectionString)
+    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+    .AddInterceptors(new RejectDatabaseWrites())
+    .Options;
+await using var context = new QuarkDataContext(options);
+var services = new ServiceCollection();
+services.AddMemoryCache();
+services.AddScoped<ICacheManager, MemoryCacheManager>();
+services.AddLocalization();
+services.AddLogging(builder => builder.AddConsole());
+using var provider = services.BuildServiceProvider();
+using var scope = provider.CreateScope();
+var cache = scope.ServiceProvider.GetRequiredService<ICacheManager>();
+var keys = new[] { "Common_ClientWebSite", "CDN_BaseUrl", "CDN_MediaGalleryFolder" };
+foreach (var setting in await context.AppSettings.Where(x => keys.Contains(x.Key)).ToListAsync())
+    await cache.Set(setting.Key, setting.Value);
+var settings = new AppSettingsKeys(cache);
+var siteUrl = settings.Common_ClientWebSite;
+if (string.IsNullOrWhiteSpace(siteUrl))
+    throw new InvalidOperationException("The website URL setting is missing.");
+
+var articleBefore = await context.NewsPublished.Where(x => x.NewsID == newsId)
+    .Select(x => new { x.NewsID, x.AllowGoogleAiFeed, x.AllowToSendRSS, x.NewsTypeID, x.PublishedDate, x.Slug })
+    .SingleOrDefaultAsync();
+if (articleBefore == null)
+    throw new InvalidOperationException("The requested published article does not exist.");
+var nowAtCheck = DateTime.Now;
+var day = nowAtCheck.Date;
+var sinceAtCheck = day;
+var candidates = await context.NewsPublished
+    .Where(x => x.PublishedDate >= sinceAtCheck && x.PublishedDate <= nowAtCheck &&
+                x.AllowToSendRSS && x.AllowGoogleAiFeed &&
+                (x.NewsTypeID == (int)NewsTypesEnum.News || x.NewsTypeID == (int)NewsTypesEnum.ColumnArticles))
+    .Select(x => new { x.NewsID, x.Slug, x.Content, x.AuthorID, x.PublishedDate })
+    .ToListAsync();
+var authorIds = candidates.Where(x => x.AuthorID.HasValue).Select(x => x.AuthorID.Value).Distinct().ToList();
+var authors = await context.Authors.Where(x => authorIds.Contains(x.ID))
+    .ToDictionaryAsync(x => x.ID, x => ((x.Firstname ?? string.Empty) + " " + (x.Lastname ?? string.Empty)).Trim());
+var candidateIds = candidates.Select(x => x.NewsID).ToList();
+var editors = await (from article in context.News
+    join editor in context.Users on article.CreatedBy equals editor.ID
+    where candidateIds.Contains((long)article.ID)
+    select new { NewsID = (long)article.ID, editor.Firstname, editor.Lastname })
+    .ToDictionaryAsync(x => x.NewsID, x => ((x.Firstname ?? string.Empty) + " " + (x.Lastname ?? string.Empty)).Trim());
+var archiveRoot = Path.Combine(root, "GoogleAiFeedArchive");
+var expectedPath = Path.Combine(archiveRoot, day.Year.ToString(), $"feed-{day:yyyy-MM-dd}.xml");
+Dictionary<string, string> SnapshotFiles() => Directory.Exists(archiveRoot)
+    ? Directory.EnumerateFiles(archiveRoot, "*.xml", SearchOption.AllDirectories)
+        .ToDictionary(x => x, x => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(x))))
+    : new Dictionary<string, string>();
+var before = SnapshotFiles();
+
+var elastic = DispatchProxy.Create<IElasticSearchService, FailingElasticProxy>();
+var service = new XmlFeedCachingService(
+    new HttpContextAccessor { HttpContext = new DefaultHttpContext() }, context,
+    scope.ServiceProvider.GetRequiredService<IStringLocalizer<CommonResource>>(), settings, cache, elastic,
+    scope.ServiceProvider.GetRequiredService<ILogger<XmlFeedCachingService>>());
+for (var repetition = 0; repetition < 2; repetition++)
+{
+    var refreshStartedAt = DateTime.Now;
+    var result = await service.ArchiveGoogleAiNewsAsync(newsId);
+    var refreshFinishedAt = DateTime.Now;
+    if (!result.IsSuccess)
+        throw new InvalidOperationException($"Archive failed: {result.Message}");
+    var path = result.Data;
+    if (!string.Equals(path, expectedPath, StringComparison.OrdinalIgnoreCase))
+        throw new InvalidOperationException($"Unexpected daily filename: {path}; expected {expectedPath}");
+    var file = new FileInfo(path);
+    if (!file.Exists || file.Length == 0)
+        throw new InvalidOperationException($"Archive is missing or empty: {path}");
+    var document = XDocument.Load(path);
+    if (document.Root?.Name != "rss" || (string)document.Root.Attribute("version") != "2.0")
+        throw new InvalidOperationException($"Invalid RSS document: {path}");
+    if (document.Root.GetNamespaceOfPrefix("atom") != XNamespace.Get("http://www.w3.org/2005/Atom"))
+        throw new InvalidOperationException($"RSS Atom namespace is missing or incorrect: {path}");
+    var items = document.Root.Element("channel")?.Elements("item").ToList()
+        ?? throw new InvalidOperationException("RSS channel is missing.");
+    var oldestPossible = refreshStartedAt.Date;
+    var newestCutoff = refreshFinishedAt.Date;
+    var expected = candidates.Where(x => x.PublishedDate >= newestCutoff).ToList();
+    var expectedUrls = expected.Select(x => $"{siteUrl.TrimEnd('/')}/{(x.Slug ?? string.Empty).TrimStart('/')}")
+        .OrderBy(x => x, StringComparer.Ordinal);
+    var actualUrls = items.Select(x => (string)x.Element("guid")).OrderBy(x => x, StringComparer.Ordinal);
+    var boundaryUrls = candidates.Where(x => x.PublishedDate >= oldestPossible && x.PublishedDate < newestCutoff)
+        .Select(x => $"{siteUrl.TrimEnd('/')}/{(x.Slug ?? string.Empty).TrimStart('/')}").ToHashSet();
+    if (!expectedUrls.SequenceEqual(actualUrls.Where(x => !boundaryUrls.Contains(x))))
+        throw new InvalidOperationException($"Archive must contain every eligible article published today; repeat on a stable database: {path}");
+    XNamespace content = "http://purl.org/rss/1.0/modules/content/";
+    XNamespace media = "http://search.yahoo.com/mrss/";
+    XNamespace atom = "http://www.w3.org/2005/Atom";
+    XNamespace dc = "http://purl.org/dc/elements/1.1/";
+    var channel = document.Root.Element("channel");
+    if (document.Root.GetNamespaceOfPrefix("content") != content ||
+        document.Root.GetNamespaceOfPrefix("media") != media || document.Root.GetNamespaceOfPrefix("dc") != dc ||
+        (string)channel.Element("title") != "Cumhuriyet Gazetesi - Google AI Feed" ||
+        (string)channel.Element("ttl") != "60" || channel.Element("image")?.Element("url") == null ||
+        channel.Element("description") == null ||
+        (string)channel.Element(atom + "link")?.Attribute("rel") != "self" ||
+        (string)channel.Element(atom + "link")?.Attribute("href") != "https://www.cumhuriyet.com.tr/feeds/google-ai.xml")
+        throw new InvalidOperationException("The full feed channel or namespaces are missing.");
+    if (items.Any(x => x.Element("title") == null || x.Element("pubDate") == null || x.Element("description") == null || x.Element(content + "encoded") == null))
+        throw new InvalidOperationException("An archive item is missing its title, date, description, or content.");
+    foreach (var item in items)
+    {
+        if (item.Element(content + "encoded").HasElements)
+            throw new InvalidOperationException("Article HTML must be enclosed in CDATA, not nested XML elements.");
+        var article = candidates.Single(x => $"{siteUrl.TrimEnd('/')}/{(x.Slug ?? string.Empty).TrimStart('/')}" == (string)item.Element("guid"));
+        CheckContent(CleanContent(article.Content), item.Element(content + "encoded").Value);
+        var expectedAuthor = article.AuthorID.HasValue && authors.TryGetValue(article.AuthorID.Value, out var name)
+            ? name : string.Empty;
+        if (string.IsNullOrWhiteSpace(expectedAuthor))
+            expectedAuthor = editors.TryGetValue(article.NewsID, out var editorName) ? editorName : string.Empty;
+        if (((string)item.Element(dc + "creator") ?? string.Empty) != expectedAuthor)
+            throw new InvalidOperationException("dc:creator does not match the assigned author or creating editor fallback.");
+        var enclosure = item.Element("enclosure");
+        var photo = item.Element(media + "content");
+        if (string.IsNullOrEmpty((string)enclosure?.Attribute("url")) ||
+            (string)enclosure.Attribute("url") != (string)photo?.Attribute("url") ||
+            !int.TryParse((string)photo?.Attribute("width"), out var width) || width <= 0 ||
+            !int.TryParse((string)photo?.Attribute("height"), out var height) || height <= 0)
+            throw new InvalidOperationException("The enclosure or media photo metadata is missing.");
+        if (article.PublishedDate < oldestPossible || article.PublishedDate > refreshFinishedAt)
+            throw new InvalidOperationException("An archive item is outside the rolling 48-hour window.");
+        if (!item.Element(content + "encoded").Nodes().OfType<XCData>().Any())
+            throw new InvalidOperationException("Full article content is not enclosed in CDATA.");
+    }
+    Console.WriteLine($"PASS refresh {repetition + 1}: {path}: all {items.Count} eligible rolling-window articles, valid RSS/CDATA, {file.Length} bytes.");
+}
+var afterArchive = SnapshotFiles();
+if (afterArchive.Count != before.Count + (before.ContainsKey(expectedPath) ? 0 : 1) ||
+    before.Where(x => x.Key != expectedPath).Any(x => !afterArchive.TryGetValue(x.Key, out var hash) || hash != x.Value))
+    throw new InvalidOperationException("A numbered file was created or an unrelated archive was changed.");
+var missingArticle = await service.ArchiveGoogleAiNewsAsync(long.MaxValue);
+if (!missingArticle.IsSuccess || missingArticle.Data != null || SnapshotFiles().Count != afterArchive.Count)
+    throw new InvalidOperationException("An absent article must not create an empty archive.");
+var refreshResult = await service.RefreshGoogleAiRSS();
+if (((FailingElasticProxy)(object)elastic).UpdateCalls != 1 || refreshResult.IsSuccess)
+    throw new InvalidOperationException("The simulated Elasticsearch outage was not reported.");
+var afterRefresh = SnapshotFiles();
+if (afterRefresh.Count != afterArchive.Count ||
+    afterArchive.Where(x => x.Key != expectedPath).Any(x => afterRefresh[x.Key] != x.Value) ||
+    !File.Exists(expectedPath))
+    throw new InvalidOperationException("A live feed refresh must maintain today's archive even if Elasticsearch fails, without changing historical files.");
+var articleAfter = await context.NewsPublished.Where(x => x.NewsID == newsId)
+    .Select(x => new { x.NewsID, x.AllowGoogleAiFeed, x.AllowToSendRSS, x.NewsTypeID, x.PublishedDate, x.Slug })
+    .SingleOrDefaultAsync();
+if (!Equals(articleBefore, articleAfter))
+    throw new InvalidOperationException("Article state changed during validation; repeat on a stable database.");
+Console.WriteLine($"PASS article {newsId} Google AI permission unchanged: {articleAfter?.AllowGoogleAiFeed}.");
+Console.WriteLine("PASS today's rolling file is reused; no numbered files created; historical archives unchanged; archive survives Elasticsearch failure. No database settings were changed.");
+
+public class FailingElasticProxy : DispatchProxy
+{
+    public int UpdateCalls { get; private set; }
+
+    protected override object Invoke(MethodInfo targetMethod, object[] args)
+    {
+        if (targetMethod.Name == nameof(IElasticSearchService.UpdateDocumentAsync))
+        {
+            UpdateCalls++;
+            return Task.FromException<bool>(new InvalidOperationException("Simulated Elasticsearch outage for archive validation; no network request was made."));
+        }
+        throw new InvalidOperationException("Unexpected Elasticsearch operation in archive check.");
+    }
+}
+
+public class RejectDatabaseWrites : SaveChangesInterceptor
+{
+    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+        => throw new InvalidOperationException("Database writes are not allowed in this check.");
+
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        => throw new InvalidOperationException("Database writes are not allowed in this check.");
+}

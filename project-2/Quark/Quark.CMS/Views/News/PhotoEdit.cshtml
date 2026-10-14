@@ -1,0 +1,73 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+    <link href="@_appSettings.CDN_AssetsFolderFullUrl/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="@_appSettings.CDN_AssetsFolderFullUrl/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <input type="hidden" id="imgId" value="@Model.ImgId" />
+    <input type="hidden" id="isNotEditor" value="@Model.IsNotEditor.ToString().ToLower()" />
+    <form id="form1" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-6">
+                <div id="photo">
+                    <img id="edited-photo-org" src="/img/blank-placeholder.png" alt="" style="display: none;" />
+                    <img id="edited-photo" src="/img/blank-placeholder.png" alt="" style="width: 100%; height: 100%"/>
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <label class="required form-label">Metin Yeri Seçimi</label>
+                <div id="groupInput" class="mb-10 h-200px w-450px auto p-2 d-flex justify-content-between flex-column " style="background-image: url('/img/placeholder.png'); background-size: cover; background-repeat: no-repeat">
+                    <div class="d-flex text-center justify-content-between p-2">
+                        <input class="form-check-input w-25px h-25px border-3" type="radio" name="radioNoLabel" id="radioNoLabel1" value="1" aria-label="...">
+                        <input class="form-check-input w-25px h-25px border-3" type="radio" name="radioNoLabel" id="radioNoLabel1" value="2" aria-label="...">
+                        <input class="form-check-input w-25px h-25px border-3" type="radio" name="radioNoLabel" id="radioNoLabel1" value="3" aria-label="...">
+                    </div>
+                    <div class=" d-flex text-center justify-content-between p-2">
+                        <input class="form-check-input w-25px h-25px border-3" type="radio" name="radioNoLabel" id="radioNoLabel1" value="4" aria-label="...">
+                        <input class="form-check-input w-25px h-25px border-3" type="radio" name="radioNoLabel" id="radioNoLabel1" value="5" aria-label="...">
+                        <input class="form-check-input w-25px h-25px border-3" type="radio" name="radioNoLabel" id="radioNoLabel1" value="6" aria-label="...">
+                    </div>
+                </div>
+                <div class="mb-10 w-450px fv-row">
+                    <label class="required form-label">Metin 1</label>
+                    <input id="text1" type="text" class="form-control mb-2" />
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+                <div class="mb-10 w-450px fv-row">
+                    <label class="required form-label">Tema 1</label>
+                    <select id="templates1" onchange="preparePhoto()" class="form-select mb-2" data-control="select2" data-placeholder="-- Seçiniz --">
+                        <option disabled selected> Template Seçiniz </option>
+                    </select>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+                <div class="mb-10 w-450px fv-row">
+                    <label class="form-label">Metin 2</label>
+                    <input id="text2" type="text" class="form-control mb-2" />
+                </div>
+                <div class="mb-10 w-450px fv-row">
+                    <label class="form-label">Tema 2</label>
+                    <select id="templates2" onchange="preparePhoto()" class="form-select mb-2" data-control="select2" data-placeholder="-- Seçiniz --">
+                        <option disabled selected> Template Seçiniz </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button onclick="savePhoto()" type="button" class="btn btn-primary">Kaydet</button>
+    </form>
+
+    <script src="@_appSettings.CDN_AssetsFolderFullUrl/assets/plugins/global/plugins.bundle.js"></script>
+    <script src="@_appSettings.CDN_AssetsFolderFullUrl/assets/js/scripts.bundle.js"></script>
+    <script src="https://quark.avvamobile.com/js/jquery.validate.min.js"></script>
+    <script src="https://quark.avvamobile.com/js/jquery.validate.unobtrusive.min.js"></script>
+    <script src="/Scripts/News/EditModal.js" asp-append-version="true"></script>
+    <script src="/PhotoEdit/get-param.js" asp-append-version="true"></script>
+
+</body>
+</html>

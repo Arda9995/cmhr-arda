@@ -1,0 +1,332 @@
+﻿<div class="app-sidebar-menu overflow-hidden flex-column-fluid">
+    <div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper hover-scroll-overlay-y my-5" data-kt-scroll="true"
+         data-kt-scroll-activate="true" data-kt-scroll-height="auto"
+         data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
+         data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
+        <div class="menu menu-column menu-rounded menu-sub-indention px-3" id="#kt_app_sidebar_menu" data-kt-menu="true"
+             data-kt-menu-expand="false">
+            <div class="menu-item">
+                <a id="submenuDashboard" class="menu-link" href="/">
+                    <span class="menu-icon">
+                        <partial name="Icons/Dashboard"/>
+                    </span>
+                    <span class="menu-title">@_localizer["HomePage"]</span>
+                </a>
+            </div>
+            <div id="menuNews" data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <partial name="Icons/Newspaper"/>
+                    </span>
+                    <span class="menu-title">@_localizer["NewsMultiple"]</span>
+                    <span class="menu-arrow"></span>
+                </span>
+                <div class="menu-sub menu-sub-accordion">
+                    <div class="menu-item">
+                        <a id="submenuNews" class="menu-link" href="/News/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["NewsMultiple"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuNewsIntegration" class="menu-link" href="/NewsIntegration/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["NewsIntegration"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuAgencyNews" class="menu-link" href="/AgencyNews/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["AgencyNews"]</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-item">
+                <a id="submenuBlocksManage" class="menu-link" href="/Blocks/Manage">
+                    <span class="menu-icon">
+                        <partial name="Icons/Slider"/>
+                    </span>
+                    <span class="menu-title">@_localizer["BlockManagement"]</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a id="submenuMediaGallery" class="menu-link" href="/MediaGallery/List">
+                    <span class="menu-icon">
+                        <partial name="Icons/MediaGallery"/>
+                    </span>
+                    <span class="menu-title">@_localizer["MediaGallery"]</span>
+                </a>
+            </div>
+            <div id="menuContent" data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <partial name="Icons/Content"/>
+                    </span>
+                    <span class="menu-title">@_localizer["Content"]</span>
+                    <span class="menu-arrow"></span>
+                </span>
+                <div class="menu-sub menu-sub-accordion">
+                    <div class="menu-item">
+                        <a id="submenuAuthors" class="menu-link" href="/Authors/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Authors"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuBooks" class="menu-link" href="/Books/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Books"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuPages" class="menu-link" href="/Pages/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Pages"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuCategories" class="menu-link" href="/Categories/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Categories"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuMenus" class="menu-link" href="/Menus/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["MenuManagement"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuTags" class="menu-link" href="/Tags/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["TagManagement"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuSources" class="menu-link" href="/Sources/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["NewsSourceManagement"]</span>
+                        </a>
+                    </div>
+                    @* <div class="menu-item">
+                        <a id="submenuSurveys" class="menu-link" href="/Surveys/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Surveys"]</span>
+                        </a>
+                    </div> *@
+                    <div class="menu-item">
+                        <a id="submenuCaricaturists" class="menu-link" href="/Caricaturists/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Caricaturists"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuAstrologers" class="menu-link" href="/Astrologers/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Astrologers"]</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="menuMembers" data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <partial name="Icons/Members"/>
+                    </span>
+                    <span class="menu-title">@_localizer["Members"]</span>
+                    <span class="menu-arrow"></span>
+                </span>
+                <div class="menu-sub menu-sub-accordion">
+                    <div class="menu-item">
+                        <a id="submenuMembers" class="menu-link" href="/Members/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Members"]</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="menuPaymentManagements" data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <partial name="Icons/Members"/>
+                    </span>
+                    <span class="menu-title">@_localizer["PaymentManagements"]</span>
+                    <span class="menu-arrow"></span>
+                </span>
+                <div class="menu-sub menu-sub-accordion">
+                    <div class="menu-item">
+                        <a id="submenuProducts" class="menu-link" href="/PaymentManagement/Products">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Products"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuPlans" class="menu-link" href="/PaymentManagement/Plans">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Plans"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuSubscriptions" class="menu-link" href="/PaymentManagement/Subscriptions">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Subscriptions"]</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="menuReports" data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <partial name="Icons/Reports"/>
+                    </span>
+                    <span class="menu-title">@_localizer["Reports"]</span>
+                    <span class="menu-arrow"></span>
+                </span>
+                <div class="menu-sub menu-sub-accordion">
+                    <div class="menu-item">
+                        <a id="submenuReport1" class="menu-link" href="/Reports/Report1">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">Rapor 1</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="menuManagement" data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <partial name="Icons/Settings"/>
+                    </span>
+                    <span class="menu-title">@_localizer["Management"]</span>
+                    <span class="menu-arrow"></span>
+                </span>
+                <div class="menu-sub menu-sub-accordion">
+                    <div class="menu-item">
+                        <a id="submenuAnomalies" class="menu-link" href="/Anomalies/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Anomalies"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuNewsPhotoTypes" class="menu-link" href="/NewsPhotoTypes/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["NewsPhotosSettings"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuImageEdit" class="menu-link" href="/PhotoEditTemplates/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["PhotoEditTemplates"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuBlockManagement" class="menu-link" href="/Blocks/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["BlockManagement"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuPromptManagement" class="menu-link" href="/Prompts/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["PromptManagement"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuUsers" class="menu-link" href="/Users/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Users"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuRoles" class="menu-link" href="/Roles/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Roles"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuUserContractManagement" class="menu-link" href="/UserContracts/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["UserContracts"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuCaches" class="menu-link" href="/Caches/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["Cache"] @_localizer["Management"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuSystemLogs" class="menu-link" href="/SystemLogs/List">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["SystemLogs"]</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a id="submenuAppSettings" class="menu-link" href="/AppSettings/Update">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@_localizer["SystemSettings"]</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

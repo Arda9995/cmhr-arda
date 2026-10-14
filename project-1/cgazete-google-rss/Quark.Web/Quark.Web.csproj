@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Remove="wwwroot\js\Scripts\News\ReadList.js" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="wwwroot\js\Scripts\News\ReadList.js" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quark.API.Business\Quark.API.Business.csproj" />
+    <ProjectReference Include="..\Quark.Business.Common\Quark.Business.Common.csproj" />
+    <ProjectReference Include="..\Quark.Business.ElasticSearch\Quark.Business.ElasticSearch.csproj" />
+    <ProjectReference Include="..\Quark.Data\Quark.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\Scripts\Account\" />
+    <Folder Include="wwwroot\js\Scripts\Survey\" />
+    <Folder Include="wwwroot\Temp\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\Scripts\News\ReadList.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+
+
+</Project>

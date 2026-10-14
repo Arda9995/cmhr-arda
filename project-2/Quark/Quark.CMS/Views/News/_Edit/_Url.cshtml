@@ -1,0 +1,36 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="mb-10 fv-row">
+    <label for="basic-url" class="required form-label">URL</label>
+    <div class="input-group">
+        <span class="input-group-text" id="slug">@Model.BaseURL</span>
+        @if (Model.IsURLEditable)
+        {
+            <input asp-for="@Model.Slug" type="text" class="form-control maxlength" maxlength="500" id="basic-url" aria-describedby="basic-addon3"/>
+        }
+        else
+        {
+            <input asp-for="@Model.Slug" type="text" class="form-control maxlength" maxlength="500" id="basic-url" aria-describedby="basic-addon3" readonly style="background-color: #e9ecef; cursor: not-allowed;"/>
+        }
+   @*      <span class="input-group-text py-0 pe-none">
+            <a role="button" onclick="ToggleUrlGenerate();" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="Başlığa göre oluştur">
+                <i class="ki-duotone ki-subtitle fs-2x mt-1 text-primary">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                    <span class="path5"></span>
+                </i>
+            </a>
+        </span> *@
+    </div>
+    <span asp-validation-for="@Model.Slug" class="fv-plugins-message-container invalid-feedback"></span>
+    <div id="url-note" class="text-muted fs-7">@_localizer["NewsUrlHint"]</div>
+    @if (Model.ID != 0)
+    {
+        <div class="form-check form-switch form-check-custom form-check-solid mt-3">
+            <input asp-for="@Model.IsChangeSlug" class="form-check-input" type="checkbox" />
+            <span style="margin-left:10px;">Kayıt Sonrası URL Güncellensin.</span>
+        </div> 
+    }
+</div>

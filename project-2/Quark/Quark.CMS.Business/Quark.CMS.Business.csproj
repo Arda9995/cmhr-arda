@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quark.Business.Caching\Quark.Business.Caching.csproj" />
+    <ProjectReference Include="..\Quark.Business.Common\Quark.Business.Common.csproj" />
+    <ProjectReference Include="..\Quark.Business.ElasticSearch\Quark.Business.ElasticSearch.csproj" />
+    <ProjectReference Include="..\Quark.Cloudflare.Adapter\Quark.Cloudflare.Adapter.csproj" />
+    <ProjectReference Include="..\Quark.Notification.Adapter\Quark.Notification.Adapter.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Betalgo.OpenAI" Version="7.4.6" />
+    <PackageReference Include="BunnyCDN.Net.Storage" Version="1.0.4" />
+    <PackageReference Include="GoogleTrendsApi" Version="2.3.5" />
+    <PackageReference Include="SixLabors.Fonts" Version="2.0.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.3" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.2" />
+  </ItemGroup>
+
+</Project>

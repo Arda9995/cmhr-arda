@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quark.Business.Common\Quark.Business.Common.csproj" />
+    <ProjectReference Include="..\Quark.Core\Quark.Core.csproj" />
+    <ProjectReference Include="..\Quark.Data\Quark.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.17.3" />
+  </ItemGroup>
+
+</Project>

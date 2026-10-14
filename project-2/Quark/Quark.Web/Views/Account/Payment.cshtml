@@ -1,0 +1,252 @@
+@{
+	Layout = "_LayoutNoAds";
+}
+
+@model Quark.API.Business.Models.Responses.AccountResponses.SubscriptionRequest
+
+<head>
+	<meta name="description" content="Reklamsız Cumhuriyet Güvenli ödeme işleminizi gerçekleştirin">
+	<title>Ödeme - Reklamsız Cumhuriyet</title><!-- Plugins -->
+</head>
+
+<partial name="_Header" />
+
+<main id="main" class="my-4 px-5 tablet:px-0">
+	<div class="max-w-container mx-auto space-y-6 max-w-none">
+		<main class="max-w-5xl mx-auto px-4 py-8 w-full font-helvetica">
+			<!-- Progress Steps -->
+			<div class="flex items-center justify-center mb-12">
+				<div class="flex items-center">
+					<div class="flex flex-col items-center">
+						<div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+								 fill="currentColor">
+								<path fill-rule="evenodd"
+									  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+									  clip-rule="evenodd"></path>
+							</svg>
+						</div>
+						<span class="text-sm mt-1 text-center">Abone Kaydı</span>
+					</div>
+					<div class="w-12 sm:w-24 h-[1px] bg-green-500 mx-4"></div>
+				</div>
+				<div class="flex items-center">
+					<div class="flex flex-col items-center">
+						<div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+								 fill="currentColor">
+								<path fill-rule="evenodd"
+									  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+									  clip-rule="evenodd"></path>
+							</svg>
+						</div>
+						<span class="text-sm mt-1 text-center">Hesap Bilgileri</span>
+					</div>
+					<div class="w-12 sm:w-24 h-[1px] bg-green-500 mx-4"></div>
+				</div>
+				<div class="flex items-center">
+					<div class="flex flex-col items-center">
+						<div class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center">
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+								 fill="currentColor">
+								<path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
+								<path fill-rule="evenodd"
+									  d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
+									  clip-rule="evenodd"></path>
+							</svg>
+						</div>
+						<span class="text-sm mt-1 text-center">Ödeme</span>
+					</div>
+				</div>
+			</div> <!-- Title -->
+			<h1 class="text-2xl font-bold text-center mb-8">Reklamsız Cumhuriyet Ödeme</h1> <!-- Form -->
+			<form class="max-w-3xl mx-auto space-y-6" asp-action="Payment" asp-controller="Account" method="post">
+				<div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+				<input type="hidden" id="selectedPlanId" name="SelectedPlanID" value="@Model.Plans.FirstOrDefault()?.PlanID" />
+				<div>
+					<label class="block text-sm font-medium mb-2">Seçilen Plan <span class="text-red-600">*</span></label>
+					<div class="select-box relative">
+						<button type="button"
+								class="w-full p-4 border border-gray-300 rounded-lg bg-white text-left flex items-center justify-between hover:border-gray-400 transition-colors">
+							<div class="flex items-center gap-2">
+								<span class="text-lg font-medium">@Model.Plans.FirstOrDefault().Price ₺</span> <span class="text-sm text-gray-500">/ @Model.Plans.FirstOrDefault().PaymentIntervalDisplayName</span>
+							</div>
+							<svg class="w-5 h-5 text-gray-400 toggle transition-transform" viewBox="0 0 20 20"
+								 fill="currentColor">
+								<path fill-rule="evenodd"
+									  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+									  clip-rule="evenodd"></path>
+							</svg>
+						</button>
+						<div class="dropdown-content absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-10 divide-y divide-gray-100">
+							@foreach (var plan in Model.Plans)
+							{
+								<button type="button" data-plan-id="@plan.PlanID" data-price="@plan.Price"
+										class="w-full p-4 text-left hover:bg-gray-50 flex items-center justify-between group">
+									<div class="flex items-center gap-2">
+										<span class="text-lg font-medium group-hover:text-red-600 transition-colors">@plan.Price ₺</span>
+										<span class="text-sm text-gray-500">/ @plan.PaymentIntervalDisplayName</span>
+									</div>
+									<svg class="w-5 h-5 text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+										 viewBox="0 0 20 20" fill="currentColor">
+										<path fill-rule="evenodd"
+											  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+											  clip-rule="evenodd"></path>
+									</svg>
+								</button>
+							}
+						</div>
+					</div>
+				</div>
+				<div>
+					<label class="block text-sm font-medium mb-2">Kart Sahibinin Adı Soyadı <span class="text-red-600">*</span></label>
+					<input type="text" asp-for="@Model.CardOwnerFullName"
+						   id="card-holder"
+						   class="w-full p-3 border border-gray-300 rounded-lg" required>
+					<span asp-validation-for="CardOwnerFullName" class="text-red-500 text-sm"></span>
+				</div>
+				<div>
+					<label class="block text-sm font-medium mb-2">Kart Numarası <span class="text-red-600">*</span></label>
+					<div class="relative">
+						<input asp-for="@Model.CardNumber" type="text" id="card-number"
+							   class="w-full p-3 pl-12 border border-gray-300 rounded-lg"
+							   maxlength="19" placeholder="0000 0000 0000 0000" required pattern="[0-9\s]{13,19}">
+						<div class="absolute left-3 top-1/2 -translate-y-1/2">
+							<svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+									  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+							</svg>
+						</div>
+					</div>
+					<span asp-validation-for="CardNumber" class="text-red-500 text-sm"></span>
+				</div>
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<label class="block text-sm font-medium mb-2">Son Kullanma Tarihi <span class="text-red-600">*</span></label>
+						<div class="grid grid-cols-2 gap-2">
+							<div class="custom-select">
+								<select asp-for="@Model.CardMonth" 
+										class="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white"
+										required>
+									<option value="">Ay</option>
+									<option value="01">01</option>
+									<option value="02">02</option>
+									<option value="03">03</option>
+									<option value="04">04</option>
+									<option value="05">05</option>
+									<option value="06">06</option>
+									<option value="07">07</option>
+									<option value="08">08</option>
+									<option value="09">09</option>
+									<option value="10">10</option>
+									<option value="11">11</option>
+									<option value="12">12</option>
+								</select>
+							</div>
+							<div class="custom-select">
+								<select asp-for="@Model.CardYear" 
+										class="w-full p-3 border border-gray-300 rounded-lg appearance-none bg-white"
+										required>
+									<option value="">Yıl</option>
+									<option value="2025">2025</option>
+									<option value="2026">2026</option>
+									<option value="2027">2027</option>
+									<option value="2028">2028</option>
+									<option value="2029">2029</option>
+									<option value="2030">2030</option>
+									<option value="2031">2031</option>
+									<option value="2032">2032</option>
+									<option value="2033">2033</option>
+									<option value="2034">2034</option>
+								</select>
+							</div>
+						</div>
+						<span asp-validation-for="CardMonth" class="text-red-500 text-sm"></span>
+						<span asp-validation-for="CardYear" class="text-red-500 text-sm"></span>
+					</div>
+					<div>
+						<label class="block text-sm font-medium mb-2">CVV <span class="text-red-600">*</span></label>
+						<div class="relative">
+							<input asp-for="@Model.CardCVV" type="text" id="cvv"
+								   class="w-full p-3 pl-12 border border-gray-300 rounded-lg"
+								   maxlength="3" placeholder="000" required>
+							<div class="absolute left-3 top-1/2 -translate-y-1/2">
+								<svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24"
+									 stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+										  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+								</svg>
+							</div>
+						</div>
+						<span asp-validation-for="CardCVV" class="text-red-500 text-sm"></span>
+					</div>
+				</div>
+				<div class="pt-4">
+					<button type="submit"
+							class="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors">
+						ÖDEME YAP
+					</button>
+				</div>
+			</form> <!-- Security Info -->
+			<div class="max-w-3xl mx-auto mt-6">
+
+				<div class="flex items-center gap-3 justify-center text-gray-500">
+
+					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+							  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+					</svg>
+					<span class="text-sm">256-bit SSL güvenlik sertifikası ile korunmaktadır.</span>
+					
+					<img src="/assets/img/iyzico_ile_ode_colored.svg" style="width:15%" />
+				</div>
+			</div>
+		</main>
+	</div>
+</main>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const selectBox = document.querySelector('.select-box');
+		const toggleButton = selectBox.querySelector('.toggle');
+		const dropdownContent = selectBox.querySelector('.dropdown-content');
+		const selectedPlanIdInput = document.getElementById('selectedPlanId');
+		const planButtons = dropdownContent.querySelectorAll('button[data-plan-id]');
+
+		// Toggle dropdown
+		toggleButton.addEventListener('click', function () {
+			dropdownContent.classList.toggle('hidden');
+		});
+
+		// Handle plan selection
+		planButtons.forEach(button => {
+			button.addEventListener('click', function () {
+				const planId = this.getAttribute('data-plan-id');
+				const price = this.getAttribute('data-price');
+				const displayName = this.querySelector('.text-gray-500').textContent.trim();
+
+				// Update selected plan ID
+				selectedPlanIdInput.value = planId;
+
+				// Update display
+				const displayDiv = selectBox.querySelector('.flex.items-center.gap-2');
+				displayDiv.innerHTML = `
+						<span class="text-lg font-medium">${price} ₺</span>
+						<span class="text-sm text-gray-500">${displayName}</span>
+					`;
+
+				// Close dropdown
+				dropdownContent.classList.add('hidden');
+			});
+		});
+
+		// Close dropdown when clicking outside
+		document.addEventListener('click', function (event) {
+			if (!selectBox.contains(event.target)) {
+				dropdownContent.classList.add('hidden');
+			}
+		});
+	});
+</script>
+
+

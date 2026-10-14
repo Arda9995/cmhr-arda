@@ -1,0 +1,34 @@
+﻿using Quark.Business.Common.Caching;
+using Quark.Web.Diagnostics;
+
+namespace Quark.Web.RouteConfigs
+{
+	public static class RouteInitializer
+	{
+		public static async Task InitializeRoutes(IEndpointRouteBuilder app, WebApplication application, AppSettingsKeys appSettingsKeys)
+		{
+			var logger = application.Services.GetService<ILoggerFactory>()?.CreateLogger("Quark.Web.RouteInitializer");
+
+			await Register(logger, nameof(AccountRouteConfig), () => { AccountRouteConfig.RegisterRoutes(app); return Task.CompletedTask; });
+			await Register(logger, nameof(AuthorRouteConfig), () => { AuthorRouteConfig.RegisterRoutes(app); return Task.CompletedTask; });
+			await Register(logger, nameof(CommonRouteConfig), () => CommonRouteConfig.RegisterRoutes(app, application));
+			await Register(logger, nameof(SourceRouteConfig), () => SourceRouteConfig.RegisterRoutes(app, appSettingsKeys));
+			await Register(logger, nameof(TagRouteConfig), () => TagRouteConfig.RegisterRoutes(app, appSettingsKeys));
+			await Register(logger, nameof(HomeRouteConfig), () => { HomeRouteConfig.RegisterRoutes(app); return Task.CompletedTask; });
+			await Register(logger, nameof(CategoryRouteConfig), () => CategoryRouteConfig.RegisterRoutes(app, application));
+			await Register(logger, nameof(NewsRouteConfig), () => { NewsRouteConfig.RegisterRoutes(app); return Task.CompletedTask; });
+		}
+
+		private static async Task Register(ILogger logger, string name, Func<Task> register)
+		{
+			try
+			{
+				await register();
+			}
+			catch (Exception ex)
+			{
+				logger?.LogError(ex, "Route registration failed for {RouteConfig}; continuing with remaining routes", name);
+			}
+		}
+	}
+}

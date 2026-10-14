@@ -1,0 +1,86 @@
+﻿@using Quark.Business.Caching.Models.Responses.NewsCachingResponses
+@model MainPageResponse
+
+@{
+    var newsList = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-EkonomiHaberleri").ToList();
+    var newsCount = newsList.Count();
+}
+
+<div class="space-y-4" data-astro-cid-j7pv25f6>
+    <!-- Title Start -->
+    <div class="flex items-center lg:gap-3 mb-4 undefined">
+        <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+        <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0"><a href="@newsList.FirstOrDefault().BlockCategorySlug" target="_blank">@newsList.FirstOrDefault().BlockCategoryName Haberleri</a></h2> <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+        <a target="_blank" href="@newsList.FirstOrDefault().BlockCategorySlug" class="text-gray-700 font-bold lg:italic text-xs lg:text-base">Tüm @newsList.FirstOrDefault().BlockCategoryName Haberleri </a>
+        <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+    </div> <!-- Title End -->
+    <div class="grid grid-cols-12 gap-6" data-astro-cid-j7pv25f6>
+        @* İlk 2 haber üstte *@
+        @for (int i = 0; i < Math.Min(2, newsCount); i++)
+        {
+            var news = newsList[i];
+            <div class="col-span-12 md:col-span-6" data-astro-cid-j7pv25f6>
+                <div class="group block relative ">
+                    <button onclick="saveNewsID(@news.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                        <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Thumbnail Start -->
+                    <a target="_blank" href="@news.NewsSlug" class="overflow-hidden relative aspect-[16/9] mb-2 block ">
+                        <img src="@news.NewsPhoto" class="w-full h-full object-cover animate-img" alt="@news.NewsHeadline" loading="lazy">
+                    </a>
+
+                    <!-- Title Start -->
+                    <a target="_blank" href="@news.NewsSlug" class="font-semibold lg:font-bold lg:text-2xl line-clamp-2 text-secondary-500 mb-1">@news.NewsHeadline</a>
+
+                    <!-- Description Start -->
+                    <a target="_blank" href="@news.NewsSlug" class="text-sm group-hover:underline line-clamp-2 text-secondary-400 font-medium">@news.NewsUpSubtitle</a>
+                </div>
+            </div>
+        }
+
+        @* 3. haberden sonrası altta *@
+        @if (newsCount > 2)
+        {
+            for (int i = 2; i < newsCount; i++)
+            {
+                var news = newsList[i];
+                <div class="col-span-12 sm:col-span-4" data-astro-cid-j7pv25f6>
+                    <div class="group block relative ">
+                        <button onclick="saveNewsID(@news.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                            <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Thumbnail Start -->
+                        <a target="_blank" href="@news.NewsSlug" class="overflow-hidden relative aspect-[16/9] mb-2 block ">
+                            <img src="@news.NewsPhoto" class="w-full h-full object-cover animate-img" alt="@news.NewsHeadline" loading="lazy">
+                        </a>
+
+                        <!-- Title Start -->
+                        <a target="_blank" href="@news.NewsSlug" class="font-semibold line-clamp-2 text-secondary-500 mb-1">@news.NewsHeadline</a>
+
+                        <!-- Description Start -->
+                        <a target="_blank" href="@news.NewsSlug" class="text-sm group-hover:underline line-clamp-2 text-secondary-400 font-medium">@news.NewsUpSubtitle</a>
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+</div>
+
+@if (Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup == (int)GovernmentOrderGroupEnum.UnderEkonomi).Any())
+{
+    var governmentModel = new GovernmentFilledBlock
+                {
+                    GovernmentAnnouncementItems = Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup == (int)GovernmentOrderGroupEnum.UnderEkonomi).ToList(),
+                    FillerBlockNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-BlokDoldurucu").ToList(),
+                };
+    <div class="mt-4">
+        @await Html.PartialAsync("BlockContainers/_GovernmentAnnouncementsBlock", governmentModel)
+    </div>
+}

@@ -1,0 +1,150 @@
+[
+  {
+    "ContainingType": "Quark.Web.Controllers.UrlMappingController",
+    "Method": "RefreshUrlMappingsCache",
+    "RelativePath": "api/UrlMapping/refresh-cache",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "GoogleAiRss",
+    "RelativePath": "feeds/google-ai.xml",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.HomeController",
+    "Method": "PageNotFound",
+    "RelativePath": "Home/404",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.HomeController",
+    "Method": "PageSystemError",
+    "RelativePath": "Home/500",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "MainRss",
+    "RelativePath": "rss",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "CategoryRss",
+    "RelativePath": "rss/{category}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "category",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "NewsSitemap",
+    "RelativePath": "sitemaps/news.xml",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "MonthlyPostsSitemap",
+    "RelativePath": "sitemaps/posts-{year}-{month}.xml",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "PostsSitemap",
+    "RelativePath": "sitemaps/posts.xml",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "SourceSitemap",
+    "RelativePath": "sitemaps/sources.xml",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "MonthlyTagsSitemap",
+    "RelativePath": "sitemaps/tag-{year}-{month}.xml",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Web.Controllers.XmlFeedController",
+    "Method": "TagsSitemap",
+    "RelativePath": "sitemaps/tags.xml",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

@@ -1,0 +1,194 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+
+
+@* <div class="w-100">
+    <label class="required form-label">@_localizer["Tags"]</label>
+    <div class="input-group mb-2">
+        <select asp-items="@Model.Tags" asp-for="@Model.SelectedTagIDs" class="form-select ajax-search-select2" data-control="select2" multiple></select>
+    </div>
+    <div class="text-muted fs-7">
+        @_localizer["NewsTagsText"]
+    </div>
+</div> *@
+@{
+    var selectedTagIdsValue = Model.SelectedTagIDs != null ? string.Join(",", Model.SelectedTagIDs) : "";
+}
+
+
+
+<div class="w-100">
+    <label class="required form-label">@_localizer["Tags"]</label>
+
+    <div class="d-flex align-items-start gap-2 mb-2">
+        <div class="flex-grow-1">
+            <input type="hidden" id="selected-tag-ids" value="@selectedTagIdsValue"/>
+
+            <select asp-items="@Model.Tags"
+                    asp-for="@Model.SelectedTagIDs"
+                    class="form-select ajax-search-select2 tag-search-ajax"
+                    data-control="select2"
+                    multiple
+                    id="tags-select">
+            </select>
+        </div>
+
+        <button type="button" class="btn btn-light-primary" data-bs-toggle="modal" data-bs-target="#addTagModal">
+            <i class="bi bi-plus-circle"></i>
+            Yeni Etiket
+        </button>
+    </div>
+
+    <span asp-validation-for="@Model.SelectedTagIDs" class="fv-plugins-message-container invalid-feedback"></span>
+    <div class="text-muted fs-7">
+        @_localizer["NewsTagsText"]
+    </div>
+
+</div>
+
+<!-- Yeni Etiket Ekle Modal -->
+<div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@_localizer["AddNewTag"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label required">@_localizer["Tag"]</label>
+                    <input type="text" id="newTagText" class="form-control"/>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label required">@_localizer["SeoTitle"]</label>
+                    <input type="text" id="newTagSeoTitle" class="form-control"/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label required">@_localizer["SeoDescription"]</label>
+                    <input type="text" id="newTagSeoDescription" class="form-control"/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label required">Breadcrumb</label>
+                    <input type="text" id="newTagBreadcrumb" class="form-control"/>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">@_localizer["Cancel"]</button>
+                <button type="button" class="btn btn-primary" id="saveNewTagBtn">@_localizer["Save"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const maxSelection = 5;
+        const selectElement = document.getElementById('tags-select');
+
+        $(selectElement).on('select2:select select2:unselect', function (e) {
+            const selectedOptions = $(selectElement).val();
+
+            if (selectedOptions && selectedOptions.length > maxSelection) {
+                toastr.error(localizer.tagLimitError);
+
+                const lastSelected = e.params.data.id;
+                const newSelection = selectedOptions.filter(id => id !== lastSelected);
+                $(selectElement).val(newSelection).trigger('change');
+            }
+        });
+    });
+</script>
+
+<script>
+    document.getElementById("saveNewTagBtn").addEventListener("click", function () {
+        const tag = {
+            Text: document.getElementById("newTagText").value.trim(),
+            SeoTitle: document.getElementById("newTagSeoTitle").value.trim(),
+            SeoDescription: document.getElementById("newTagSeoDescription").value.trim(),
+            Breadcrumb: document.getElementById("newTagBreadcrumb").value.trim()
+        };
+        
+        var butonIndicator = document.getElementById("saveNewTagBtn");
+        butonIndicator.disabled = true; // Butonu devre dışı bırak
+        butonIndicator.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Yükleniyor...'; // Butonun içeriğini değiştir
+
+        // Basit doğrulama (isteğe bağlı)
+        if (!tag.Text || !tag.SeoTitle || !tag.SeoDescription || !tag.Breadcrumb) {
+            alert("Lütfen Zorunlu Alanları Doldurunuz");
+            butonIndicator.disabled = false;
+            butonIndicator.innerHTML = 'Kaydet';
+            return;
+        }
+
+        $.ajax({
+            url: '/Tags/CreateTagFromNewsModal',
+            type: 'POST',
+            data: {
+                Text: tag.Text,
+                Url: toSlugTR(tag.Text),
+                SeoTitle: tag.SeoTitle,
+                SeoDescription: tag.SeoDescription,
+                Breadcrumb: tag.Breadcrumb,
+            },
+            success: function (data) {
+                if (data.isSuccess) {
+                    butonIndicator.disabled = false;
+                    butonIndicator.innerHTML = 'Kaydet';
+                    const newOption = new Option(data.text, data.id, true, true);
+                    $('#tags-select').append(newOption).trigger('change');
+                    $('#addTagModal').modal('hide');
+                    document.getElementById("newTagText").value = '';
+                    document.getElementById("newTagSeoTitle").value = '';
+                    document.getElementById("newTagSeoDescription").value = '';
+                    document.getElementById("newTagBreadcrumb").value = '';
+                } else {
+                    butonIndicator.disabled = false;
+                    butonIndicator.innerHTML = 'Kaydet';
+                    $('#addTagModal').modal('hide');
+                }
+            },
+            error: function () {
+                butonIndicator.disabled = false;
+                butonIndicator.innerHTML = 'Kaydet';
+                $('#addTagModal').modal('hide');
+            }
+        });
+    });
+
+    // Tek başına fonksiyon
+    function toSlugTR(input) {
+        if (!input || !input.trim()) return "";
+
+        // TR locale ile küçült
+        let str = input.toLocaleLowerCase('tr-TR');
+
+        // Türkçe karakterleri sadeleştir
+        str = str
+            .replace(/ü/g, "u")
+            .replace(/ğ/g, "g")
+            .replace(/ç/g, "c")
+            .replace(/ş/g, "s")
+            .replace(/ö/g, "o")
+            .replace(/ı/g, "i");
+
+        // Harf ve rakam dışındakileri '-' yap
+        str = str.replace(/[^a-z0-9]+/g, "-");
+
+        // Birden fazla '-' -> tek '-'
+        str = str.replace(/-+/g, "-");
+
+        // Baştaki/sondaki '-'ları kırp
+        return str.replace(/^-|-$/g, "");
+    }
+
+</script>
+
+
+

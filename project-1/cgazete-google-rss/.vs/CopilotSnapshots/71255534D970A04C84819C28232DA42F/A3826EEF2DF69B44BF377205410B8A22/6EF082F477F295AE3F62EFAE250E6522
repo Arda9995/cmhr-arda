@@ -1,0 +1,191 @@
+﻿
+@model MainPageResponse
+
+@{
+    var newsList = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-SurmansetSlider").ToList();
+}
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 slider--area" data-astro-cid-j7pv25f6>
+    <div class="md:col-span-8" data-astro-cid-j7pv25f6>
+        <div class="splide slider" role="group">
+            <div class="splide__track">
+                <ul class="splide__list">
+                    @foreach (var news in newsList)
+                    {
+                        <li class="splide__slide relative" data-astro-cid-j7pv25f6>
+                            <a target="_blank" tabindex="0" href="@news.NewsSlug" class="block relative h-60"
+                               data-astro-cid-j7pv25f6>
+                                <div class="absolute inset-0 primary-manset-gradient w-4/5 z-20"
+                                     data-astro-cid-j7pv25f6></div>
+                                <div class="aspect-[16/9] absolute right-0 top-0 bottom-0" data-astro-cid-j7pv25f6>
+                                    <img class="object-cover block w-full h-full" src="@news.NewsPhoto" alt=""
+                                         data-astro-cid-j7pv25f6>
+                                </div>
+                                <div class="absolute inset-0 w-2/3 text-white z-30 p-8 text-3xl font-black space-y-3 flex flex-col justify-center"
+                                     data-astro-cid-j7pv25f6>
+                                    <div class="text-yellow-500 " data-astro-cid-j7pv25f6>@news.NewsSubHeading</div>
+                                    @if (news.ShowUpSubHeading && !string.IsNullOrEmpty(news.NewsUpSubHeading))
+                                    {
+                                        <div data-astro-cid-j7pv25f6>@news.NewsUpSubHeading</div>
+                                    }
+                                    else
+                                    {
+                                        <div data-astro-cid-j7pv25f6>@news.NewsHeadline</div>
+                                    }
+                                </div>
+
+                            </a>
+                        </li>
+                    }
+                </ul>
+                <div>
+                   
+                </div>
+            </div>
+            </div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(pagesBodyEnd))
+            {
+                    <div class="shrink-0">
+                    @Html.Raw(pagesBodyEnd)
+                    </div>
+            }
+            </div>
+@*<div class="grid grid-cols-2 md:grid-cols-4 gap-6" data-astro-cid-j7pv25f6>
+    @foreach (var news in newsList)
+    {
+        <!-- Item Start -->
+        <div class="space-y-1 group relative">
+            <button onclick="saveNewsID(@news.NewsID)" onclick="saveNewsID(@news.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-3 top-3 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                </svg>
+            </button>
+            <!-- Thumbnail Start -->
+            <a target="_blank" href="@news.NewsSlug" class="overflow-hidden aspect-[16/9] block">
+                <img src="@news.NewsPhoto" class="w-full h-full animate-img" alt="@news.NewsHeadline" loading="lazy">
+            </a>
+            <!-- Thumnbanil End -->
+            <!-- Title Start -->
+            <a target="_blank" href="@news.NewsSlug" class="line-clamp-3 text-secondary-500 font-semibold">@news.NewsHeadline</a>
+            <!-- Title End -->
+        </div>
+        <!-- Item End -->
+    }
+</div>
+
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 slider--area" data-astro-cid-j7pv25f6>
+    <div class="md:col-span-8" data-astro-cid-j7pv25f6>
+        <div class="splide slider" role="group">
+            <div class="splide__track">
+                <ul class="splide__list">
+                    @foreach (var news in newsList)
+                    {
+                        <li class="splide__slide relative" data-astro-cid-j7pv25f6>
+                            <a target="_blank" tabindex="0" href="@news.NewsSlug" class="block relative h-60"
+                               data-astro-cid-j7pv25f6>
+                                <div class="absolute inset-0 primary-manset-gradient w-4/5 z-20"
+                                     data-astro-cid-j7pv25f6></div>
+                                <div class="aspect-[16/9] absolute right-0 top-0 bottom-0" data-astro-cid-j7pv25f6><img
+                                        class="object-cover block w-full h-full" src="@news.NewsPhoto" alt=""
+                                        data-astro-cid-j7pv25f6></div>
+                                <div
+                                    class="absolute inset-0 w-2/3 text-white z-30 p-8 text-3xl font-black space-y-3 flex flex-col justify-center"
+                                    data-astro-cid-j7pv25f6>
+                                    <div class="text-yellow-500 " data-astro-cid-j7pv25f6>@news.NewsSubHeading</div>
+                                    @if (news.ShowUpSubHeading && !string.IsNullOrEmpty(news.NewsUpSubHeading))
+                                    {
+                                        <div data-astro-cid-j7pv25f6>@news.NewsUpSubHeading</div>
+                                    }
+                                    else
+                                    {
+                                        <div data-astro-cid-j7pv25f6>@news.NewsHeadline</div>
+                                    }
+                                </div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="md:col-span-4" data-astro-cid-j7pv25f6>
+        <!-- Newzletter Start -->
+        <div> *@
+        @*     <a target="_blank" href="/uye/abonelik"> *@
+        @*     <img src="~/assets/img/abone-ol.JPG" /> *@
+        @*     </a> *@
+        @* </div> *@
+         @*
+        <div class="primary-gradient p-4 text-white h-full">
+            <!-- Title Start -->
+            <div class="font-semibold">Bültene Abone Olun</div> <!-- Title End --> <!-- Description Start -->
+            <p class="text-sm mt-3 mb-3 mr-10 font-helvetica"> En güncel haberlerden anında haberdar olun! </p>
+            <!-- Description End -->
+            <input type="text" id="setrowEmailInput"
+                   class="bg-neutral-50/20 rounded-full !outline-none text-sm py-2.5 px-4 w-full placeholder-white font-helvetica"
+                   placeholder="E-posta adresinizi yazın...">
+            <div class="flex items-start gap-1.5 checkbox-container">
+                <input type="checkbox" id="aydinlatma-metni" class="hidden peer">
+                <svg class="peer-checked:hidden block cursor-pointer mt-2" width="12" height="12"
+                     viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M0 2.16668C0 1.59205 0.228273 1.04095 0.634602 0.634617C1.04093 0.228288 1.59203 1.52588e-05 2.16667 1.52588e-05H9.83333C10.408 1.52588e-05 10.9591 0.228288 11.3654 0.634617C11.7717 1.04095 12 1.59205 12 2.16668V9.83335C12 10.408 11.7717 10.9591 11.3654 11.3654C10.9591 11.7717 10.408 12 9.83333 12H2.16667C1.59203 12 1.04093 11.7717 0.634602 11.3654C0.228273 10.9591 0 10.408 0 9.83335V2.16668ZM2.16667 1.00002C1.85725 1.00002 1.5605 1.12293 1.34171 1.34172C1.12292 1.56052 1 1.85726 1 2.16668V9.83335C1 10.4773 1.52267 11 2.16667 11H9.83333C10.1428 11 10.4395 10.8771 10.6583 10.6583C10.8771 10.4395 11 10.1428 11 9.83335V2.16668C11 1.85726 10.8771 1.56052 10.6583 1.34172C10.4395 1.12293 10.1428 1.00002 9.83333 1.00002H2.16667Z"
+                        fill="white"></path>
+                </svg>
+                <svg class="peer-checked:block hidden cursor-pointer mt-2" width="12" height="12"
+                     viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M2.16667 0C1.59203 0 1.04093 0.228273 0.634602 0.634602C0.228273 1.04093 0 1.59203 0 2.16667V9.83333C0 10.408 0.228273 10.9591 0.634602 11.3654C1.04093 11.7717 1.59203 12 2.16667 12H9.83333C10.408 12 10.9591 11.7717 11.3654 11.3654C11.7717 10.9591 12 10.408 12 9.83333V2.16667C12 1.59203 11.7717 1.04093 11.3654 0.634602C10.9591 0.228273 10.408 0 9.83333 0H2.16667ZM8.85333 4.52L5.52 7.85333C5.42625 7.94697 5.29917 7.99956 5.16667 7.99956C5.03417 7.99956 4.90708 7.94697 4.81333 7.85333L3.47733 6.51733C3.42821 6.47156 3.38881 6.41636 3.36148 6.35503C3.33415 6.29369 3.31946 6.22748 3.31827 6.16035C3.31709 6.09321 3.32944 6.02653 3.35459 5.96427C3.37973 5.90201 3.41716 5.84545 3.46464 5.79797C3.51212 5.7505 3.56868 5.71307 3.63094 5.68792C3.69319 5.66277 3.75988 5.65042 3.82701 5.65161C3.89415 5.65279 3.96036 5.66748 4.02169 5.69481C4.08303 5.72214 4.13823 5.76154 4.184 5.81067L5.16667 6.79267L8.14667 3.81267C8.19281 3.76493 8.248 3.72687 8.30902 3.70069C8.37003 3.67452 8.43565 3.66076 8.50204 3.66021C8.56843 3.65967 8.63426 3.67235 8.6957 3.69752C8.75713 3.72269 8.81294 3.75984 8.85987 3.80681C8.90679 3.85378 8.94389 3.90962 8.969 3.97108C8.99411 4.03254 9.00673 4.09838 9.00612 4.16477C9.00552 4.23116 8.99169 4.29677 8.96546 4.35776C8.93923 4.41874 8.90111 4.4739 8.85333 4.52Z"
+                        fill="white"></path>
+                </svg>
+                <label
+                    class="flex items-center gap-1 cursor-pointer select-none text-[0.65rem] font-semibold my-1.5"
+                    for="aydinlatma-metni"> <span><a target="_blank" href="#"
+                                                     class="hover:underline">Aydınlatma metni</a> kapsamında ileti almak istiyorum</span>
+                </label>
+            </div> <!-- Checkboxes Start -->
+            <div class="flex items-center mt-1 mb-2 gap-5">
+                <div class="flex items-center gap-1.5 checkbox-container">
+                    <input type="checkbox" id="aylik" class="hidden peer" value="490264">
+                    <svg class="peer-checked:hidden block cursor-pointer" width="12" height="12" viewBox="0 0 12 12"
+                         fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M0 2.16668C0 1.59205 0.228273 1.04095 0.634602 0.634617C1.04093 0.228288 1.59203 1.52588e-05 2.16667 1.52588e-05H9.83333C10.408 1.52588e-05 10.9591 0.228288 11.3654 0.634617C11.7717 1.04095 12 1.59205 12 2.16668V9.83335C12 10.408 11.7717 10.9591 11.3654 11.3654C10.9591 11.7717 10.408 12 9.83333 12H2.16667C1.59203 12 1.04093 11.7717 0.634602 11.3654C0.228273 10.9591 0 10.408 0 9.83335V2.16668ZM2.16667 1.00002C1.85725 1.00002 1.5605 1.12293 1.34171 1.34172C1.12292 1.56052 1 1.85726 1 2.16668V9.83335C1 10.4773 1.52267 11 2.16667 11H9.83333C10.1428 11 10.4395 10.8771 10.6583 10.6583C10.8771 10.4395 11 10.1428 11 9.83335V2.16668C11 1.85726 10.8771 1.56052 10.6583 1.34172C10.4395 1.12293 10.1428 1.00002 9.83333 1.00002H2.16667Z"
+                            fill="white"></path>
+                    </svg>
+                    <svg class="peer-checked:block hidden cursor-pointer" width="12" height="12" viewBox="0 0 12 12"
+                         fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M2.16667 0C1.59203 0 1.04093 0.228273 0.634602 0.634602C0.228273 1.04093 0 1.59203 0 2.16667V9.83333C0 10.408 0.228273 10.9591 0.634602 11.3654C1.04093 11.7717 1.59203 12 2.16667 12H9.83333C10.408 12 10.9591 11.7717 11.3654 11.3654C11.7717 10.9591 12 10.408 12 9.83333V2.16667C12 1.59203 11.7717 1.04093 11.3654 0.634602C10.9591 0.228273 10.408 0 9.83333 0H2.16667ZM8.85333 4.52L5.52 7.85333C5.42625 7.94697 5.29917 7.99956 5.16667 7.99956C5.03417 7.99956 4.90708 7.94697 4.81333 7.85333L3.47733 6.51733C3.42821 6.47156 3.38881 6.41636 3.36148 6.35503C3.33415 6.29369 3.31946 6.22748 3.31827 6.16035C3.31709 6.09321 3.32944 6.02653 3.35459 5.96427C3.37973 5.90201 3.41716 5.84545 3.46464 5.79797C3.51212 5.7505 3.56868 5.71307 3.63094 5.68792C3.69319 5.66277 3.75988 5.65042 3.82701 5.65161C3.89415 5.65279 3.96036 5.66748 4.02169 5.69481C4.08303 5.72214 4.13823 5.76154 4.184 5.81067L5.16667 6.79267L8.14667 3.81267C8.19281 3.76493 8.248 3.72687 8.30902 3.70069C8.37003 3.67452 8.43565 3.66076 8.50204 3.66021C8.56843 3.65967 8.63426 3.67235 8.6957 3.69752C8.75713 3.72269 8.81294 3.75984 8.85987 3.80681C8.90679 3.85378 8.94389 3.90962 8.969 3.97108C8.99411 4.03254 9.00673 4.09838 9.00612 4.16477C9.00552 4.23116 8.99169 4.29677 8.96546 4.35776C8.93923 4.41874 8.90111 4.4739 8.85333 4.52Z"
+                            fill="white"></path>
+                    </svg>
+                    <label class="flex items-center gap-1 cursor-pointer select-none text-xs font-semibold"
+                           for="aylik"> Aylık </label>
+                </div>
+                <div class="flex items-center gap-1.5 checkbox-container">
+                    <input type="checkbox" id="haftalik" class="hidden peer" value="490263">
+                    <svg class="peer-checked:hidden block active cursor-pointer" width="12" height="12"
+                         viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M0 2.16668C0 1.59205 0.228273 1.04095 0.634602 0.634617C1.04093 0.228288 1.59203 1.52588e-05 2.16667 1.52588e-05H9.83333C10.408 1.52588e-05 10.9591 0.228288 11.3654 0.634617C11.7717 1.04095 12 1.59205 12 2.16668V9.83335C12 10.408 11.7717 10.9591 11.3654 11.3654C10.9591 11.7717 10.408 12 9.83333 12H2.16667C1.59203 12 1.04093 11.7717 0.634602 11.3654C0.228273 10.9591 0 10.408 0 9.83335V2.16668ZM2.16667 1.00002C1.85725 1.00002 1.5605 1.12293 1.34171 1.34172C1.12292 1.56052 1 1.85726 1 2.16668V9.83335C1 10.4773 1.52267 11 2.16667 11H9.83333C10.1428 11 10.4395 10.8771 10.6583 10.6583C10.8771 10.4395 11 10.1428 11 9.83335V2.16668C11 1.85726 10.8771 1.56052 10.6583 1.34172C10.4395 1.12293 10.1428 1.00002 9.83333 1.00002H2.16667Z"
+                            fill="white"></path>
+                    </svg>
+                    <svg class="peer-checked:block hidden cursor-pointer" width="12" height="12" viewBox="0 0 12 12"
+                         fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M2.16667 0C1.59203 0 1.04093 0.228273 0.634602 0.634602C0.228273 1.04093 0 1.59203 0 2.16667V9.83333C0 10.408 0.228273 10.9591 0.634602 11.3654C1.04093 11.7717 1.59203 12 2.16667 12H9.83333C10.408 12 10.9591 11.7717 11.3654 11.3654C11.7717 10.9591 12 10.408 12 9.83333V2.16667C12 1.59203 11.7717 1.04093 11.3654 0.634602C10.9591 0.228273 10.408 0 9.83333 0H2.16667ZM8.85333 4.52L5.52 7.85333C5.42625 7.94697 5.29917 7.99956 5.16667 7.99956C5.03417 7.99956 4.90708 7.94697 4.81333 7.85333L3.47733 6.51733C3.42821 6.47156 3.38881 6.41636 3.36148 6.35503C3.33415 6.29369 3.31946 6.22748 3.31827 6.16035C3.31709 6.09321 3.32944 6.02653 3.35459 5.96427C3.37973 5.90201 3.41716 5.84545 3.46464 5.79797C3.51212 5.7505 3.56868 5.71307 3.63094 5.68792C3.69319 5.66277 3.75988 5.65042 3.82701 5.65161C3.89415 5.65279 3.96036 5.66748 4.02169 5.69481C4.08303 5.72214 4.13823 5.76154 4.184 5.81067L5.16667 6.79267L8.14667 3.81267C8.19281 3.76493 8.248 3.72687 8.30902 3.70069C8.37003 3.67452 8.43565 3.66076 8.50204 3.66021C8.56843 3.65967 8.63426 3.67235 8.6957 3.69752C8.75713 3.72269 8.81294 3.75984 8.85987 3.80681C8.90679 3.85378 8.94389 3.90962 8.969 3.97108C8.99411 4.03254 9.00673 4.09838 9.00612 4.16477C9.00552 4.23116 8.99169 4.29677 8.96546 4.35776C8.93923 4.41874 8.90111 4.4739 8.85333 4.52Z"
+                            fill="white"></path>
+                    </svg>
+                    <label class="flex items-center gap-1 cursor-pointer select-none text-xs font-semibold"
+                           for="haftalik"> Haftalık </label>
+                </div>
+            </div> <!-- Checkboxes End --> <!-- Button Start -->
+            <button class="bg-[#F2F2F7] text-secondary-500 text-sm font-semibold py-3 w-full clickSubsButton"> Abone
+                Ol
+            </button>
+            <!-- Button End -->
+        </div> <!-- Newsletter End -->
+    </div>
+</div> *@

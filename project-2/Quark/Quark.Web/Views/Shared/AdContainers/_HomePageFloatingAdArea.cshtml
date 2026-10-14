@@ -1,0 +1,32 @@
+﻿@{
+	var hasPremiumMembership = "False";
+
+	var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+	if (id !=  null)
+	{
+		hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+	}
+}
+
+@if (hasPremiumMembership == "True")
+{
+	
+}
+else
+{
+	<div id="floating-ads" class="hidden xl:block fixed top-44 left-0 right-0 -z-10" style="pointer-events:none;"data-astro-cid-j7pv25f6>
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-astro-cid-j7pv25f6>
+			<div class="-mx-20  flex justify-between" data-astro-cid-j7pv25f6>
+				<!-- Ad Start -->
+				<div class="ads-box" style="pointer-events:all;"> 
+					<cmh-ads data-adunit="/cumhuriyet.com.tr/ansayfa_pageskin_sol"
+							 data-sizes="[[160, 600], [120, 600]]" data-device="desktop" style="max-width:160px; display:block;"></cmh-ads>
+				</div> <!-- Ad End --> <!-- Ad Start -->
+				<div class="ads-box" style="pointer-events:all;"> 
+					<cmh-ads data-adunit="/cumhuriyet.com.tr/ansayfa_pageskin_sag"
+					         data-sizes="[[160, 600], [120, 600]]" data-device="desktop" style="max-width:160px;  display:block;"></cmh-ads>
+				</div> <!-- Ad End -->
+			</div>
+		</div>
+	</div>
+}

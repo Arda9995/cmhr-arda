@@ -1,0 +1,41 @@
+﻿{
+  "ConnectionStrings": {
+    Server=192.168.35.32;Database=News-Hangfire
+    "ConnectionString": "Server=192.168.35.32;Database=News-Migration;User Id=News-Migration-User;Password=f74ef93f-d0a7-44a4-af88-dfa5853d6444;Trust Server Certificate=true;  Pooling=true; Max Pool Size=400;Min Pool Size=200; "
+  },
+  "ElasticSearchOptions": {
+    "Uri": "https://192.168.35.32:9200",
+    "ElasticUserName": "elastic",
+    "ElasticPassword": "XkmEjEvWDTIiHkU8vX+6"
+  },
+  "RedisConnectionString": "192.168.35.32:6390,password=redispw",
+  "CronExpSettings": {
+    "UpdateCurrencyCronExp": "*/10 * * * *",
+    "UpdateCryptoCronExp": "*/10 * * * *",
+    "RefreshWeatherDataCronExp": "0 0 * * *",
+    "PrayerTimesCronExp": "0 0 * * *",
+    "UnlockNewsCronExp": "* * * * *",
+    "UpdateViewsCronExp": "* * * * *",
+    "PublishScheduledNewsCronExp": "* * * * *",
+    "UnPublishScheduledNewsCronExp": "* * * * *",
+    "CheckAnomaliesDailyCronExp": "0 0 * * *",
+    "RefreshSurveyCountCronExp": "30 * * * * *",
+    "RefreshNewsViewCountCronExp": "30 * * * * *",
+    "RefreshAuthorsMainPageAndTodaysNewsListCronExp": "0 * * * *",
+    "RefreshMonthlyPostsSitemapCronExp": "0 5 * * *",
+    "RefreshMonthlyTagsSitemap": "0 5 * * *",
+    "RefreshNewsSitemapCronExp": "*/3 * * * *",
+    "RefreshAgencyAANewsCronExp": "*/3 * * * *",
+    "RefreshAgencySitemapGetsCronExp": "*/3 * * * *"
+  },
+  "DashboardUser": {
+    "Username": "admin",
+    "Password": "password1"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

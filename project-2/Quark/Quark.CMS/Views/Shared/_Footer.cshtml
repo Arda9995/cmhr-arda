@@ -1,0 +1,22 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<div id="kt_app_footer" class="app-footer">
+    <div class="app-container container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack py-3">
+        <div class="text-dark order-2 order-md-1">
+            <span class="text-muted fw-semibold me-1">@DateTime.Now.Year©</span>
+            <a href="@_appSettings.Common_ClientWebSite" target="_blank" class="text-gray-800 text-hover-primary">@_appSettings.Common_ClientName</a>
+        </div>
+        <ul class="menu menu-gray-600 menu-hover-primary fw-semibold order-1">
+            <li class="menu-item mt-3">
+                <span class="badge badge-light-success me-3">@Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")</span>
+                <environment names="Development,Staging">
+                    <span class="badge badge-light-success me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="@Configuration.GetSection("ConnectionStrings")["ConnectionString"]">Database</span>
+                </environment>
+            </li>
+            <li class="menu-item">
+                <a href="https://avvamobile.com" target="_blank" class="menu-link px-2">Powered By Avva Mobile Enterprise Solutions</a>
+            </li>
+        </ul>
+    </div>
+</div>

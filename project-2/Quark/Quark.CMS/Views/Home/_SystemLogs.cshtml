@@ -1,0 +1,34 @@
+@model Quark.CMS.Business.Models.Responses.HomeResponses.HomeResponse
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">
+            <h3>@_localizer["LatestActions"]</h3>
+        </div>
+    </div>
+    <div class="card-body p-0 card-scroll h-300px">
+        <table class="table table-bordered">
+
+            <tbody>
+            @foreach (var log in Model.SystemLogs)
+            {
+            <tr>
+                <td>
+                    <span class="w-125px d-block">@log.CreatedDate</span>
+                </td>
+                <td>
+                    <a href="/SystemLogs/Details/@log.ID" class="text-black" target="_blank"> <strong>@log.UserName</strong>&nbsp; @_localizer["By"] @log.Message</a>
+                </td>
+            </tr>
+            }
+            </tbody>
+        </table>
+        @* @foreach (var log in Model.SystemLogs) *@
+        @* { *@
+        @*     <li class="d-flex align-items-center py-2 mb-2"> *@
+        @*         <span class="bullet me-5"></span> <span class="w-250px">@log.CreatedDate</span> | &nbsp; <a href="/SystemLogs/Details/@log.ID" class="text-black" target="_blank"> <strong>@log.UserName</strong>&nbsp; tarafından @log.Message</a> *@
+        @*     </li> *@
+        @* } *@
+    </div>
+</div>
+

@@ -1,0 +1,26 @@
+﻿@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+
+<div class="mb-6 flex-lg-grow-1">
+    <button type="button" id="add-option" class="btn btn-primary">@_localizer["AddOption"]</button>
+    <button type="button" id="remove-option" class="btn btn-danger">@_localizer["DeleteOption"]</button>
+</div>
+<input type="hidden" id="SurveyOptions" value='@Newtonsoft.Json.JsonConvert.SerializeObject(Model.SurveyOptions)' />
+
+<div class="row mb-6 option-row">
+    <div class="col-1w">
+        <label class="required form-label">@_localizer["Option"] 1</label>
+        <div class="input-group" >
+            <input name="SurveyOptions" class="form-control maxlength option-1" maxlength="100"></input>
+        </div>
+    </div>
+</div>
+<div class="row mb-6 option-row">
+    <div class="col-1w">
+        <label class="required form-label">@_localizer["Option"] 2</label>
+        <div class="input-group">
+            <input name="SurveyOptions" class="form-control maxlength option-2" maxlength="100"></input>
+        </div>
+    </div>
+</div>
+<div class="mb-6" id="options-container"></div>

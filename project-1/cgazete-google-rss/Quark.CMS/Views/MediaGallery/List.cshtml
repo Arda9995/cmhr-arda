@@ -1,0 +1,94 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["All"] + " " + _localizer["Files"];
+    ViewData[ViewDataNames.AsideMenu] = "MediaGallery";
+    ViewData[ViewDataNames.AsideSubMenu] = "MediaGallery";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["MediaGallery"], "/MediaGallery/List")
+    };
+}
+
+@section Styles{
+    <link href="https://metronic.b-cdn.net/8.1.5/assets/plugins/custom/jstree/jstree.bundle.css" rel="stylesheet" type="text/css"/>
+}
+
+@section Scripts{
+    <script src="https://metronic.b-cdn.net/8.1.5/assets/plugins/custom/jstree/jstree.bundle.js" type="text/javascript"></script>
+    <script src="/Scripts/MediaGallery/List.js" asp-append-version="true"></script>
+
+}
+<ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
+    <li class="nav-item">
+        <a class="nav-link active text-black" data-bs-toggle="tab" href="#tab_gallery">
+            <i class="ki-duotone ki-file fs-2">
+                <span class="path1"></span>
+                <span class="path2"></span>
+            </i>
+            @_localizer["Gallery"]
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-black" data-bs-toggle="tab" href="#tab_fav">
+            <i class="ki-duotone ki-star fs-2">
+            </i>
+            @_localizer["Favourites"]
+        </a>
+    </li>
+@*    <li class="nav-item">
+        <a class="nav-link text-black" data-bs-toggle="tab" href="#tab_archive">
+            <i class="ki-duotone ki-archive fs-2">
+                <span class="path1"></span>
+                <span class="path2"></span>
+                <span class="path3"></span>
+            </i>
+            @_localizer["Archive"]
+        </a>
+    </li>*@
+</ul>
+<div id="media-gallery-main" class="row">
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_gallery">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="card card-flush card-stretch">
+                        <div class="card-header">
+                            <div class="card-title"></div>
+                            <div class="card-toolbar">
+                                <partial name="_GalleryActionButton"/>
+                            </div>
+                        </div>
+                        <div class="card-body hover-scroll pt-0">
+                            <div id="divMediaGalleryTree"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <partial name="_Files"/>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="tab_fav">
+            <div class="row">
+                <div class="col-lg-12">
+                    <partial name="_FavouriteFiles"/>
+                </div>
+            </div>
+        </div>
+       @* <div class="tab-pane" id="tab_archive">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="card card-flush card-stretch">
+                        <div class="card-body hover-scroll pt-5">
+                            <div id="divArchiveTree"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <partial name="_ArchiveFiles"/>
+                </div>
+            </div>
+        </div>*@
+    </div>
+</div>
+
+<partial name="_AddFolder"/>

@@ -1,0 +1,56 @@
+@{
+    Layout = "_LayoutPublic";
+    ViewData[ViewDataNames.Title] = _localizer["SecureLogin"];
+}
+
+@model Quark.CMS.Business.Models.Requests.AccountRequests.SignInOTPRequest
+
+<style>
+    body {
+        background-image: url('https://metronic.avvamobile.com/8.2.0/assets/media/auth/bg4.jpg');
+    }
+
+    [data-bs-theme="dark"] body {
+        background-image: url('https://metronic.avvamobile.com/8.2.0/assets/media/auth/bg4-dark.jpg');
+    }
+</style>
+
+<div class="d-flex flex-column flex-column-fluid flex-lg-row">
+    <div class="d-flex flex-center w-lg-50 pt-15 pt-lg-0 px-10">
+        <div class="d-flex flex-center flex-lg-start flex-column">
+            <img alt="Logo" src="/img/logo-white.svg" class="h-75px" />
+            <h2 class="text-white fw-normal m-0">
+                Pozitron CMS
+            </h2>
+        </div>
+    </div>
+    <div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12 p-lg-20">
+        <div class="bg-body d-flex flex-column align-items-stretch flex-center rounded-4 w-md-600px p-20">
+            <div class="d-flex flex-center flex-column flex-column-fluid px-lg-10 pb-15 pb-lg-20">
+                <form class="form w-100" method="post">
+                    <div class="text-center mb-11">
+                        <h1 class="text-dark fw-bolder mb-3">
+                            @_localizer["SecureLogin"]
+                        </h1>
+                        <div class="text-gray-500 fw-semibold fs-6">
+                            @_localizer["SecureLoginDescription"]
+                        </div>
+                    </div>
+                    <partial name="_MessageBox" />
+                    <div class="fv-row mb-8">
+                        <input type="hidden" asp-for="MobilePhone"/>
+                        <input asp-for="@Model.Password" type="password" class="form-control bg-transparent h-60px w-100 fs-2qx text-center mx-1 my-2" autocomplete="off" autofocus="true" placeholder="* * * * * *" />
+                    </div>
+
+                    <div class="fv-row justify-content-center mb-10">
+                        <div id="captcha_holder"></div>
+                    </div>
+
+                    <div class="d-grid mb-10">
+                        <button type="submit" class="btn btn-primary">@_localizer["SignIn"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

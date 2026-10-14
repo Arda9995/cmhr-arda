@@ -1,0 +1,54 @@
+<div class="card card-flush">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <partial name="Icons/Search" />
+                <input type="text" data-kt-filter="datatable-search" id="search-value" class="form-control form-control-solid w-250px ps-14" placeholder="@_localizer["Search"]">
+            </div>
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <table id="datatable">
+            <thead>
+            <tr>
+                <th class="w-75px">@_localizer["News"]</th>
+                <th></th>
+                <th>@_localizer["Category"]</th>
+                <th>@_localizer["NewsType"]</th>
+                <th>@_localizer["PublishDate"]</th>
+                <th class="text-center">@_localizer["Last15Minutes"]</th>
+                <th>@_localizer["Status"]</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <div style="display:none">
+                <div id="Col2">
+                    {0}
+                </div>
+                <div id="Col3">
+                    <a href="/News/Details/{0}">{1}</a>
+                </div>
+                <div id="Col4">
+                    {0}
+                </div>
+                <div id="Col5">
+                    {0}
+                </div>
+                <div id="Col6">
+                    {0}
+                </div>
+                <div id="Col7">
+                    <div id="impression_chart_{0}" class="h-50px mt-n8 pe-7" data-kt-chart-color="success"></div>
+                </div>
+                <div id="Col8">
+                    {0}
+                </div>
+                <div class="text-center" id="Col12">
+                    {0}
+                </div>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>

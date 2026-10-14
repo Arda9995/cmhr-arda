@@ -1,0 +1,158 @@
+﻿<#
+.SYNOPSIS
+	Google AI RSS kontrol araçlarını derler ve çalıştırır.
+
+.DESCRIPTION
+	1. tools\GoogleAiArchiveCheck projesini derler.
+	2. Çevrimdışı kontrolleri çalıştırır (--check-window, --check-content, --check-creator, --check-refactor).
+	   Bu kontroller veritabanına, Elasticsearch'e veya arşiv dosyalarına erişmez.
+	3. -WriteArchive verilirse veritabanından salt okunur sorgu ile test haberini bulur (veya -NewsId kullanır)
+	   ve --write-archive testini çalıştırır. Bu test bugünün günlük XML dosyasını yeniden yazar
+	   (bugün haber yoksa dosya oluşturmaz); veritabanına yazmaz, Elasticsearch'e bağlanmaz.
+	4. -IncludeSwitchCheck verilirse tools\GoogleAiFeedSwitchCheck projesini de derleyip çalıştırır.
+
+.EXAMPLE
+	.\tools\Run-GoogleAiChecks.ps1
+.EXAMPLE
+	.\tools\Run-GoogleAiChecks.ps1 -WriteArchive
+.EXAMPLE
+	.\tools\Run-GoogleAiChecks.ps1 -WriteArchive -NewsId 2540358 -AllowedServer 192.168.35.40 -AllowedDatabase News-Migration
+#>
+[CmdletBinding()]
+param(
+	[string]$WorkspaceRoot = "",
+	[switch]$WriteArchive,
+	[long]$NewsId = 0,
+	[string]$AllowedServer = "192.168.35.40",
+	[string]$AllowedDatabase = "News-Migration",
+	[switch]$IncludeSwitchCheck
+)
+
+$ErrorActionPreference = "Continue"
+if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
+	$scriptDirectory = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+	$WorkspaceRoot = Split-Path -Parent $scriptDirectory
+}
+$WorkspaceRoot = (Resolve-Path $WorkspaceRoot).Path
+$archiveCheckDir = Join-Path $WorkspaceRoot "tools\GoogleAiArchiveCheck"
+$switchCheckDir = Join-Path $WorkspaceRoot "tools\GoogleAiFeedSwitchCheck"
+$failures = New-Object System.Collections.Generic.List[string]
+
+function Invoke-Step {
+	param([string]$Name, [scriptblock]$Action)
+	Write-Host ""
+	Write-Host "== $Name" -ForegroundColor Cyan
+	& $Action
+	if ($LASTEXITCODE -ne 0) {
+		Write-Host "FAIL: $Name (exit code $LASTEXITCODE)" -ForegroundColor Red
+		$failures.Add($Name)
+	}
+	else {
+		Write-Host "OK: $Name" -ForegroundColor Green
+	}
+}
+
+function Get-CmsConnectionString {
+	# Aracın kullandığı yapılandırma ile aynı: Quark.CMS appsettings.json + appsettings.Development.json
+	$connectionString = $null
+	foreach ($file in @("appsettings.json", "appsettings.Development.json")) {
+		$path = Join-Path $WorkspaceRoot "Quark.CMS\$file"
+		if (-not (Test-Path $path)) { continue }
+		# Satır başındaki // yorumlarını ve sondaki virgülleri temizle (Windows PowerShell JSON ayrıştırıcısı için)
+		$json = (Get-Content $path -Raw -Encoding UTF8) -split "`r?`n" |
+			Where-Object { $_ -notmatch '^\s*//' }
+		$json = ($json -join "`n") -replace ',(\s*[}\]])', '$1'
+		$config = $json | ConvertFrom-Json
+		if ($config.ConnectionStrings -and $config.ConnectionStrings.ConnectionString) {
+			$connectionString = $config.ConnectionStrings.ConnectionString
+		}
+	}
+	if (-not $connectionString) { throw "Quark.CMS ayarlarında ConnectionStrings:ConnectionString bulunamadı." }
+	return $connectionString
+}
+
+function Find-LatestGoogleAiNewsId {
+	param([string]$ConnectionString)
+	# System.Data.SqlClient, Microsoft.Data.SqlClient'ın boşluklu anahtar adlarını tanımaz
+	$ConnectionString = $ConnectionString -replace '(?i)Trust\s+Server\s+Certificate', 'TrustServerCertificate' -replace '(?i)Multiple\s+Active\s+Result\s+Sets', 'MultipleActiveResultSets' -replace '(?i)Application\s+Intent', 'ApplicationIntent'
+	$builder = New-Object System.Data.SqlClient.SqlConnectionStringBuilder $ConnectionString
+	if ($builder.DataSource -ne $AllowedServer -or $builder.InitialCatalog -ne $AllowedDatabase) {
+		throw "Bağlantı izinli veritabanına ait değil: $($builder.DataSource)/$($builder.InitialCatalog) (izinli: $AllowedServer/$AllowedDatabase)"
+	}
+	$builder["Connect Timeout"] = 15
+	$connection = New-Object System.Data.SqlClient.SqlConnection $builder.ConnectionString
+	try {
+		$connection.Open()
+		$command = $connection.CreateCommand()
+		# Salt okunur sorgu. Modeldeki AllowGoogleAiFeed, veritabanında ExcludeFromGoogleAiFeed sütununa karşılık gelir.
+		$command.CommandText = "SELECT TOP 1 NewsID, PublishedDate FROM [News.NewsPublished] " +
+			"WHERE AllowToSendRSS = 1 AND ExcludeFromGoogleAiFeed = 0 AND PublishedDate <= GETDATE() " +
+			"ORDER BY PublishedDate DESC"
+		$reader = $command.ExecuteReader()
+		try {
+			if ($reader.Read()) {
+				Write-Host "Test haberi: $($reader[0]) (yayın: $($reader[1]))"
+				return [long]$reader[0]
+			}
+		}
+		finally { $reader.Close() }
+	}
+	finally { $connection.Close() }
+	throw "Google AI akışına uygun yayımlanmış haber bulunamadı."
+}
+
+Push-Location $archiveCheckDir
+try {
+	Invoke-Step "GoogleAiArchiveCheck derleme" { dotnet build -v q -nologo }
+	if ($failures.Count -gt 0) { throw "Derleme başarısız; kontroller çalıştırılmadı." }
+
+	foreach ($check in @("--check-window", "--check-content", "--check-creator", "--check-refactor")) {
+		Invoke-Step "GoogleAiArchiveCheck $check" { dotnet run --no-build -- $check }
+	}
+
+	if ($WriteArchive) {
+		if ($NewsId -le 0) {
+			try {
+				$NewsId = Find-LatestGoogleAiNewsId -ConnectionString (Get-CmsConnectionString)
+			}
+			catch {
+				Write-Host "FAIL: Test haberi bulunamadı: $($_.Exception.Message)" -ForegroundColor Red
+				$failures.Add("Test haberi seçimi")
+			}
+		}
+		if ($NewsId -gt 0) { Invoke-Step
+			--AllowedDatabase $AllowedDatabase
+		} }
+	}
+	else {
+		Write-Host ""
+		Write-Host "--write-archive testi atlandı (çalıştırmak için -WriteArchive kullanın)." -ForegroundColor Yellow
+	}
+}
+finally {
+	Pop-Location
+}
+
+if ($IncludeSwitchCheck) {
+	if (Test-Path $switchCheckDir) {
+		Push-Location $switchCheckDir
+		try {
+			Invoke-Step "GoogleAiFeedSwitchCheck derleme" { dotnet build -v q -nologo }
+			if (-not $failures.Contains("GoogleAiFeedSwitchCheck derleme")) {
+				Invoke-Step "GoogleAiFeedSwitchCheck" { dotnet run --no-build }
+			}
+		}
+		finally { Pop-Location }
+	}
+	else {
+		Write-Host "GoogleAiFeedSwitchCheck bulunamadı: $switchCheckDir" -ForegroundColor Yellow
+	}
+}
+
+Write-Host ""
+if ($failures.Count -eq 0) {
+	Write-Host "TÜM KONTROLLER BAŞARILI" -ForegroundColor Green
+	exit 0
+}
+Write-Host "BAŞARISIZ: $($failures -join ', ')" -ForegroundColor Red
+exit 1

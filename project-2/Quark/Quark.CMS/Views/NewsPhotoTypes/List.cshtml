@@ -1,0 +1,84 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["NewsPhotosSettings"];
+    ViewData[ViewDataNames.AsideMenu] = "Management";
+    ViewData[ViewDataNames.AsideSubMenu] = "NewsPhotoTypes";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Management"], string.Empty),
+        new BreadcrumbItem(_localizer["NewsPhotosSettings"], "/NewsPhotoTypes/List")
+    };
+}
+
+@section Scripts {
+    <script src="/Scripts/NewsPhotoTypes/List.js" asp-append-version="true"></script>
+}
+
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <partial name="Icons/Search" />
+                <input type="text" data-kt-filter="datatable-search" id="search-value" class="form-control form-control-solid w-250px ps-14" placeholder="@_localizer["Search"]">
+            </div>
+        </div>
+        <div class="card-toolbar">
+            <div class="d-flex justify-content-end">
+                <a href="/NewsPhotoTypes/Create" class="btn btn-primary">
+                    <partial name="Icons/Add" />
+                    @_localizer["New"] @_localizer["PhotoType"]
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <table id="datatable">
+            <thead>
+                <tr>
+                    <th class="w-70px text-center"></th>
+                    <th>@_localizer["PhotoType"]</th>
+                    <th>@_localizer["KeyWord"]</th>
+                    <th>@_localizer["Scalings"]</th>
+                    <th>@_localizer["Required"]</th>
+                    <th>@_localizer["Status"]</th>
+                    <th>@_localizer["Order"]</th>
+                    <th class="w-100px text-center"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <div style="display:none">
+                        <div id="Col1">
+                            {0}
+                        </div>
+                        <div id="Col2">
+                           <a href="/NewsPhotoTypes/Update/{1}">{0}</a>
+                        </div>
+                        <div id="Col3">
+                            {0}
+                        </div>
+                        <div id="Col4">
+                            {0}x{1}
+                        </div>
+                        <div id="Col5">
+                            <span class="badge badge-light-{0}">{1}</span>
+                        </div>
+                        <div id="Col6">
+                            <span class="badge badge-light-{0}">{1}</span>
+                        </div>
+                        <div id="Col7">
+                            {0}
+                        </div>
+                        <div class="text-center" id="Col12">
+                            <a href="/NewsPhotoTypes/Update/{0}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="@_localizer["Update"]">
+                                <partial name="Icons/Edit" />
+                            </a>
+                            <a onclick="DeleteRecordAndRefreshPage('/NewsPhotoTypes/Delete/{1}')" class="btn btn-icon btn-bg-light btn-active-color-danger btn-sm me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="@_localizer["Delete"]">
+                                <partial name="Icons/Delete" />
+                            </a>
+                        </div>
+                    </div>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

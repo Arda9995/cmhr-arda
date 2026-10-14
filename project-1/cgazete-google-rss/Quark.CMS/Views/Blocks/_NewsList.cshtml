@@ -1,0 +1,11 @@
+@using Quark.CMS.Business.Models.Responses.CommonResponses
+@using Quark.CMS.Business.Models.Responses.BlockResponses
+@model PagingResponse<ListBlockNewsResponseItem>
+
+
+<div class="row custom-draggable-zone draggable-left min-h-125px">
+    <partial name="_NewsItems" model="Model.Data"/>
+</div>
+<div class="mt-10">
+    <partial name="_Pagination" model="Model" async />
+</div>

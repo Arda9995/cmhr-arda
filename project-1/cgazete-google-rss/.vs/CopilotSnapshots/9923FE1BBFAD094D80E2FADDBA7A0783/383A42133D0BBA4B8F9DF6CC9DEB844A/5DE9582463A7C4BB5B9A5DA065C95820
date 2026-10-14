@@ -1,0 +1,2174 @@
+﻿using AvvaMobile.Core.Business;
+using AvvaMobile.Core.Caching;
+using AvvaMobile.Core.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
+using Quark.API.Caching.Models.Responses.NewsCachingResponses;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Caching.Models.Responses.AuthorCachingResponses;
+using Quark.Business.Caching.Models.Responses.NewsCachingResponses;
+using Quark.Business.Caching.Models.Responses.PageCachingResponses;
+using Quark.Business.Common.BaseServices;
+using Quark.Business.Common.Caching;
+using Quark.Business.ElasticSearch.Abstractions;
+using Quark.Cloudflare.Adapter.Interfaces;
+using Quark.Core.Extensions;
+using Quark.Core.Extentions;
+using Quark.Data;
+using Quark.Data.Models;
+using Quark.Data.Models.News;
+using Quark.Data.Models.Survey;
+using Quark.Resources;
+using System.Data;
+using System.Data.Common;
+using System.Globalization;
+using System.Reflection;
+using Elastic.Clients.Elasticsearch;
+using Quark.Business.ElasticSearch.Constants;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+using Quark.Business.ElasticSearch.Models.Responses.NewsResponses;
+
+namespace Quark.Business.Caching.Services;
+
+public class NewsCachingService(
+    IHttpContextAccessor httpContext,
+    QuarkDataContext context,
+    IStringLocalizer<CommonResource> localizer,
+    AppSettingsKeys appSettingsKeys,
+    ICacheManager cache,
+    IElasticSearchService elasticSearchService,
+    ITagCachingService tagCachingService,
+    INewsPhotosCachingService newsPhotosCachingService,
+    ISourceCachingService sourceCachingService,
+    IAuthorCachingService authorCachingService,
+    ICloudflareAdapter cloudflareAdapter,
+    IXmlFeedCachingService xmlFeedCachingService)
+    : BaseService(httpContext, context, localizer, appSettingsKeys, cache), INewsCachingService
+{
+    public async Task<ServiceResult> IncreaseNewsViewCount(int newsID)
+    {
+        var result = new ServiceResult();
+
+        var newGuid = Guid.NewGuid().ToString();
+        var model = new NewsViewCountResponse
+        {
+            ID = newGuid,
+            CreatedDate = DateTime.Now,
+            NewsID = newsID
+        };
+
+        result.IsSuccess = await elasticSearchService.IndexDocumentAsync(model, IndexNames.News_View_Count);
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshAll()
+    {
+        var result = new ServiceResult();
+
+        var govAnnounceResult = await RefreshMainPageGovernmentAnnouncement();
+        if (!govAnnounceResult.IsSuccess)
+            result.SetError("RefreshDailyGovernmentAnnouncement failed: " + govAnnounceResult.Message);
+
+        var columnArticlesResult = await RefreshAuthorSideColumnArticles();
+        if (!columnArticlesResult.IsSuccess)
+            result.SetError("RefreshTodaysColumnArticles failed: " + columnArticlesResult.Message);
+
+        var zodiacSign = await RefreshMainPageZodiacSignBlock();
+        if (!zodiacSign.IsSuccess)
+            result.SetError("RefreshZodiacSignBlock failed: " + zodiacSign.Message);
+
+        var todayColumnArticles = await RefreshNewsByCategorySlug((int)CategoryEnum.GovernmentAnnouncement);
+        if (!todayColumnArticles.IsSuccess)
+            result.SetError("TodayColumnArticles failed: " + todayColumnArticles.Message);
+
+        var refreshAuthorsMainpageAndTodayNewsList =
+            await authorCachingService.RefreshAll();
+        if (!refreshAuthorsMainpageAndTodayNewsList.IsSuccess)
+            result.SetError("Mainpage Authors failed: " + refreshAuthorsMainpageAndTodayNewsList.Message);
+
+        return result;
+    }
+
+    public async Task<ServiceResult<List<GovernmentAnnouncementItem>>> GetMainPageGovernmentAnnouncement()
+    {
+        var result = new ServiceResult<List<GovernmentAnnouncementItem>>();
+
+        result.Data = await _cache.Get<List<GovernmentAnnouncementItem>>(RedisKeys.DailyGovernmentAnnouncement);
+
+        if (result.Data == null)
+        {
+            await RefreshMainPageGovernmentAnnouncement();
+            result.Data = await _cache.Get<List<GovernmentAnnouncementItem>>(RedisKeys.DailyGovernmentAnnouncement);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshMainPageGovernmentAnnouncement()
+    {
+        var result = new ServiceResult();
+        var governmentAnnouncementList = await (
+            from np in _context.NewsPublished
+            let photo = (from ph in _context.NewsPhotos
+                where ph.NewsID == np.NewsID &&
+                      (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                       ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                orderby
+                    ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl) ? 0 :
+                        ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl) ? 1 :
+                        2
+                select ph).FirstOrDefault()
+            where np.NewsTypeID == (int)NewsTypesEnum.GovernmentAnnouncement &&
+                  np.PublishedDate.Date == DateTime.Today.Date
+            select new GovernmentAnnouncementItem
+            {
+                ID = (int)np.NewsID,
+                Headline = np.Headline ?? np.Title,
+                UpSubtitle = np.UpSubtitle ?? np.Subtitle ?? np.Content.ExtractTextFromHtml(),
+                Slug = _appSettingsKeys.Common_ClientWebSite + np.Slug.TrimStart('/'),
+                CoverPhoto = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                    _appSettingsKeys.CDN_MediaGalleryFolder),
+                BoxCount = np.BoxCount ?? 0,
+                PressNo = np.PressNo,
+                OrderGroup = np.BoxCount >= 150 ? (int)GovernmentOrderGroupEnum.UnderAnaSlider : 0
+            }).ToListAsync();
+
+        var counter = 1;
+        foreach (var item in governmentAnnouncementList.Where(x =>
+                     x.OrderGroup != (int)GovernmentOrderGroupEnum.UnderAnaSlider))
+        {
+            item.OrderGroup = (int)Math.Ceiling((counter / 4.0)) + 1;
+            if (item.OrderGroup == (int)GovernmentOrderGroupEnum.Remaining)
+                continue;
+            counter++;
+        }
+
+        var serializedData = JsonConvert.SerializeObject(governmentAnnouncementList);
+        await _cache.Set(RedisKeys.DailyGovernmentAnnouncement, serializedData,
+            RedisTTLSeconds.MainPageGovernmentAnnouncement_TTL);
+        return result;
+    }
+
+    public async Task<ServiceResult> IncreaseSurveyResult(int surveyID, int optionID)
+    {
+        var result = new ServiceResult();
+
+        var surveyOptions = await _context.SurveyOptions.Where(x => x.SurveyID == surveyID).Select(x =>
+            new SurveyOptionsResult
+            {
+                OptionID = x.ID,
+                OptionName = x.Option,
+                AnswerCount = x.AnswerCount
+            }).ToListAsync();
+
+        var increasedSurveyOption = surveyOptions.FirstOrDefault(x => x.OptionID == optionID);
+        increasedSurveyOption.AnswerCount += 1;
+
+        var surveyOptionResultCachingResponse = new SurveyOptionResultCachingResponse()
+        {
+            SurveyID = surveyID,
+            SurveyOptions = surveyOptions
+        };
+        var jsonData = JsonConvert.SerializeObject(surveyOptionResultCachingResponse);
+        await _cache.Set(string.Format(RedisKeys.SurveyResult, surveyID), jsonData, TimeSpan.FromSeconds(180));
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshSurveyResult(int surveyID)
+    {
+        var result = new ServiceResult();
+
+        var surveyOptionList = await _context.SurveyOptions.Where(x => x.SurveyID == surveyID).ToListAsync();
+        var totalAnswers = surveyOptionList.Sum(y => y.AnswerCount);
+
+        var surveyOptions = surveyOptionList.Select(x => new SurveyOptionsResult
+        {
+            OptionID = x.ID,
+            OptionName = x.Option,
+            AnswerCount = x.AnswerCount,
+            PercentRatio = totalAnswers == 0 ? 0 : (int)Math.Round(((double)x.AnswerCount / totalAnswers) * 100)
+        }).ToList();
+
+        var surveyOptionResultCachingResponse = new SurveyOptionResultCachingResponse()
+        {
+            SurveyID = surveyID,
+            SurveyOptions = surveyOptions
+        };
+
+        var jsonData = JsonConvert.SerializeObject(surveyOptionResultCachingResponse);
+        await _cache.Set(string.Format(RedisKeys.SurveyResult, surveyID), jsonData, TimeSpan.FromSeconds(180));
+        return result;
+    }
+
+    public async Task<ServiceResult<SurveyOptionResultCachingResponse>> GetSurveyOptionResult(int surveyID)
+    {
+        var result = new ServiceResult<SurveyOptionResultCachingResponse>();
+
+        result.Data =
+            await _cache.Get<SurveyOptionResultCachingResponse>(string.Format(RedisKeys.SurveyResult, surveyID));
+        if (result.Data == null)
+        {
+            await RefreshSurveyResult(surveyID);
+            return result;
+        }
+
+        result.Data =
+            await _cache.Get<SurveyOptionResultCachingResponse>(string.Format(RedisKeys.SurveyResult, surveyID));
+        return result;
+    }
+
+    public async Task<ServiceResult<List<int>>> GetNewsIdsByNewsType(int newsTypeID, int size = 10000)
+    {
+        var result = new ServiceResult<List<int>>();
+
+        var getElasticSearchNewsResponse = await elasticSearchService
+            .SearchDocumentsAsync<GetNewsPublishedCacheResponse>(
+                IndexNames.News_Published_Search,
+                q => q
+                    .Bool(b => b
+                        .Should(
+                            s => s.Match(m => m
+                                .Field(f => f.NewsTypeID)
+                                .Query(newsTypeID.ToString())
+                            ),
+                            s => s.Range(x => x.DateRange(r => r.Field(f => f.PublishDate)
+                                .Gte(DateTime.UtcNow.AddDays(-2))
+                            ))
+                        )
+                        .MinimumShouldMatch(2)
+                    ),
+                sort => sort
+                    .Field(f => f.PublishDate, field => field.Order(SortOrder.Desc)),
+                size: size
+            );
+
+        if (getElasticSearchNewsResponse == null)
+        {
+            result.SetError("ElasticSearch'ten veri alınırken hata oluştu.");
+            return result;
+        }
+
+        // get random max size
+        var random = new Random();
+        var maxSize = Math.Min(size, getElasticSearchNewsResponse.Count);
+
+        var randomNewsIds = getElasticSearchNewsResponse
+            .OrderBy(x => random.Next())
+            .Take(maxSize)
+            .Select(x => x.ID)
+            .ToList();
+
+        result.Data = randomNewsIds;
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshAllNewsTags()
+    {
+        var result = new ServiceResult();
+
+        var newsTags = await _context.NewsTags.ToListAsync();
+        var jsonData = JsonConvert.SerializeObject(newsTags);
+        await _cache.Set(RedisKeys.NewsTags, jsonData);
+
+        return result;
+    }
+
+    public async Task<ServiceResult<GetCachingNewsDetailResponse>> GetNewsDetailByID(int id)
+    {
+        var result = new ServiceResult<GetCachingNewsDetailResponse>();
+
+        var getNewsDetailResponse =
+            await _cache.Get<GetCachingNewsDetailResponse>(string.Format(RedisKeys.NewsDetail, id));
+
+        if (getNewsDetailResponse == null)
+        {
+            var isPublished = await _context.NewsPublished
+                .Where(x => x.NewsID == id).AnyAsync();
+
+            if (!isPublished)
+            {
+                result.SetError("Haber bulunamadı.");
+                return result;
+            }
+
+            var newsDetail = await CreateNewsDetail(id);
+
+            if (newsDetail.Data != null)
+            {
+                result.Data = newsDetail.Data;
+
+                var jsonData = JsonConvert.SerializeObject(newsDetail.Data);
+                await _cache.Set(string.Format(RedisKeys.NewsDetail, id), jsonData, RedisTTLSeconds.NewsDetail_TTL);
+                getNewsDetailResponse =
+                    await _cache.Get<GetCachingNewsDetailResponse>(string.Format(RedisKeys.NewsDetail, id));
+            }
+            else
+            {
+                result.IsSuccess = false;
+                return result;
+            }
+        }
+
+        result.Data = getNewsDetailResponse;
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshNewsPublishedSearch()
+    {
+        var result = new ServiceResult();
+
+        var searchNews = await (from np in _context.NewsPublished.Select(x => new
+            {
+                NewsID = x.NewsID,
+                Title = x.Title,
+                Subtitle = x.Subtitle,
+                Headline = x.Headline,
+                UpSubtitle = x.UpSubtitle,
+                Slug = x.Slug,
+                PublishedDate = x.PublishedDate,
+                CategoryID = x.CategoryID,
+                AuthorID = x.AuthorID,
+                SourceIDs = x.SourceIDs,
+                NewsTypeID = x.NewsTypeID
+            })
+            let photo = (from ph in _context.NewsPublishedPhotos
+                where ph.NewsID == np.NewsID &&
+                      (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                       ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                orderby
+                    ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                        ? 0
+                        : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                            ? 1
+                            : 2
+                select ph).FirstOrDefault()
+            select new GetNewsPublishedCacheResponse()
+            {
+                ID = (int)np.NewsID,
+                Title = np.Title ?? string.Empty,
+                SubTitle = np.Subtitle ?? string.Empty,
+                Headline = np.Headline ?? string.Empty,
+                UpSubtitle = np.UpSubtitle ?? string.Empty,
+                Slug = np.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                CoverPhoto = photo != null && !string.IsNullOrEmpty(photo.PhotoUrl)
+                    ? photo.PhotoUrl.TrimStart('/').PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder)
+                    : string.Empty,
+                PublishDate = np.PublishedDate,
+                CategoryID = np.CategoryID,
+                AuthorID = np.AuthorID,
+                SoruceIDs = np.SourceIDs,
+                NewsTypeID = np.NewsTypeID
+            }).ToListAsync();
+
+        if (searchNews.Any())
+        {
+            var addElastic =
+                await elasticSearchService.BulkIndexDocumentsAsync<GetNewsPublishedCacheResponse>(searchNews,
+                    "prod_news_published_search");
+            if (!addElastic)
+            {
+                result.SetError("ElasticSearch'e veri eklenemedi.");
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> DeleteNewsPublishedSearchByID(int id)
+    {
+        var result = new ServiceResult();
+
+        var deleteElastic = await elasticSearchService.DeleteIndexDocuments(IndexNames.News_Published_Search,
+            new List<string> { id.ToString() });
+        if (!deleteElastic)
+        {
+            result.SetError("ElasticSearch'ten veri silinemedi.");
+            return result;
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshNewsPublishedSearchByID(int id)
+    {
+        var result = new ServiceResult();
+
+        var searchNews = await (from np in _context.NewsPublished
+            let photo = (from ph in _context.NewsPublishedPhotos
+                where ph.NewsID == np.NewsID &&
+                      (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                       ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                orderby
+                    ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                        ? 0
+                        : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                            ? 1
+                            : 2
+                select ph).FirstOrDefault()
+            where np.NewsID == id
+            select new GetNewsPublishedCacheResponse()
+            {
+                ID = (int)np.NewsID,
+                Title = np.Title ?? string.Empty,
+                SubTitle = np.Subtitle ?? string.Empty,
+                Headline = np.Headline ?? string.Empty,
+                UpSubtitle = np.UpSubtitle ?? string.Empty,
+                Slug = np.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                CoverPhoto = photo != null && !string.IsNullOrEmpty(photo.PhotoUrl)
+                    ? photo.PhotoUrl.TrimStart('/').PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder)
+                    : string.Empty,
+                PublishDate = np.PublishedDate,
+                CategoryID = np.CategoryID,
+                AuthorID = np.AuthorID,
+                SoruceIDs = np.SourceIDs,
+                NewsTypeID = np.NewsTypeID
+            }).FirstOrDefaultAsync();
+
+        if (searchNews != null)
+        {
+            var addElastic =
+                await elasticSearchService.UpdateDocumentAsync<GetNewsPublishedCacheResponse>(searchNews, id.ToString(),
+                    IndexNames.News_Published_Search);
+            if (!addElastic)
+            {
+                result.SetError("ElasticSearch'de veri güncellenemedi.");
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult<List<GetNewsPublishedCacheResponse>>> GetNewsPublishedSearch(string keyword,
+        int size = 10000)
+    {
+        var result = new ServiceResult<List<GetNewsPublishedCacheResponse>>();
+
+        var getElasticSearchNewsResponse = await elasticSearchService
+            .SearchDocumentsAsync<GetNewsPublishedCacheResponse>(
+                IndexNames.News_Published_Search,
+                q => q
+                    .Bool(b => b
+                        .Should(
+                            s => s.Match(m => m.Field(f => f.Title).Query(keyword)),
+                            s => s.Match(m => m.Field(f => f.Headline).Query(keyword)),
+                            s => s.Match(t => t.Field(f => f.SubTitle).Query(keyword)),
+                            s => s.Match(t => t.Field(f => f.UpSubtitle).Query(keyword))
+                        )
+                        .MinimumShouldMatch(1)
+                    ),
+                sort => sort
+                    .Field(f => f.PublishDate, field => field.Order(SortOrder.Desc)),
+                size: size
+            );
+
+        if (getElasticSearchNewsResponse != null)
+        {
+            result.Data = getElasticSearchNewsResponse.ToList();
+        }
+        else
+        {
+            result.SetError("ElasticSearch'ten veri alınırken hata oluştu.");
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshNewsByCategorySlug(int categoryID)
+    {
+        var result = new ServiceResult<GetNewsListCachingResponse>
+        {
+            Data = new GetNewsListCachingResponse
+            {
+                SurveyNewsTwo = new List<SurveyNewsCaching>(),
+                SurveyNewsSix = new List<SurveyNewsCaching>(),
+                SurveyNewsOthers = new List<SurveyNewsCaching>(),
+                CategoryTwo = new List<CategoryNewsCaching>(),
+                CategorySix = new List<CategoryNewsCaching>(),
+                CategoryTen = new List<CategoryNewsCaching>(),
+                CategoryOthers = new List<CategoryNewsCaching>(),
+                ZodiacSignNews = new List<CategoryNewsCaching>(),
+                ZodiacSignNewsForSlider = new List<ZodiacSignNewsForSliderCaching>(),
+            }
+        };
+
+        var categoryResponseModel = await (from cat in _context.Categories
+            where cat.ID == categoryID
+            select new GetNewsListCachingResponse()
+            {
+                CategoryBreadcrumb = cat.Breadcrumb,
+                CategoryName = cat.Name,
+                CategoryID = cat.ID,
+                CategorySlug = cat.Url.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                SeoDescription = !string.IsNullOrEmpty(cat.SeoDescription) ? cat.SeoDescription : cat.Name,
+                SeoTitle = !string.IsNullOrEmpty(cat.SeoTitle) ? cat.SeoTitle : cat.Name,
+            }).FirstOrDefaultAsync();
+
+
+        if (categoryID != (int)CategoryEnum.Survey
+            && categoryID != (int)CategoryEnum.GovernmentAnnouncement
+            && categoryID != (int)CategoryEnum.Astrologie)
+        {
+            var categoryNews = await (from np in _context.NewsPublished
+                let photo = (from ph in _context.NewsPublishedPhotos
+                    where ph.NewsID == np.NewsID &&
+                          (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                           ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                    orderby
+                        ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                            ? 0
+                            : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                              !string.IsNullOrEmpty(ph.PhotoUrl)
+                                ? 1
+                                : 2
+                    select ph).FirstOrDefault()
+                where np.CategoryID == categoryID
+                orderby np.PublishedDate descending
+                select new CategoryNewsCaching()
+                {
+                    ID = (int)np.NewsID,
+                    Headline = !string.IsNullOrEmpty(np.Headline) ? np.Headline
+                        : !string.IsNullOrEmpty(np.Title) ? np.Title
+                        : null,
+                    UpSubtitle = !string.IsNullOrEmpty(np.UpSubtitle) ? np.UpSubtitle
+                        : !string.IsNullOrEmpty(np.Subtitle) ? np.Subtitle
+                        : np.Content.ExtractTextFromHtml(),
+                    Slug = np.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                    ImageURL = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                }).Take(30).ToListAsync();
+
+            categoryResponseModel.CategoryTwo = categoryNews.Take(2).ToList();
+            categoryResponseModel.CategorySix = categoryNews.Skip(2).Take(6).ToList();
+            categoryResponseModel.CategoryOthers = categoryNews.Skip(8).Take(22).ToList();
+        }
+
+        if (categoryID == (int)CategoryEnum.Astrologie)
+        {
+            var zodiacSignNews = await (from np in _context.NewsPublished
+                let photo = (from ph in _context.NewsPublishedPhotos
+                    where ph.NewsID == np.NewsID &&
+                          (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                           ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                    orderby
+                        ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                            ? 0
+                            : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                              !string.IsNullOrEmpty(ph.PhotoUrl)
+                                ? 1
+                                : 2
+                    select ph).FirstOrDefault()
+                where np.CategoryID == categoryID
+                orderby np.PublishedDate descending
+                select new CategoryNewsCaching()
+                {
+                    ID = (int)np.NewsID,
+                    UpHeadline = np.UpHeadline,
+                    Headline = !string.IsNullOrEmpty(np.Headline) ? np.Headline
+                        : !string.IsNullOrEmpty(np.Title) ? np.Title
+                        : null,
+                    UpSubtitle = !string.IsNullOrEmpty(np.UpSubtitle) ? np.UpSubtitle
+                        : !string.IsNullOrEmpty(np.Subtitle) ? np.Subtitle
+                        : np.Content.ExtractTextFromHtml(),
+                    Slug = np.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                    ImageURL = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                    PublishDate = np.PublishedDate.ToFormattedDate()
+                }).Take(30).ToListAsync();
+
+
+            categoryResponseModel.ZodiacSignNews = zodiacSignNews.Skip(10).ToList();
+            categoryResponseModel.ZodiacSignNewsForSlider = zodiacSignNews.Take(10).Select(x =>
+                new ZodiacSignNewsForSliderCaching()
+                {
+                    Slug = x.Slug,
+                    Headline = x.Headline,
+                    UpHeadline = x.UpHeadline,
+                    ShowUpHeadline = !string.IsNullOrEmpty(x.UpHeadline),
+                    ImageURL = x.ImageURL
+                }).ToList();
+        }
+
+        if (categoryID == (int)CategoryEnum.Survey)
+        {
+            var surveyNews = await _context.NewsPublished
+                .Where(np => np.NewsTypeID == (int)NewsTypesEnum.Survey)
+                .Select(np => new
+                {
+                    NewsPublishedForSurvey = np,
+                    NewsVersions = _context.NewsVersions
+                        .Where(nv => nv.NewsID == np.NewsID)
+                        .OrderByDescending(nv => nv.ID)
+                        .ToList()
+                })
+                .ToListAsync();
+
+
+            var allSurveyNews = surveyNews
+                .Select(x => new
+                {
+                    x.NewsPublishedForSurvey,
+                    LatestSurvey = x.NewsVersions
+                        .Select(nv => _context.Surveys
+                            .Where(s => s.NewsVersionID == nv.ID)
+                            .OrderByDescending(s => s.ID)
+                            .FirstOrDefault())
+                        .FirstOrDefault(s => s != null)
+                })
+                .Where(x => x.LatestSurvey != null)
+                .Select(x => new SurveyNewsCaching()
+                {
+                    ID = x.LatestSurvey.ID,
+                    Title = x.NewsPublishedForSurvey.Title ?? x.LatestSurvey.Question,
+                    Question = x.LatestSurvey.Question ?? x.NewsPublishedForSurvey.Title,
+                    Slug = _appSettingsKeys.Common_ClientWebSite + x.NewsPublishedForSurvey.Slug.TrimStart('/'),
+                    ImageURL = _context.NewsPublishedPhotos
+                        .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                    p.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto)
+                        .FirstOrDefault().PhotoUrl != null
+                        ? _context.NewsPublishedPhotos
+                            .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                        p.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto)
+                            .FirstOrDefault().PhotoUrl
+                            .PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_MediaGalleryFolder)
+                        : _context.NewsPublishedPhotos
+                            .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                        p.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                            .FirstOrDefault().PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                _appSettingsKeys.CDN_MediaGalleryFolder),
+                    RemainingTime = x.LatestSurvey.EndDate.DateToShortCountdown(x.LatestSurvey.StartDate),
+                    JoinedUserCount = (int)_context.SurveyOptions
+                        .Where(so => so.SurveyID == x.LatestSurvey.ID)
+                        .Sum(so => so.AnswerCount),
+                })
+                .OrderByDescending(sn => sn.JoinedUserCount)
+                .ToList();
+
+            if (allSurveyNews.Any())
+            {
+                categoryResponseModel.SurveyNewsTwo = allSurveyNews.Take(2).ToList();
+                categoryResponseModel.SurveyNewsSix = allSurveyNews.Skip(2).Take(8).ToList();
+                categoryResponseModel.SurveyNewsOthers = allSurveyNews.Skip(8).ToList();
+            }
+        }
+
+        if (categoryID == (int)CategoryEnum.GovernmentAnnouncement)
+        {
+            var governmentAnnouncementNews = await (from np in _context.NewsPublished
+                let photo = (from ph in _context.NewsPublishedPhotos
+                    where ph.NewsID == np.NewsID &&
+                          (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                           ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                    orderby
+                        ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                            ? 0
+                            : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                              !string.IsNullOrEmpty(ph.PhotoUrl)
+                                ? 1
+                                : 2
+                    select ph).FirstOrDefault()
+                where np.CategoryID == categoryID && np.PublishedDate.Date == DateTime.Now.Date
+                orderby np.PublishedDate descending
+                select new CategoryNewsCaching()
+                {
+                    ID = (int)np.NewsID,
+                    Headline = !string.IsNullOrEmpty(np.Headline) ? np.Headline
+                        : !string.IsNullOrEmpty(np.Title) ? np.Title
+                        : null,
+                    Slug = np.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                    ImageURL = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                    PressNo = np.PressNo,
+                }).Take(32).ToListAsync();
+
+            categoryResponseModel.GovernmentAnnouncementNews = governmentAnnouncementNews;
+        }
+
+        categoryResponseModel.ID = categoryID;
+        result.Data = categoryResponseModel;
+
+        var jsonData = JsonConvert.SerializeObject(categoryResponseModel);
+        await _cache.Set(string.Format(RedisKeys.NewsByCategorySlug, categoryID), jsonData,
+            RedisTTLSeconds.NewsByCategorySlug_TTL);
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshNewsByTagSlug(string tagSlug)
+    {
+        var result = new ServiceResult<GetNewsListCachingResponse>
+        {
+            Data = new GetNewsListCachingResponse
+            {
+                SurveyNewsTwo = new List<SurveyNewsCaching>(),
+                SurveyNewsSix = new List<SurveyNewsCaching>(),
+                SurveyNewsOthers = new List<SurveyNewsCaching>(),
+                CategoryTwo = new List<CategoryNewsCaching>(),
+                CategorySix = new List<CategoryNewsCaching>(),
+                CategoryTen = new List<CategoryNewsCaching>(),
+                CategoryOthers = new List<CategoryNewsCaching>(),
+                ZodiacSignNews = new List<CategoryNewsCaching>(),
+                ZodiacSignNewsForSlider = new List<ZodiacSignNewsForSliderCaching>(),
+            }
+        };
+
+        var tagWithResponse = await (from t in _context.Tags
+            where t.Url.Contains(tagSlug)
+            select new GetNewsListCachingResponse
+            {
+                TagBreadcrumb = t.Breadcrumb,
+                TagName = t.Text,
+                TagID = t.ID,
+                TagSlugWithoutClientURL = t.Url,
+                TagSlug = t.Url.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                SeoDescription = t.SeoDescription,
+                SeoTitle = t.SeoTitle,
+            }).FirstOrDefaultAsync();
+
+        if (tagWithResponse == null)
+        {
+            result.SetError("Tag bulunamadı.");
+            return result;
+        }
+
+        var newsWithTag = await _context.NewsTags
+            .Where(nt => nt.TagID == tagWithResponse.TagID)
+            .Select(nt => nt.NewsID)
+            .Distinct()
+            .ToListAsync();
+
+        var categoryNews = await _context.NewsPublished
+            .Where(np => newsWithTag.Contains(np.NewsID))
+            .OrderByDescending(np => np.PublishedDate)
+            .Take(29)
+            .Select(np => new
+            {
+                NewsPublished = np,
+                PhotoUrl = _context.NewsPublishedPhotos
+                    .Where(ph => ph.NewsID == np.NewsID &&
+                                 (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                                  ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto))
+                    .OrderBy(ph =>
+                        ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                            ? 0
+                            : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                              !string.IsNullOrEmpty(ph.PhotoUrl)
+                                ? 1
+                                : 2)
+                    .Select(ph => ph.PhotoUrl)
+                    .FirstOrDefault()
+            })
+            .ToListAsync();
+
+        var mappedCategoryNews = categoryNews
+            .Select(x => new CategoryNewsCaching
+            {
+                ID = (int)x.NewsPublished.NewsID,
+                Headline = !string.IsNullOrEmpty(x.NewsPublished.Headline) ? x.NewsPublished.Headline
+                    : !string.IsNullOrEmpty(x.NewsPublished.Title) ? x.NewsPublished.Title
+                    : null,
+                UpSubtitle = !string.IsNullOrEmpty(x.NewsPublished.UpSubtitle) ? x.NewsPublished.UpSubtitle
+                    : !string.IsNullOrEmpty(x.NewsPublished.Subtitle) ? x.NewsPublished.Subtitle
+                    : x.NewsPublished.Content,
+                Slug = x.NewsPublished.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                SlugWithOutClientURL = x.NewsPublished.Slug,
+                ImageURL = x.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                    _appSettingsKeys.CDN_MediaGalleryFolder)
+            })
+            .ToList();
+
+        tagWithResponse.CategoryNine = mappedCategoryNews.Take(9).ToList();
+        tagWithResponse.CategoryOthers = mappedCategoryNews.Skip(9).Take(20).ToList();
+
+        result.Data = tagWithResponse;
+        var jsonData = JsonConvert.SerializeObject(tagWithResponse);
+        await _cache.Set(string.Format(RedisKeys.NewsByTagSlug, tagSlug), jsonData, RedisTTLSeconds.NewsByTagSlug_TTL);
+
+        return result;
+    }
+
+    public async Task<ServiceResult<GetNewsListCachingResponse>> GetCachingNewsByCategorySlug(int categoryID)
+    {
+        var result = new ServiceResult<GetNewsListCachingResponse>();
+
+        result.Data =
+            await _cache.Get<GetNewsListCachingResponse>(string.Format(RedisKeys.NewsByCategorySlug, categoryID));
+
+        if (result.Data == null)
+        {
+            await RefreshNewsByCategorySlug(categoryID);
+            result.Data =
+                await _cache.Get<GetNewsListCachingResponse>(string.Format(RedisKeys.NewsByCategorySlug, categoryID));
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult<List<AuthorsLastColumnArticlesCacheResponse>>> GetAuthorLastNews(int authorID)
+    {
+        var result = new ServiceResult<List<AuthorsLastColumnArticlesCacheResponse>>();
+
+        result.Data =
+            await _cache.Get<List<AuthorsLastColumnArticlesCacheResponse>>(string.Format(RedisKeys.AuthorLastNews,
+                authorID));
+
+        if (result.Data == null || result.Data.Count == 0)
+        {
+            await RefreshAuthorLastNews(authorID);
+            result.Data =
+                await _cache.Get<List<AuthorsLastColumnArticlesCacheResponse>>(string.Format(RedisKeys.AuthorLastNews,
+                    authorID));
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshNewsBySourceIds(List<int> ids)
+    {
+        var result = new ServiceResult();
+
+        if (ids == null || ids.Count == 0)
+        {
+            return result;
+        }
+
+        var sources = await _context.Sources
+            .Where(x => ids.Contains(x.ID))
+            .Select(x => new
+            {
+                ID = x.ID,
+                Url = x.Url.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+            }).ToListAsync();
+
+        foreach (var source in sources)
+        {
+            await RefreshNewsBySourceSlug(source.Url);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshNewsBySourceSlug(string sourceSlug)
+    {
+        var result = new ServiceResult<GetNewsListCachingResponse>
+        {
+            Data = new GetNewsListCachingResponse()
+            {
+                SurveyNewsTwo = new List<SurveyNewsCaching>(),
+                SurveyNewsSix = new List<SurveyNewsCaching>(),
+                SurveyNewsOthers = new List<SurveyNewsCaching>(),
+                CategoryTwo = new List<CategoryNewsCaching>(),
+                CategorySix = new List<CategoryNewsCaching>(),
+                CategoryTen = new List<CategoryNewsCaching>(),
+                CategoryOthers = new List<CategoryNewsCaching>(),
+                ZodiacSignNews = new List<CategoryNewsCaching>(),
+                ZodiacSignNewsForSlider = new List<ZodiacSignNewsForSliderCaching>(),
+            }
+        };
+
+        var sourceWithResponse = await (from src in _context.Sources
+            where src.Url == sourceSlug
+            select new GetNewsListCachingResponse()
+            {
+                SourceBreadcrumb = src.Breadcrumb,
+                SourceName = src.Name,
+                SourceID = src.ID,
+                SourceSlug = src.Url.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                SourceSlugWithoutClientURL = src.Url
+            }).FirstOrDefaultAsync();
+
+        if (sourceWithResponse == null)
+        {
+            result.SetError("Kaynak bulunamadı.");
+            return result;
+        }
+
+        int sourceId = sourceWithResponse.SourceID;
+
+
+        var categoryNews = await (from np in _context.NewsPublished
+                let photo = (from ph in _context.NewsPublishedPhotos
+                    where ph.NewsID == np.NewsID &&
+                          (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                           ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                    orderby
+                        ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                            ? 0
+                            : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                              !string.IsNullOrEmpty(ph.PhotoUrl)
+                                ? 1
+                                : 2
+                    select ph).FirstOrDefault()
+                where
+                    np.SourceIDs == sourceId.ToString() ||
+                    np.SourceIDs.StartsWith(sourceId + ",") ||
+                    np.SourceIDs.Contains("," + sourceId + ",") ||
+                    np.SourceIDs.EndsWith("," + sourceId)
+                orderby
+                    np.PublishedDate descending
+                select new
+                {
+                    np,
+                    photo = photo.PhotoUrl
+                })
+            .Take(29)
+            .ToListAsync();
+
+        var finalResult = categoryNews.Select(x => new CategoryNewsCaching()
+        {
+            ID = (int)x.np.NewsID,
+            Headline = !string.IsNullOrEmpty(x.np.Headline) ? x.np.Headline
+                : !string.IsNullOrEmpty(x.np.Title) ? x.np.Title
+                : null,
+            UpSubtitle = !string.IsNullOrEmpty(x.np.UpSubtitle) ? x.np.UpSubtitle
+                : !string.IsNullOrEmpty(x.np.Subtitle) ? x.np.Subtitle
+                : x.np.Content.ExtractTextFromHtml(),
+            Slug = x.np.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+            SlugWithOutClientURL = x.np.Slug,
+            ImageURL = x.photo?.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                _appSettingsKeys.CDN_MediaGalleryFolder),
+        }).ToList();
+
+        sourceWithResponse.CategoryNine = finalResult.Take(9).ToList();
+        sourceWithResponse.CategoryOthers = finalResult.Skip(9).Take(20).ToList();
+
+        sourceWithResponse.ID = sourceId;
+
+        result.Data = sourceWithResponse;
+
+        var jsonData = JsonConvert.SerializeObject(sourceWithResponse);
+        await _cache.Set(string.Format(RedisKeys.NewsBySourceSlug, sourceSlug), jsonData,
+            RedisTTLSeconds.NewsBySourceSlug_TTL);
+
+        return result;
+    }
+
+    public async Task<ServiceResult<GetNewsListCachingResponse>> GetCachingNewsByTagSlug(string tagSlug)
+    {
+        var result = new ServiceResult<GetNewsListCachingResponse>();
+
+        result.Data =
+            await _cache.Get<GetNewsListCachingResponse>(string.Format(RedisKeys.NewsByTagSlug, tagSlug));
+
+        if (result.Data == null)
+        {
+            await RefreshNewsByTagSlug(tagSlug);
+            result.Data = await _cache.Get<GetNewsListCachingResponse>(string.Format(RedisKeys.NewsByTagSlug, tagSlug));
+            if (result.Data == null)
+            {
+                result.SetError("Tag bulunamadı.");
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult<List<MostViewNewsCachingResponse>>> GetMostViewNews()
+    {
+        var result = new ServiceResult<List<MostViewNewsCachingResponse>>();
+
+        result.Data = await _cache.Get<List<MostViewNewsCachingResponse>>(RedisKeys.MostViewNews);
+        if (result.Data == null)
+        {
+            await RefreshMostViewNews();
+            result.Data = await _cache.Get<List<MostViewNewsCachingResponse>>(RedisKeys.MostViewNews);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshMostViewNews()
+    {
+        var result = new ServiceResult();
+
+        var news = await (
+            from np in _context.NewsPublished
+            join n in _context.News on np.NewsID equals n.ID
+            where np.PublishedDate >= DateTime.Now.AddDays(-1) // son 24 saat
+            let photo = (from ph in _context.NewsPublishedPhotos
+                where ph.NewsID == np.NewsID &&
+                      (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                       ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                orderby
+                    ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                        ? 0
+                        : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                            ? 1
+                            : 2
+                select ph).FirstOrDefault()
+            orderby n.ViewCount descending
+            select new MostViewNewsCachingResponse()
+            {
+                ID = (int)np.NewsID,
+                Headline = np.Headline ?? np.Title,
+                UpSubtitle = np.UpSubtitle ?? np.Subtitle ?? np.Content.ExtractTextFromHtml(),
+                Slug = _appSettingsKeys.Common_ClientWebSite + np.Slug.TrimStart('/'),
+                ImageURL = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                    _appSettingsKeys.CDN_MediaGalleryFolder),
+            }).Take(10).ToListAsync();
+
+        var jsonData = JsonConvert.SerializeObject(news);
+        await _cache.Set(RedisKeys.MostViewNews, jsonData, RedisTTLSeconds.MostViewedNews_TTL);
+        return result;
+    }
+
+    public async Task<ServiceResult<GetNewsListCachingResponse>> GetCachingNewsBySourceSlug(string sourceSlug)
+    {
+        var result = new ServiceResult<GetNewsListCachingResponse>();
+
+        result.Data =
+            await _cache.Get<GetNewsListCachingResponse>(string.Format(RedisKeys.NewsBySourceSlug, sourceSlug));
+
+        if (result.Data == null)
+        {
+            await RefreshNewsBySourceSlug(sourceSlug);
+            result.Data =
+                await _cache.Get<GetNewsListCachingResponse>(string.Format(RedisKeys.NewsBySourceSlug, sourceSlug));
+            if (result.Data == null)
+            {
+                result.SetError("Kaynak bulunamadı.");
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult<GetCachingNewsDetailResponse>> CreateNewsDetail(int newsId)
+    {
+        var result = new ServiceResult<GetCachingNewsDetailResponse>();
+
+        try
+        {
+            var isPublished = await _context.NewsPublished
+                .Where(x => x.NewsID == newsId).AnyAsync();
+
+            if (!isPublished)
+            {
+                result.SetError("Haber bulunamadı.");
+                return result;
+            }
+
+            var procedureModel = await GetNewsDetailWithDbProcedure(newsId);
+
+            if (!procedureModel.IsSuccess)
+            {
+                result.SetError(procedureModel.Message);
+                return result;
+            }
+
+            var news = new GetCachingNewsDetailResponse
+            {
+                ID = newsId,
+                NewsSlug = procedureModel.Data.NewsSlug,
+                NewsTypeID = procedureModel.Data.NewsTypeID,
+                Title = procedureModel.Data.Title,
+                SubTitle = procedureModel.Data.SubTitle,
+                Content = procedureModel.Data.Content,
+                Headline = procedureModel.Data.Headline,
+                UpHeadline = procedureModel.Data.UpHeadline,
+                UpdateDate = procedureModel.Data.UpdateDate,
+                CreatedDate = procedureModel.Data.CreatedDate,
+                PublishDate = procedureModel.Data.PublishDate,
+                SourceIDs = procedureModel.Data.SourceIDs,
+                AuthorID = procedureModel.Data.AuthorID,
+                CategoryID = procedureModel.Data.CategoryID,
+                PressNo = procedureModel.Data.PressNo,
+                BoxCount = procedureModel.Data.BoxCount,
+                UpSubtitle = procedureModel.Data.UpSubtitle,
+                Subheading = procedureModel.Data.Subheading,
+                UpSubheading = procedureModel.Data.UpSubheading,
+                CategorySlug = procedureModel.Data.CategorySlug,
+                CategoryName = procedureModel.Data.CategoryName,
+                CategoryBreadcrumb = procedureModel.Data.CategoryBreadcrumb,
+                Video = procedureModel.Data.Video,
+                VideoPlayerID = procedureModel.Data.VideoPlayerID,
+                SecondaryCategoryMap = procedureModel.Data.SecondaryCategoryMap,
+                SeoDescription = procedureModel.Data.SeoDescription.ExtractTextFromHtml(150),
+                SeoTitle = procedureModel.Data.SeoTitle,
+                CoverPhoto = procedureModel.Data.CoverPhoto,
+            };
+
+            if (string.IsNullOrEmpty(news.SubTitle))
+            {
+                news.SubTitle = news.Content.ExtractTextFromHtml(150);
+            }
+
+            var offsetUpdatedDate = new DateTimeOffset(news.UpdateDate, TimeSpan.FromHours(3));
+            var offsetUPublishedDate = new DateTimeOffset(news.PublishDate, TimeSpan.FromHours(3));
+            var formattedUpdateDate =
+                offsetUpdatedDate.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
+            var formattedPublishedDate =
+                offsetUPublishedDate.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
+
+            news.UpdateDateForMetaTag = formattedUpdateDate;
+            news.PublishDateForMetaTag = formattedPublishedDate;
+
+            news.Tags = news.TagList != null ? string.Join(", ", news.TagList.Select(x => x.Text)) : string.Empty;
+
+            #region Yazar İşlemleri
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles ||
+                news.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews)
+            {
+                var authorCache = await _cache.Get<List<Author>>(RedisKeys.AuthorTable);
+                var author = new AuthorCachingResponse();
+                if (authorCache.Any())
+                {
+                    author = authorCache
+                        .Where(a => a.ID == news.AuthorID)
+                        .Select(x => new AuthorCachingResponse
+                        {
+                            ID = x.ID,
+                            Firstname = x.Firstname,
+                            Lastname = x.Lastname,
+                            Url = x.Url,
+                            Photo = x.ClichePhoto,
+                            AuthorSocialFacebook = x.FacebookUrl,
+                            AuthorSocialInstagram = x.InstagramUrl,
+                            AuthorSocialLinkedIn = x.LinkedinUrl,
+                            AuthorSocialMail = x.Email,
+                            AuthorSocialX = x.XUrl
+                        }).FirstOrDefault();
+                }
+                else
+                {
+                    var authors = await _context.Authors.ToListAsync();
+                    author = authors.Select(x => new AuthorCachingResponse
+                    {
+                        ID = x.ID,
+                        Firstname = x.Firstname,
+                        Lastname = x.Lastname,
+                        Url = x.Url,
+                        Photo = x.ClichePhoto,
+                        AuthorSocialFacebook = x.FacebookUrl,
+                        AuthorSocialInstagram = x.InstagramUrl,
+                        AuthorSocialLinkedIn = x.LinkedinUrl,
+                        AuthorSocialMail = x.Email,
+                        AuthorSocialX = x.XUrl
+                    }).FirstOrDefault(a => a.ID == news.AuthorID);
+
+                    var jsonData = JsonConvert.SerializeObject(authors);
+                    await _cache.Set(RedisKeys.AuthorTable, jsonData);
+                }
+
+                news.AuthorName = author != null
+                    ? $"{author.Firstname} {author.Lastname}".Trim()
+                    : string.Empty;
+                news.AuthorSlug = author != null
+                    ? _appSettingsKeys.Common_ClientWebSite + author.Url.TrimStart('/')
+                    : string.Empty;
+
+                if (author != null)
+                {
+                    news.CachingNewsDetailColumnArticleDetails = new CachingNewsDetailColumnArticleDetails
+                    {
+                        AuthorFullName = news.AuthorName,
+                        AuthorSlug = _appSettingsKeys.Common_ClientWebSite + author.Url.TrimStart('/'),
+                        AuthorPhoto =
+                            author.Photo.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_AuthorPhotos),
+                        AuthorSocialFacebook = author.AuthorSocialFacebook,
+                        AuthorSocialInstagram = author.AuthorSocialInstagram,
+                        AuthorSocialX = author.AuthorSocialX,
+                        AuthorSocialLinkedIn = author.AuthorSocialLinkedIn,
+                        AuthorSocialMail = author.AuthorSocialMail,
+                    };
+                }
+            }
+
+            #endregion
+
+            #region Foto Galeri
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+            {
+                var cachePhotoGalleryItems = await newsPhotosCachingService.GetNewsPublishedPhotoGalleryItems(news.ID);
+                if (cachePhotoGalleryItems.IsSuccess)
+                {
+                    news.PhotoGalleryItems = cachePhotoGalleryItems.Data.Select(x =>
+                        new CachingNewsDetailPhotoGalleryItem
+                        {
+                            ImageURL = x.PhotoUrl,
+                            Content = x.Content
+                        }).ToList();
+                }
+                else
+                {
+                    var photoGalleryItemIds =
+                        procedureModel.Data.PhotoGalleryItemIDs.Split(",").Select(int.Parse).ToList();
+                    news.PhotoGalleryItems = await _context.NewsPublishedPhotoGalleryItems
+                        .Where(x => photoGalleryItemIds.Contains(x.ID))
+                        .OrderBy(x => x.Order)
+                        .Select(x => new CachingNewsDetailPhotoGalleryItem
+                        {
+                            ImageURL = x.PhotoUrl,
+                            Content = x.Content
+                        }).ToListAsync();
+                }
+            }
+
+            #endregion
+
+            #region Kaynaklar
+
+            var sourceIDModel = procedureModel.Data.SourceIDs;
+            if (sourceIDModel != null)
+            {
+                var sourceIds = sourceIDModel.Split(",").Select(int.Parse).ToList();
+                var sourceCachingList = await sourceCachingService.GetNewsSourceList();
+                if (sourceCachingList.IsSuccess)
+                {
+                    news.SourceList = sourceCachingList.Data
+                        .Where(x => sourceIds.Contains(x.ID))
+                        .Select(x => new CachingNewsDetailSourceList
+                        {
+                            ID = x.ID,
+                            Name = x.Name,
+                            Slug = _appSettingsKeys.Common_ClientWebSite + _appSettingsKeys.SlugPrefix_Sources + "/" +
+                                   x.Url.TrimStart('/')
+                        }).ToList();
+                }
+                else
+                {
+                    news.SourceList = await _context.Sources
+                        .Where(x => sourceIds.Contains(x.ID))
+                        .Select(x => new CachingNewsDetailSourceList
+                        {
+                            ID = x.ID,
+                            Name = x.Name,
+                            Slug = _appSettingsKeys.Common_ClientWebSite + _appSettingsKeys.SlugPrefix_Sources + "/" +
+                                   x.Url.TrimStart('/')
+                        }).ToListAsync();
+                }
+
+                news.Sources = string.Join(", ", news.SourceList.Select(x => x.Name));
+            }
+
+            #endregion
+
+            #region İkincil Kategoriler
+
+            if (procedureModel.Data.SecondaryCategoryIDList != null)
+            {
+                news.SecondaryCategoryIDList =
+                    procedureModel.Data.SecondaryCategoryIDList.Split(",").Select(int.Parse).ToList();
+                news.SecondaryCategoryNameList = procedureModel.Data.SecondaryCategoryNameList.Split(",").ToList();
+            }
+
+            #endregion
+
+            #region Kapak Fotoğrafı
+
+            var coverPhotoInformation = news.CoverPhoto.Split(",");
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles
+                && Convert.ToInt32(coverPhotoInformation[1]) == (int)NewsPhotoTypesEnum.CoverPhoto)
+            {
+                news.CoverPhoto = !(coverPhotoInformation[0].IsNullOrEmtpy())
+                    ? coverPhotoInformation[0]
+                        .PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_AuthorPhotos)
+                    : string.Empty;
+            }
+            else
+            {
+                news.CoverPhoto = !(coverPhotoInformation[0].IsNullOrEmtpy())
+                    ? coverPhotoInformation[0].PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder)
+                    : string.Empty;
+            }
+
+            #endregion
+
+            #region Etiketler
+
+            if (!procedureModel.Data.TagIDsList.IsNullOrEmtpy())
+            {
+                var cacheTagList =
+                    await tagCachingService.GetTagsElastic(procedureModel.Data.TagIDsList.Split(",").Select(int.Parse)
+                        .ToList());
+                news.TagList = cacheTagList.Data.Select(x => new CachingNewsDetailTagList
+                {
+                    ID = x.ID,
+                    Text = x.Text,
+                    Slug = _appSettingsKeys.Common_ClientWebSite + _appSettingsKeys.SlugPrefix_Tags + "/" +
+                           x.Url.TrimStart('/')
+                }).ToList();
+            }
+
+            #endregion
+
+            #region Kategori Haberleri
+
+            var mostViewNews = await GetMostViewNews();
+
+            if (mostViewNews.IsSuccess)
+            {
+                var cacheMostView = mostViewNews.Data
+                    .Select(x => new CachingNewsDetailCategoryNews()
+                    {
+                        ID = x.ID,
+                        Headline = x.Headline,
+                        UpSubtitle = x.UpSubtitle,
+                        Slug = x.Slug,
+                        ImageURL = x.ImageURL
+                    })
+                    .Take(4)
+                    .ToList();
+
+                news.CategoryNewsList = cacheMostView;
+            }
+
+            #endregion
+
+            #region İlişkili Haberler
+
+            if (procedureModel.Data.RelatedNewsIDsList != null)
+            {
+                var idList = procedureModel.Data.RelatedNewsIDsList.Split(",").Select(int.Parse).ToList();
+
+                news.RelatedNewsList = await (from np in _context.NewsPublished
+                    let photo = (from ph in _context.NewsPhotos
+                        where ph.NewsID == np.NewsID &&
+                              (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                               ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                        orderby
+                            ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                ? 0
+                                : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                                  !string.IsNullOrEmpty(ph.PhotoUrl)
+                                    ? 1
+                                    : 2
+                        select ph).FirstOrDefault()
+                    where idList.Contains((int)np.NewsID) && !string.IsNullOrEmpty(np.Slug)
+                    select new CachingNewsDetailRelatedNews
+                    {
+                        ID = (int)np.NewsID,
+                        Title = np.Title,
+                        Slug = _appSettingsKeys.Common_ClientWebSite + np.Slug.TrimStart('/'),
+                        Subtitle = np.Subtitle,
+                        ImageURL = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                            _appSettingsKeys.CDN_MediaGalleryFolder),
+                    }).ToListAsync();
+            }
+
+            #endregion
+
+            #region Anketler
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.Survey)
+            {
+                var newsVersionIds = await _context.NewsVersions
+                    .Where(x => x.NewsID == news.ID)
+                    .OrderByDescending(x => x.ID)
+                    .Select(x => x.ID)
+                    .ToListAsync();
+
+                Survey survey = null;
+
+                foreach (var versionId in newsVersionIds)
+                {
+                    survey = await _context.Surveys
+                        .Where(x => x.NewsVersionID == versionId)
+                        .FirstOrDefaultAsync();
+
+
+                    if (survey != null)
+                    {
+                        break;
+                    }
+                }
+
+                var surveyOptionList = await _context.SurveyOptions
+                    .Where(x => x.SurveyID == survey.ID && x.NewsVersionID == (int)survey.NewsVersionID)
+                    .ToListAsync();
+
+                var totalAnswerCount = surveyOptionList.Sum(x => x.AnswerCount);
+
+                var surveyOptions = surveyOptionList
+                    .OrderBy(x => x.Order)
+                    .Select(x => new CachingNewsDetailSurveySection
+                    {
+                        Option = x.Option,
+                        Percent =
+                            totalAnswerCount > 0 ? (int)Math.Round((double)x.AnswerCount / totalAnswerCount * 100) : 0,
+                        OptionID = x.ID,
+                        SurveyID = x.SurveyID,
+                    })
+                    .ToList();
+
+
+                var surveyNews = await _context.NewsPublished
+                    .Where(np => np.NewsTypeID == (int)NewsTypesEnum.Survey)
+                    .Select(np => new
+                    {
+                        NewsPublishedForSurvey = np,
+                        NewsVersions = _context.NewsVersions
+                            .Where(nv => nv.NewsID == np.NewsID)
+                            .OrderByDescending(nv => nv.ID)
+                            .ToList()
+                    })
+                    .ToListAsync();
+
+
+                var finalResult = surveyNews
+                    .Select(x => new
+                    {
+                        x.NewsPublishedForSurvey,
+                        LatestSurvey = x.NewsVersions
+                            .Select(nv => _context.Surveys
+                                .Where(s => s.NewsVersionID == nv.ID)
+                                .OrderByDescending(s => s.ID)
+                                .FirstOrDefault())
+                            .FirstOrDefault(s => s != null)
+                    })
+                    .Where(x => x.LatestSurvey != null)
+                    .Select(x => new CachingNewsDetailSurveyNews
+                    {
+                        ID = x.LatestSurvey.ID,
+                        Title = x.NewsPublishedForSurvey.Title ?? x.LatestSurvey.Question,
+                        Question = x.LatestSurvey.Question ?? x.NewsPublishedForSurvey.Title,
+                        Slug = _appSettingsKeys.Common_ClientWebSite + x.NewsPublishedForSurvey.Slug.TrimStart('/'),
+                        ImageURL = _context.NewsPublishedPhotos
+                            .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                        p.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto)
+                            .FirstOrDefault().PhotoUrl != null
+                            ? _context.NewsPublishedPhotos
+                                .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                            p.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto)
+                                .FirstOrDefault().PhotoUrl
+                                .PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_MediaGalleryFolder)
+                            : _context.NewsPublishedPhotos
+                                .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                            p.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                                .FirstOrDefault().PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                    _appSettingsKeys.CDN_MediaGalleryFolder),
+                        RemainingTime = x.LatestSurvey.EndDate.DateToShortCountdown(x.LatestSurvey.StartDate),
+                        JoinedUserCount = (int)_context.SurveyOptions
+                            .Where(so => so.SurveyID == x.LatestSurvey.ID)
+                            .Sum(so => so.AnswerCount),
+                    })
+                    .OrderByDescending(sn => sn.JoinedUserCount)
+                    .Take(7)
+                    .ToList();
+
+                news.CachingNewsDetailSurveyElements = new CachingNewsDetailSurveyElements
+                {
+                    JoinedUserCount = (int)surveyOptionList.Select(x => x.AnswerCount).ToList().Sum(),
+                    RemainingTime = survey.EndDate.DateToLongCountdown(survey.StartDate),
+                    SurveyQuestion = survey.Question,
+                    SurveySections = surveyOptions,
+                    CategoryNews = news.CategoryNewsList.Take(3).ToList(),
+                    SurveyNewsThird = finalResult.Take(3).ToList(),
+                    SurveyNewsQuad = finalResult.Skip(3).Take(4).ToList()
+                };
+            }
+
+            #endregion
+
+            result.Data = news;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            result.SetError($"Haber detayı oluşturulurken hata oluştu: {ex.Message}");
+            return result;
+        }
+    }
+
+    public async Task<ServiceResult> RefreshNewsDetails(int id)
+    {
+        var result = new ServiceResult();
+
+        var detailPage = await CreateNewsDetail(id);
+
+        if (!detailPage.IsSuccess)
+        {
+            result.Message = detailPage.Message;
+            return result;
+        }
+
+        var jsonData = JsonConvert.SerializeObject(detailPage.Data);
+        await _cache.Set(string.Format(RedisKeys.NewsDetail, id), jsonData, RedisTTLSeconds.NewsDetail_TTL);
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshAuthorSideColumnArticles()
+    {
+        var result = new ServiceResult();
+
+        var maxArticleDate = await _context.NewsPublished
+            .Where(np => np.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+            .MaxAsync(x => x.PublishedDate);
+
+        var newTodaysColumnArticles = await (from np in _context.NewsPublished
+            join a in _context.Authors on np.AuthorID equals a.ID
+            where np.PublishedDate.Date == maxArticleDate.Date &&
+                  np.NewsTypeID == (int)NewsTypesEnum.ColumnArticles
+            orderby a.Order, np.PublishedDate
+            select new CacheTodaysColumnArticles
+            {
+                AuthorFullName = $"{a.Firstname} {a.Lastname}".Trim(),
+                AuthorPhoto = a.ClichePhoto.TrimStart('/').PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                    _appSettingsKeys.CDN_AuthorPhotos),
+                Headline = np.Headline ?? np.Title,
+                Slug = _appSettingsKeys.Common_ClientWebSite + np.Slug.TrimStart('/'),
+                UpSubtitle = np.UpSubtitle ?? np.Subtitle,
+                NewsID = (int)np.NewsID,
+                AuthorID = a.ID
+            }).ToListAsync();
+
+
+        var jsonData = JsonConvert.SerializeObject(newTodaysColumnArticles);
+        await _cache.Set(RedisKeys.TodayColumnArticles, jsonData, RedisTTLSeconds.TodayColumnArticles_TTL);
+        return result;
+    }
+
+    public async Task<ServiceResult<List<CacheTodaysColumnArticles>>> GetAuthorSideColumnArticles()
+    {
+        var result = new ServiceResult<List<CacheTodaysColumnArticles>>();
+
+        result.Data = await _cache.Get<List<CacheTodaysColumnArticles>>(RedisKeys.TodayColumnArticles);
+        if (result.Data == null)
+        {
+            await RefreshAuthorSideColumnArticles();
+            result.Data = await _cache.Get<List<CacheTodaysColumnArticles>>(RedisKeys.TodayColumnArticles);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult<ZodiacSignBlockCacheResponse>> GetMainPageZodiacSignBlock()
+    {
+        var result = new ServiceResult<ZodiacSignBlockCacheResponse>
+        {
+            Data = new ZodiacSignBlockCacheResponse
+            {
+                ZodiacSignItems = new List<ZodiacSignBlockCacheResponseItem>(),
+            }
+        };
+
+        result.Data = await _cache.Get<ZodiacSignBlockCacheResponse>(RedisKeys.ZodiacSignBlock);
+
+        if (result.Data == null)
+        {
+            await RefreshMainPageZodiacSignBlock();
+            result.Data = await _cache.Get<ZodiacSignBlockCacheResponse>(RedisKeys.ZodiacSignBlock);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshMainPageZodiacSignBlock()
+    {
+        var result = new ServiceResult<ZodiacSignBlockCacheResponse>
+        {
+            Data = new ZodiacSignBlockCacheResponse
+            {
+                ZodiacSignItems = new List<ZodiacSignBlockCacheResponseItem>(),
+            }
+        };
+
+        var publishedDates = new List<DateTime>();
+
+
+        var astrologer = await (from a in _context.Authors
+            join ac in _context.AuthorCategories on a.ID equals ac.AuthorID
+            where ac.CategoryID == (int)CategoryEnum.Astrologie
+            select a).FirstOrDefaultAsync();
+
+        foreach (ZodiacSignEnum sign in Enum.GetValues(typeof(ZodiacSignEnum)))
+        {
+            var latestNews = await (from np in _context.NewsPublished
+                where np.CategoryID == (int)CategoryEnum.Astrologie &&
+                      np.SecondaryCategoryMap.Contains(((int)sign).ToString())
+                orderby np.PublishedDate descending
+                select new ZodiacSignBlockCacheResponseItem
+                {
+                    NewsID = np.NewsID,
+                    Slug = np.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                    ZodiacSignType = sign,
+                    PublishDate = np.PublishedDate
+                }).FirstOrDefaultAsync();
+
+            if (latestNews != null)
+            {
+                publishedDates.Add(latestNews.PublishDate);
+                result.Data.ZodiacSignItems.Add(latestNews);
+            }
+        }
+
+        string weekRangeText;
+        var culture = new CultureInfo("tr-TR");
+
+        if (publishedDates.Any())
+        {
+            var minDate = publishedDates.Min();
+            var maxDate = publishedDates.Max();
+
+            if (minDate.Date == maxDate.Date)
+            {
+                var date = maxDate;
+                var startOfWeek = date.AddDays(-(int)date.DayOfWeek + (int)DayOfWeek.Monday - 7);
+                var endOfWeek = startOfWeek.AddDays(6);
+                weekRangeText =
+                    $"{startOfWeek.Day} {startOfWeek.ToString("MMMM", culture)} - {endOfWeek.Day} {endOfWeek.ToString("MMMM", culture)}";
+            }
+            else
+            {
+                weekRangeText =
+                    $"{minDate.Day} {minDate.ToString("MMMM", culture)} - {maxDate.Day} {maxDate.ToString("MMMM", culture)}";
+            }
+
+            result.Data.DateStringForZodiacSignDateRange = weekRangeText;
+        }
+
+        if (astrologer != null)
+        {
+            result.Data.AstrologerName = astrologer.FullName;
+            result.Data.AstrologerImageURL =
+                astrologer.ClichePhoto.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_AuthorPhotos);
+        }
+        else
+        {
+            result.Data.AstrologerName = null;
+            result.Data.AstrologerImageURL = null;
+        }
+
+        var serializedData = JsonConvert.SerializeObject(result.Data);
+        var cacheResponse = await _cache.Set(RedisKeys.ZodiacSignBlock, serializedData,
+            RedisTTLSeconds.MainPageZodiacSignBlock_TTL);
+
+        if (!cacheResponse)
+        {
+            result.Message = "Redis veri güncellenirken hata oluştu.";
+            return result;
+        }
+
+        return result;
+    }
+
+    private async Task<ServiceResult<DbProcedureNewsDetailResponse>> GetNewsDetailWithDbProcedure(int newsID)
+    {
+        var result = new ServiceResult<DbProcedureNewsDetailResponse>();
+        DataTable dataTable = new DataTable();
+
+        try
+        {
+            DbConnection connection = _context.Database.GetDbConnection();
+            DbProviderFactory dbFactory = DbProviderFactories.GetFactory(connection);
+
+            using (var cmd = dbFactory.CreateCommand())
+            {
+                cmd.Connection = connection;
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "[dbo].[NewsDetailCreateModel]";
+                DbParameter dbParameter = cmd.CreateParameter();
+                dbParameter.ParameterName = "@NewsId";
+                dbParameter.DbType = DbType.Int32;
+                dbParameter.Value = newsID;
+                cmd.Parameters.Add(dbParameter);
+
+                using (DbDataAdapter adapter = dbFactory.CreateDataAdapter())
+                {
+                    adapter.SelectCommand = cmd;
+                    adapter.Fill(dataTable);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            result.IsSuccess = false;
+            return result;
+        }
+
+        result.Data = ConvertDataTable<DbProcedureNewsDetailResponse>(dataTable).FirstOrDefault();
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshAuthorDetailLastColumnArticles(string slug)
+    {
+        var result = new ServiceResult();
+        var response = new GetAuthorLastColumnArticlesCacheResponse
+        {
+            AuthorsLastColumnArticles = new List<AuthorsLastColumnArticlesCacheResponse>()
+        };
+        
+        var author = await _context.Authors.FirstOrDefaultAsync(x => x.Url.Contains(slug));
+
+        if (author != null)
+        {
+            var authorsLastColumnArticles = await GetAuthorLastNews(author.ID);
+
+            var authorDetail = new GetAuthorLastColumnArticlesCacheResponse
+            {
+                FullName = $"{author.Firstname} {author.Lastname}".Trim(),
+                Slug = _appSettingsKeys.Common_ClientWebSite + author.Url.TrimStart('/'),
+                Photo = author.ClichePhoto.TrimStart('/')
+                    .PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_AuthorPhotos),
+                SocialFacebook = author.FacebookUrl,
+                SocialInstagram = author.InstagramUrl,
+                SocialX = author.XUrl,
+                SocialLinkedIn = author.LinkedinUrl,
+                SocialMail = author.Email,
+                AuthorsLastColumnArticles = authorsLastColumnArticles.Data,
+                ID = author.ID,
+            };
+
+            response = authorDetail;
+            var jsonData = JsonConvert.SerializeObject(response);
+            await _cache.Set(string.Format(RedisKeys.AuthorLastColumnArticles, slug), jsonData,
+                RedisTTLSeconds.AuthorDetailLastColumnArticles_TTL);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult<GetAuthorLastColumnArticlesCacheResponse>>
+        GetAuthorDetailLastColumnArticles(string slug)
+    {
+        var result = new ServiceResult<GetAuthorLastColumnArticlesCacheResponse>();
+
+        result.Data =
+            await _cache.Get<GetAuthorLastColumnArticlesCacheResponse>(string.Format(RedisKeys.AuthorLastColumnArticles,
+                slug));
+        if (result.Data == null)
+        {
+            await RefreshAuthorDetailLastColumnArticles(slug);
+            result.Data =
+                await _cache.Get<GetAuthorLastColumnArticlesCacheResponse>(
+                    string.Format(RedisKeys.AuthorLastColumnArticles, slug));
+            if (result.Data == null)
+            {
+                result.SetError("Yazar bulunamadı.");
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshAuthorLastNews(int authorID)
+    {
+        var result = new ServiceResult();
+
+        var authorsLastColumnArticles = await (from np in _context.NewsPublished
+            join a in _context.Authors on np.AuthorID equals a.ID
+            where np.AuthorID == authorID
+                  && np.NewsTypeID == (int)NewsTypesEnum.ColumnArticles
+            orderby np.PublishedDate descending
+            select new AuthorsLastColumnArticlesCacheResponse
+            {
+                UpSubtitle = np.UpSubtitle ?? np.Subtitle,
+                Headline = np.Headline ?? np.Title,
+                Slug = _appSettingsKeys.Common_ClientWebSite + np.Slug.TrimStart('/'),
+                PublishDate = np.PublishedDate.ToFormattedDate(),
+                NewsID = (int)np.NewsID,
+            }).Take(40).ToListAsync();
+
+        var jsonData = JsonConvert.SerializeObject(authorsLastColumnArticles);
+        await _cache.Set(string.Format(RedisKeys.AuthorLastNews, authorID), jsonData,
+            RedisTTLSeconds.AuthorLastNews_TTL);
+        return result;
+    }
+
+    public async Task<ServiceResult> RemoveNewsDetails(int id)
+    {
+        var result = new ServiceResult();
+
+        await _cache.Remove(string.Format(RedisKeys.NewsDetail, id));
+        return result;
+    }
+
+    public async Task HandlePublishCacheOperations(News news)
+    {
+        await xmlFeedCachingService.ArchiveGoogleAiNewsAsync(news.ID);
+        await xmlFeedCachingService.RefreshGoogleAiRSS();
+
+        await RefreshNewsDetails(news.ID);
+        await RefreshNewsByCategorySlug(news.CategoryID);
+        await RefreshNewsPublishedSearchByID(news.ID);
+
+        if (news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+        {
+            var authorSlug = _context.Authors.Where(x => x.ID == news.AuthorID).Select(x => x.Url).FirstOrDefault();
+            await RefreshAuthorLastNews(news.AuthorID ?? 0);
+            await RefreshAuthorDetailLastColumnArticles(authorSlug);
+            await RefreshAuthorSideColumnArticles();
+            await authorCachingService.RefreshMainPageAuthorsAll();
+            await authorCachingService.RefreshAuthorNewsTodayList();
+            await authorCachingService.RefreshAuthorCategoryNewsTodayList(authorSlug);
+        }
+
+        if (news.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+        {
+            await newsPhotosCachingService.RefreshNewsPublishedPhotoGalleryItems(news.ID);
+        }
+
+        if (news.NewsTypeID == (int)NewsTypesEnum.GovernmentAnnouncement)
+        {
+            await RefreshMainPageGovernmentAnnouncement();
+        }
+
+        if (news.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+        {
+            var zodiacSignBlockResponse = await RefreshMainPageZodiacSignBlock();
+        }
+
+        var tags = await (from nt in _context.NewsTags
+            join t in _context.Tags on nt.TagID equals t.ID
+            where nt.NewsID == news.ID
+            select new { t.Url }).ToListAsync();
+
+        if (tags.Count > 0)
+        {
+            foreach (var tag in tags)
+            {
+                await RefreshNewsByTagSlug(tag.Url);
+            }
+        }
+
+        var sources = await (from nt in _context.NewsSources
+            join t in _context.Sources on nt.SourceID equals t.ID
+            where nt.NewsID == news.ID
+            select new { t.Url }).ToListAsync();
+
+        if (sources.Count > 0)
+        {
+            foreach (var source in sources)
+            {
+                await RefreshNewsBySourceSlug(source.Url);
+            }
+        }
+
+        var blockKey = await (from bi in _context.BlockItems
+            join b in _context.Blocks on bi.BlockID equals b.ID
+            where bi.NewsID == news.ID
+            select b.Key).ToListAsync();
+
+        if (blockKey.Any())
+        {
+            foreach (var block in blockKey)
+            {
+                await RefreshBlockNewsWithKey(block);
+            }
+        }
+
+        cloudflareAdapter.Purge(news.Slug.TrimStart('/').PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite));
+    }
+
+    public async Task HandleUnPublishCacheOperations(News news)
+    {
+        if (news.PublishDate.HasValue)
+            await xmlFeedCachingService.RefreshGoogleAiArchiveDayAsync(news.PublishDate.Value);
+
+        await xmlFeedCachingService.RefreshGoogleAiRSS();
+
+        await RefreshNewsByCategorySlug(news.CategoryID);
+        await RemoveNewsDetails(news.ID);
+        await DeleteNewsPublishedSearchByID(news.ID);
+
+        if (news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+        {
+            var authorSlug = _context.Authors.Where(x => x.ID == news.AuthorID).Select(x => x.Url).FirstOrDefault();
+            await RefreshAuthorLastNews(news.AuthorID ?? 0);
+            await RefreshAuthorDetailLastColumnArticles(authorSlug);
+            await RefreshAuthorSideColumnArticles();
+            await authorCachingService.RefreshMainPageAuthorsAll();
+            await authorCachingService.RefreshAuthorNewsTodayList();
+            await authorCachingService.RefreshAuthorCategoryNewsTodayList(authorSlug);
+        }
+
+        if (news.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+        {
+            await newsPhotosCachingService.RefreshNewsPublishedPhotoGalleryItems(news.ID);
+        }
+
+        if (news.NewsTypeID == (int)NewsTypesEnum.GovernmentAnnouncement)
+        {
+            await RefreshMainPageGovernmentAnnouncement();
+        }
+
+        if (news.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+        {
+            await RefreshMainPageZodiacSignBlock();
+        }
+
+        var tags = await (from nt in _context.NewsTags
+            join t in _context.Tags on nt.TagID equals t.ID
+            where nt.NewsID == news.ID
+            select new { t.Url }).ToListAsync();
+
+        if (tags.Count > 0)
+        {
+            foreach (var tag in tags)
+            {
+                await RefreshNewsByTagSlug(tag.Url);
+            }
+        }
+
+        var sources = await (from nt in _context.NewsSources
+            join t in _context.Sources on nt.SourceID equals t.ID
+            where nt.NewsID == news.ID
+            select new { t.Url }).ToListAsync();
+
+        if (sources.Count > 0)
+        {
+            foreach (var source in sources)
+            {
+                await RefreshNewsBySourceSlug(source.Url);
+            }
+        }
+
+        await _context.SaveChangesAsync();
+
+        var blockKey = await (from bi in _context.BlockItems
+            join b in _context.Blocks on bi.BlockID equals b.ID
+            where bi.NewsID == news.ID
+            select b.Key).ToListAsync();
+
+        if (blockKey.Any())
+        {
+            foreach (var block in blockKey)
+            {
+                await RefreshBlockNewsWithKey(block);
+            }
+        }
+
+        cloudflareAdapter.Purge(news.Slug.TrimStart('/').PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite));
+    }
+
+    private async Task<ServiceResult> RefreshBlockNewsWithKey(string key)
+    {
+        var result = new ServiceResult();
+
+        var blockNews = await (from blck in _context.Blocks
+            join blcks in _context.BlockItems on blck.ID equals blcks.BlockID
+            join news in _context.NewsPublished on blcks.NewsID equals news.NewsID
+            join cat in _context.Categories on news.CategoryID equals cat.ID
+            join blockCat in _context.Categories on blck.CategoryID equals blockCat.ID into blockCatJoin
+            from blockCat in blockCatJoin.DefaultIfEmpty()
+            let photo = (from ph in _context.NewsPublishedPhotos
+                where ph.NewsID == news.NewsID &&
+                      (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                       ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                orderby
+                    ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl) ? 0 :
+                        ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl) ? 1 :
+                        2
+                select ph).FirstOrDefault()
+            where blck.Key == key
+            orderby blcks.Order
+            select new PageNewsCachingResponse
+            {
+                BlockID = blcks.ID,
+                BlockTitle = blck.Title ?? string.Empty,
+                BlockKey = blck.Key,
+                BlockName = blck.Name ?? string.Empty,
+                NewsContent = news.Content ?? string.Empty,
+                CategoryPhotoUrl =
+                    cat.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_CategoryPhotos),
+                ShowUpHeadline = news.ShowUpHeadline,
+                ShowUpSubHeading = news.ShowUpSubHeading,
+                NewsID = (int)news.NewsID,
+                NewsTitle = !string.IsNullOrWhiteSpace(news.Title)
+                    ? news.Title
+                    : !string.IsNullOrWhiteSpace(news.Headline)
+                        ? news.Headline
+                        : string.Empty,
+
+                NewsUpSubtitle = !string.IsNullOrWhiteSpace(news.UpSubtitle)
+                    ? news.UpSubtitle
+                    : !string.IsNullOrWhiteSpace(news.Subtitle)
+                        ? news.Subtitle
+                        : string.Empty,
+
+                NewsSubtitle = !string.IsNullOrWhiteSpace(news.Subtitle)
+                    ? news.Subtitle
+                    : !string.IsNullOrWhiteSpace(news.UpSubtitle)
+                        ? news.UpSubtitle
+                        : string.Empty,
+                NewsTypeID = news.NewsTypeID,
+                NewsHeadline = news.Headline ?? news.Title,
+                NewsUpHeadline = news.ShowUpHeadline ? news.UpHeadline : string.Empty,
+                NewsUpSubHeading = news.ShowUpSubHeading ? news.UpSubHeading : string.Empty,
+                NewsSubHeading = news.ShowSubHeading ? news.SubHeading : string.Empty,
+                NewsSlug = _appSettingsKeys.Common_ClientWebSite + (news.Slug ?? string.Empty).TrimStart('/'),
+                ShowHeadline = news.ShowHeadline,
+                CategoryName = cat.Name,
+                BlockCategoryName = blockCat != null ? blockCat.Name ?? string.Empty : string.Empty,
+                BlockCategoryID = blockCat != null ? blockCat.ID : (int?)null,
+                BlockCategorySlug = blockCat != null && !string.IsNullOrWhiteSpace(blockCat.Url)
+                    ? _appSettingsKeys.Common_ClientWebSite + blockCat.Url.TrimStart('/')
+                    : string.Empty,
+                BlockCategoryBackgroundPhotoUrl =
+                    blockCat != null && !string.IsNullOrWhiteSpace(blockCat.BackgroundPhotoUrl)
+                        ? blockCat.BackgroundPhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                            _appSettingsKeys.CDN_CategoryPhotos)
+                        : string.Empty,
+                NewsPhoto = photo != null && !string.IsNullOrWhiteSpace(photo.PhotoUrl)
+                    ? photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder)
+                    : string.Empty
+            }).ToListAsync();
+
+        var surveyBlock = blockNews.FirstOrDefault(x => x.NewsTypeID == (int)NewsTypesEnum.Survey);
+
+        if (surveyBlock != null)
+        {
+            var newsVersions = await _context.NewsVersions.Where(x => x.NewsID == surveyBlock.NewsID)
+                .OrderByDescending(x => x.ID).Select(x => x.ID).ToListAsync();
+
+            for (int i = 0; i < newsVersions.Count; i++)
+            {
+                var newsVersionID = newsVersions[i];
+
+                var survey = await _context.Surveys.Where(x => x.NewsVersionID == newsVersionID).FirstOrDefaultAsync();
+
+                if (survey != null)
+                {
+                    var joinedUserCount = await _context.SurveyOptions
+                        .Where(x => x.NewsVersionID == newsVersionID && x.SurveyID == survey.ID)
+                        .Select(x => x.AnswerCount).SumAsync();
+
+                    var surveyItem = new SurveyItem
+                    {
+                        JoinedUserCount = (int?)joinedUserCount ?? 0,
+                        Question = survey.Question,
+                    };
+
+                    surveyBlock.SurveyItem = surveyItem;
+
+                    break;
+                }
+            }
+        }
+
+        foreach (var item in blockNews)
+        {
+            var extractedContent = item.NewsContent.ExtractTextFromHtml();
+
+            if (string.IsNullOrWhiteSpace(item.NewsUpSubtitle))
+            {
+                item.NewsUpSubtitle = !string.IsNullOrWhiteSpace(item.NewsSubtitle)
+                    ? item.NewsSubtitle
+                    : extractedContent ?? string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(item.NewsSubtitle))
+            {
+                item.NewsSubtitle = !string.IsNullOrWhiteSpace(item.NewsUpSubtitle)
+                    ? item.NewsUpSubtitle
+                    : extractedContent ?? string.Empty;
+            }
+        }
+
+        var jsonData = JsonConvert.SerializeObject(blockNews);
+        await _cache.Set(string.Format(RedisKeys.BlockNewsItem, key), jsonData, RedisTTLSeconds.MainPageBlockNews_TTL);
+        return result;
+    }
+
+    private static List<T> ConvertDataTable<T>(DataTable dt)
+    {
+        List<T> data = new List<T>();
+        foreach (DataRow row in dt.Rows)
+        {
+            T item = GetItem<T>(row);
+            data.Add(item);
+        }
+
+        return data;
+    }
+
+    private static T GetItem<T>(DataRow dr)
+    {
+        Type temp = typeof(T);
+        T obj = Activator.CreateInstance<T>();
+
+        foreach (DataColumn column in dr.Table.Columns)
+        {
+            foreach (PropertyInfo pro in temp.GetProperties())
+            {
+                if (pro.Name == column.ColumnName)
+                {
+                    var value = dr[column.ColumnName];
+
+                    if (value == DBNull.Value)
+                    {
+                        pro.SetValue(obj, null, null);
+                    }
+                    else
+                    {
+                        var targetType = Nullable.GetUnderlyingType(pro.PropertyType) ?? pro.PropertyType;
+                        var safeValue = Convert.ChangeType(value, targetType);
+                        pro.SetValue(obj, safeValue, null);
+                    }
+                }
+            }
+        }
+
+        return obj;
+    }
+
+    public async Task<ServiceResult<List<GetIncreasedNewsViewCountResponse>>> GetIncreasedNewsViewCount()
+    {
+        var result = new ServiceResult<List<GetIncreasedNewsViewCountResponse>>();
+
+        var elasticResponse = new List<NewsViewCountResponse>();
+        List<FieldValue>? listSearchAfter = null;
+
+        var minute = DateTime.Now.AddMinutes(-2);
+
+        while (true)
+        {
+            var query = await elasticSearchService
+                .SearchDocumentsWithSearchAfterAsync<NewsViewCountResponse>(
+                    IndexNames.News_View_Count,
+                    q => q
+                        .Bool(b => b
+                            .Should(s => s.Range(r => r.DateRange(x => x.Field(y => y.CreatedDate).Lt(minute)))
+                            )
+                            .MinimumShouldMatch(1)
+                        ),
+                    sort => sort
+                        .Field(f => f.ID.Suffix("keyword"), field => field.Order(SortOrder.Asc)),
+                    size: 15000,
+                    listSearchAfter
+                );
+
+            if (!query.Documents.Any())
+            {
+                break;
+            }
+
+
+            elasticResponse.AddRange(query.Documents);
+            var readOnlyCollection = query.Hits.Last().Sort;
+            if (readOnlyCollection != null) listSearchAfter = readOnlyCollection.ToList();
+        }
+
+        var idsToDelete = elasticResponse.Select(x => x.ID).ToList();
+        await elasticSearchService.BulkDeleteDocumentsAsync<NewsViewCountResponse>(
+            IndexNames.News_View_Count,
+            idsToDelete
+        );
+
+        var responseData = elasticResponse
+            .GroupBy(x => x.NewsID)
+            .Select(y => new GetIncreasedNewsViewCountResponse
+            {
+                NewsID = y.Key,
+                Count = y.Count()
+            }).ToList();
+
+        result.Data = responseData;
+
+        return result;
+    }
+}

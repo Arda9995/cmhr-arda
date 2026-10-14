@@ -1,0 +1,97 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Quark.API.Business.Services.Interfaces;
+using Quark.Web.Handler;
+
+namespace Quark.Web.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class XmlFeedController : ControllerBase
+    {
+        private readonly IXmlFeedService _xmlFeedService;
+
+        public XmlFeedController(IXmlFeedService xmlFeedService)
+        {
+            _xmlFeedService = xmlFeedService;
+        }
+
+        [HttpGet]
+        [Route("/sitemaps/news.xml")]
+        public async Task<IActionResult> NewsSitemap()
+        {
+            var result = await _xmlFeedService.GetNewsSitemap();
+            return Content(result, "application/xml; charset=utf-8");
+        }
+
+        [HttpGet]
+        [Route("/sitemaps/posts.xml")]
+        public async Task<IActionResult> PostsSitemap()
+        {
+            var result = await _xmlFeedService.GetPostsSitemap();
+            return Content(result, "application/xml; charset=utf-8");
+        }
+
+        [HttpGet]
+        [Route("/sitemaps/posts-{year}-{month}.xml")]
+        public async Task<IActionResult> MonthlyPostsSitemap(int year, int month)
+        {
+            var result = await _xmlFeedService.GetMonthlyPostsSitemap(year, month);
+            return Content(result, "application/xml; charset=utf-8");
+        }
+
+        [HttpGet]
+        [Route("/sitemaps/sources.xml")]
+        public async Task<IActionResult> SourceSitemap()
+        {
+            var result = await _xmlFeedService.GetSourceSitemap();
+            return Content(result, "application/xml; charset=utf-8");
+        }
+
+        [HttpGet]
+        [Route("/sitemaps/tags.xml")]
+        public async Task<IActionResult> TagsSitemap()
+        {
+            var result = await _xmlFeedService.GetTagsSitemap();
+            return Content(result, "application/xml; charset=utf-8");
+        }
+
+        [HttpGet]
+        [Route("/sitemaps/tag-{year}-{month}.xml")]
+        public async Task<IActionResult> MonthlyTagsSitemap(int year, int month)
+        {
+            var result = await _xmlFeedService.GetMonthlyTagsSitemap(year, month);
+            return Content(result, "application/xml; charset=utf-8");
+        }
+
+        [HttpGet]
+        [Route("/rss")]
+        public async Task<IActionResult> MainRss()
+        {
+            var result = await _xmlFeedService.GetMainRss();
+            return Content(result, "application/rss+xml; charset=utf-8");
+        }
+
+        [HttpGet]
+        [Route("/rss/{category}")]
+        public async Task<IActionResult> CategoryRss(string category)
+        {
+            var result = await _xmlFeedService.GetCategoryRss(category);
+            if (string.IsNullOrEmpty(result))
+            {
+                return NotFound();
+            }
+
+            return Content(result, "application/rss+xml; charset=utf-8");
+        }
+
+        [HttpGet]
+        [Route("/feeds/google-ai.xml")]
+        [Authorize(AuthenticationSchemes = GoogleAiRssBasicAuthenticationHandler.SchemeName)]
+        public async Task<IActionResult> GoogleAiRss()
+        {
+            var result = await _xmlFeedService.GetGoogleAiRss();
+            return Content(result, "application/rss+xml; charset=utf-8");
+        }
+    }
+}

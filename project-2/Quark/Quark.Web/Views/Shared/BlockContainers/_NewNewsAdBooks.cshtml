@@ -1,0 +1,292 @@
+﻿@model Quark.API.Business.Models.Responses.PageResponses.MainPageResponse
+
+@{
+
+    var bookNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-KitapEkiHaberleri").ToList();
+    var automotiveNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-OtomotivHaberleri").ToList();
+    var cultureAndArtNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-KulturSanatHaberleri").ToList();
+    var scienceAndTechNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-BilimTeknolojiHaberleri").ToList();
+    var fashionNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-ModaHaberleri").ToList();
+
+    var firstBookNews = bookNews.FirstOrDefault() ?? new PageNewsCachingResponse();
+    var firstAutomotiveNews = automotiveNews.FirstOrDefault() ?? new PageNewsCachingResponse();
+    var firstCultureAndArtNews = cultureAndArtNews.FirstOrDefault() ?? new PageNewsCachingResponse();
+    var firstScienceAndTechNews = scienceAndTechNews.FirstOrDefault() ?? new PageNewsCachingResponse();
+    var firstFashionNews = fashionNews.FirstOrDefault() ?? new PageNewsCachingResponse();
+
+    var books = Model.BookCachingResponses;
+}
+
+<div class="grid grid-cols-12 gap-6" data-astro-cid-j7pv25f6>
+    <div class="col-span-12 md:col-span-8 space-y-8" data-astro-cid-j7pv25f6>
+        <!-- Item Grid List Start -->
+        <div class="grid md:grid-cols-2 gap-6" data-astro-cid-j7pv25f6>
+            <div data-astro-cid-j7pv25f6>
+                <!-- Title Start -->
+                <div class="flex items-center lg:gap-3 mb-4 !mb-3">
+                    <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+                    <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0"><a href="@firstScienceAndTechNews.BlockCategorySlug" target="_blank">@firstScienceAndTechNews.BlockCategoryName Haberleri</a></h2>
+                    <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+                </div> <!-- Title End --> <!-- Items Start -->
+                <div class="space-y-4 relative before:absolute before:top-0 before:-right-3 before:bottom-0 before:bg-[#E5E5EA] before:w-px" data-astro-cid-j7pv25f6>
+                    <div class="group block relative ">
+                        <button onclick="saveNewsID(@firstScienceAndTechNews.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                            <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                            </svg>
+                        </button><!-- Thumbnail Start -->
+                        <a target="_blank" href="@firstScienceAndTechNews.NewsSlug" class="overflow-hidden relative aspect-[16/9] mb-2 block ">
+                            <img src="@firstScienceAndTechNews.NewsPhoto" class="w-full h-full object-cover animate-img" alt="@firstScienceAndTechNews.NewsHeadline" loading="lazy">
+                        </a><!-- Thumbnail End --><!-- Title Start -->
+                        <a target="_blank" href="@firstScienceAndTechNews.NewsSlug" class="font-semibold line-clamp-2 text-secondary-500 mb-1">@firstScienceAndTechNews.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                        <a target="_blank" href="@firstScienceAndTechNews.NewsSlug" class="text-sm group-hover:underline line-clamp-2 text-secondary-400 font-medium">@firstScienceAndTechNews.NewsUpSubtitle</a>
+                    </div>
+                    <div class="*:pb-4 divide-y divide-[#E5E5EA]" data-astro-cid-j7pv25f6>
+                        @for (int i = 1; i < scienceAndTechNews.Count; i++)
+                        {
+                            var news = scienceAndTechNews[i];
+                            <div class="flex gap-3 items-center group py-4">
+                                <!-- Thumbnail Start -->
+                                <div class="overflow-hidden shrink-0 aspect-[16/9] w-[134px] relative ">
+                                    <button onclick="saveNewsID(@news.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                                        <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                                        </svg>
+                                    </button>
+                                    <a target="_blank" href="@news.NewsSlug" class="block" target="">
+                                        <img src="@news.NewsPhoto" class="w-full h-full object-cover group-hover:scale-125 transition-all duration-500" alt="@news.NewsHeadline" loading="lazy">
+                                    </a>
+                                </div><!-- Thumbnail End --><!-- Content Start -->
+                                <div class="space-y-1">
+                                    <!-- Title Start -->
+                                    <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold text-secondary-500 line-clamp-2" target="">@news.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                                    <a target="_blank" href="@news.NewsSlug" target="" class="line-clamp-2 text-xs font-medium group-hover:underline">@news.NewsUpSubtitle</a><!-- Description End -->
+                                </div><!-- Content End -->
+                            </div>
+                        }
+                    </div>
+                </div> <!-- Items End -->
+            </div>
+            <div data-astro-cid-j7pv25f6>
+                <!-- Title Start -->
+                <div class="flex items-center lg:gap-3 mb-4 !mb-3">
+                    <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+                    <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0"><a href="@firstAutomotiveNews.BlockCategorySlug" target="_blank">@firstAutomotiveNews.BlockCategoryName Haberleri</a></h2>
+                    <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+                </div> <!-- Title End --> <!-- Items Start -->
+                <div class="space-y-4 relative before:absolute before:top-0 before:-right-3 before:bottom-0 before:bg-[#E5E5EA] before:w-px" data-astro-cid-j7pv25f6>
+                    <div class="group block relative ">
+                        <button onclick="saveNewsID(@firstAutomotiveNews.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                            <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                            </svg>
+                        </button><!-- Thumbnail Start -->
+                        <a target="_blank" href="@firstAutomotiveNews.NewsSlug" class="overflow-hidden relative aspect-[16/9] mb-2 block ">
+                            <img src="@firstAutomotiveNews.NewsPhoto" class="w-full h-full object-cover animate-img" alt="@firstAutomotiveNews.NewsHeadline" loading="lazy">
+                        </a><!-- Thumbnail End --><!-- Title Start -->
+                        <a target="_blank" href="@firstAutomotiveNews.NewsSlug" class="font-semibold line-clamp-2 text-secondary-500 mb-1">@firstAutomotiveNews.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                        <a target="_blank" href="@firstAutomotiveNews.NewsSlug" class="text-sm group-hover:underline line-clamp-2 text-secondary-400 font-medium">@firstAutomotiveNews.NewsUpSubtitle</a>
+                    </div>
+                    <div class="*:pb-4 divide-y divide-[#E5E5EA]" data-astro-cid-j7pv25f6>
+                        @for (int i = 1; i < automotiveNews.Count; i++)
+                        {
+                            var news = automotiveNews[i];
+                            <div class="flex gap-3 items-center group py-4">
+                                <!-- Thumbnail Start -->
+                                <div class="overflow-hidden shrink-0 aspect-[16/9] w-[134px] relative ">
+                                    <button onclick="saveNewsID(@news.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                                        <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                                        </svg>
+                                    </button>
+                                    <a target="_blank" href="@news.NewsSlug" class="block" target="">
+                                        <img src="@news.NewsPhoto" class="w-full h-full object-cover group-hover:scale-125 transition-all duration-500" alt="@news.NewsHeadline" loading="lazy">
+                                    </a>
+                                </div><!-- Thumbnail End --><!-- Content Start -->
+                                <div class="space-y-1">
+                                    <!-- Title Start -->
+                                    <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold text-secondary-500 line-clamp-2" target="">@news.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                                    <a target="_blank" href="@news.NewsSlug" target="" class="line-clamp-2 text-xs font-medium group-hover:underline">@news.NewsUpSubtitle</a><!-- Description End -->
+                                </div><!-- Content End -->
+                            </div>
+                        }
+                    </div>
+                </div> <!-- Items End -->
+            </div>
+          </div> <!-- Item Grid List End --> <!-- Books Slider Start -->
+        <div data-astro-cid-j7pv25f6>
+            <!-- Head Start -->
+            <div class="space-y-1" data-astro-cid-j7pv25f6>
+                <!-- Title Start -->
+                <div class="text-3xl font-semibold" data-astro-cid-j7pv25f6><a href="https://www.cumhuriyetkitap.com.tr" target="_blank" rel="nofollow">Edebiyatın ve Kültürün Nabzı</a></div> <!-- Title End --> <!-- Description Start -->
+                <div class="text-gray-700 text-sm font-medium" data-astro-cid-j7pv25f6>Kitap dünyasına açılan kapınızı aralayın! En sevdiğiniz kitapları indirimli fiyatlarla keşfedin ve hayal gücünüzü genişletin. </div> <!-- Description End -->
+            </div> <!-- Head End -->
+            <div class="splide books mt-6 rounded-b-2xl overflow-hidden" role="group">
+                <div class="splide__track">
+                    <ul class="splide__list">
+                        @foreach (var book in books)
+                        {
+                            <li class="splide__slide" data-astro-cid-j7pv25f6>
+                                <a target="_blank" href="@book.Slug" rel="nofollow" class="relative block group" data-astro-cid-j7pv25f6>
+                                    <div class="absolute inset-0 bg-black/60 flex items-center justify-center scale-90 transition-all opacity-0 group-hover:scale-100 group-hover:opacity-100" data-astro-cid-j7pv25f6>
+                                        <div class="text-white text-sm font-semibold" data-astro-cid-j7pv25f6>Satın Al</div>
+                                    </div> <img class="w-full h-[138px] object-cover" src="@book.ImageURL" alt="" loading="lazy" data-astro-cid-j7pv25f6>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div> <!-- Books Slider End -->     
+        <partial name="~/Views/Shared/AdContainers/_HomePage480x320_1_AdArea.cshtml" />
+        <!-- Item Grid List Start -->
+        <div class="grid md:grid-cols-2 gap-6" data-astro-cid-j7pv25f6>
+            <div data-astro-cid-j7pv25f6>
+                <!-- Title Start -->
+                <div class="flex items-center lg:gap-3 mb-4 !mb-3">
+                    <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+                    <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0"><a href="@firstBookNews.BlockCategorySlug" target="_blank">@firstBookNews.BlockCategoryName Haberleri</a></h2>
+                    <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+                </div> <!-- Title End --> <!-- Items Start -->
+                <div class="space-y-4 relative before:absolute before:top-0 before:-right-3 before:bottom-0 before:bg-[#E5E5EA] before:w-px" data-astro-cid-j7pv25f6>
+                    <div class="group block relative ">
+                        <button onclick="saveNewsID(@firstBookNews.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                            <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                            </svg>
+                        </button><!-- Thumbnail Start -->
+                        <a target="_blank" href="@firstBookNews.NewsSlug" class="overflow-hidden relative aspect-[16/9] mb-2 block ">
+                            <img src="@firstBookNews.NewsPhoto" class="w-full h-full object-cover animate-img" alt="@firstBookNews.NewsHeadline" loading="lazy">
+                        </a><!-- Thumbnail End --><!-- Title Start -->
+                        <a target="_blank" href="@firstBookNews.NewsSlug" class="font-semibold line-clamp-2 text-secondary-500 mb-1">@firstBookNews.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                        <a target="_blank" href="@firstBookNews.NewsSlug" class="text-sm group-hover:underline line-clamp-2 text-secondary-400 font-medium">@firstBookNews.NewsUpSubtitle</a>
+                    </div>
+                    <div class="*:pb-4 divide-y divide-[#E5E5EA]" data-astro-cid-j7pv25f6>
+                        @for (int i = 1; i < bookNews.Count; i++)
+                        {
+                            var news = bookNews[i];
+                            <div class="flex gap-3 items-center group py-4">
+                                <!-- Thumbnail Start -->
+                                <div class="overflow-hidden shrink-0 aspect-[16/9] w-[134px] relative ">
+                                    <button onclick="saveNewsID(@news.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                                        <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                                        </svg>
+                                    </button>
+                                    <a target="_blank" href="@news.NewsSlug" class="block" target="">
+                                        <img src="@news.NewsPhoto" class="w-full h-full object-cover group-hover:scale-125 transition-all duration-500" alt="@news.NewsHeadline" loading="lazy">
+                                    </a>
+                                </div><!-- Thumbnail End --><!-- Content Start -->
+                                <div class="space-y-1">
+                                    <!-- Title Start -->
+                                    <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold text-secondary-500 line-clamp-2" target="">@news.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                                    <a target="_blank" href="@news.NewsSlug" target="" class="line-clamp-2 text-xs font-medium group-hover:underline">@news.NewsUpSubtitle</a><!-- Description End -->
+                                </div><!-- Content End -->
+                            </div>
+                        }
+                    </div>
+                </div> <!-- Items End -->
+            </div>
+            <div data-astro-cid-j7pv25f6>
+                <!-- Title Start -->
+                <div class="flex items-center lg:gap-3 mb-4 !mb-3">
+                    <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+                    <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0"><a href="@firstCultureAndArtNews.BlockCategorySlug" target="_blank">@firstCultureAndArtNews.BlockCategoryName Haberleri</a></h2>
+                    <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+                </div> <!-- Title End --> <!-- Items Start -->
+                <div class="space-y-4 relative before:absolute before:top-0 before:-right-3 before:bottom-0 before:bg-[#E5E5EA] before:w-px" data-astro-cid-j7pv25f6>
+                    <div class="group block relative ">
+                        <button onclick="saveNewsID(@firstCultureAndArtNews.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                            <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                            </svg>
+                        </button><!-- Thumbnail Start -->
+                        <a target="_blank" href="@firstCultureAndArtNews.NewsSlug" class="overflow-hidden relative aspect-[16/9] mb-2 block ">
+                            <img src="@firstCultureAndArtNews.NewsPhoto" class="w-full h-full object-cover animate-img" alt="@firstCultureAndArtNews.NewsHeadline" loading="lazy">
+                        </a><!-- Thumbnail End --><!-- Title Start -->
+                        <a target="_blank" href="@firstCultureAndArtNews.NewsSlug" class="font-semibold line-clamp-2 text-secondary-500 mb-1">@firstCultureAndArtNews.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                        <a target="_blank" href="@firstCultureAndArtNews.NewsSlug" class="text-sm group-hover:underline line-clamp-2 text-secondary-400 font-medium">@firstCultureAndArtNews.NewsUpSubtitle</a>
+                    </div>
+                    <div class="*:pb-4 divide-y divide-[#E5E5EA]" data-astro-cid-j7pv25f6>
+                        @for (int i = 1; i < cultureAndArtNews.Count; i++)
+                        {
+                            var news = cultureAndArtNews[i];
+                            <div class="flex gap-3 items-center group py-4">
+                                <!-- Thumbnail Start -->
+                                <div class="overflow-hidden shrink-0 aspect-[16/9] w-[134px] relative ">
+                                    <button onclick="saveNewsID(@news.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                                        <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                                        </svg>
+                                    </button>
+                                    <a target="_blank" href="@news.NewsSlug" class="block" target="">
+                                        <img src="@news.NewsPhoto" class="w-full h-full object-cover group-hover:scale-125 transition-all duration-500" alt="@news.NewsHeadline" loading="lazy">
+                                    </a>
+                                </div><!-- Thumbnail End --><!-- Content Start -->
+                                <div class="space-y-1">
+                                    <!-- Title Start -->
+                                    <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold text-secondary-500 line-clamp-2" target="">@news.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                                    <a target="_blank" href="@news.NewsSlug" target="" class="line-clamp-2 text-xs font-medium group-hover:underline">@news.NewsUpSubtitle</a><!-- Description End -->
+                                </div><!-- Content End -->
+                            </div>
+                        }
+                    </div>
+                </div> <!-- Items End -->
+            </div>
+        </div> <!-- Item Grid List End -->
+    </div>
+    <div class="col-span-12 md:col-span-4" data-astro-cid-j7pv25f6>
+
+        <div data-astro-cid-j7pv25f6>
+            <!-- Title Start -->
+            <div class="flex items-center lg:gap-3 mb-4 !mb-3">
+                <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+                <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0"><a href="@firstFashionNews.BlockCategorySlug" target="_blank">@firstFashionNews.BlockCategoryName Haberleri</a></h2>
+                <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            </div> <!-- Title End --> <!-- Items Start -->
+            <div class="space-y-4 relative before:absolute before:top-0 before:-right-3 before:bottom-0 before:bg-[#E5E5EA] before:w-px" data-astro-cid-j7pv25f6>
+                <div class="group block relative ">
+                    <button onclick="saveNewsID(@firstFashionNews.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                        <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                        </svg>
+                    </button><!-- Thumbnail Start -->
+                    <a target="_blank" href="@firstFashionNews.NewsSlug" class="overflow-hidden relative aspect-[16/9] mb-2 block ">
+                        <img src="@firstFashionNews.NewsPhoto" class="w-full h-full object-cover animate-img" alt="@firstFashionNews.NewsHeadline" loading="lazy">
+                    </a><!-- Thumbnail End --><!-- Title Start -->
+                    <a target="_blank" href="@firstFashionNews.NewsSlug" class="font-semibold line-clamp-2 text-secondary-500 mb-1">@firstFashionNews.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                    <a target="_blank" href="@firstFashionNews.NewsSlug" class="text-sm group-hover:underline line-clamp-2 text-secondary-400 font-medium">@firstFashionNews.NewsUpSubtitle</a>
+                </div>
+                <div class="*:pb-4 divide-y divide-[#E5E5EA]" data-astro-cid-j7pv25f6>
+                    @for (int i = 1; i < fashionNews.Count; i++)
+                    {
+                        var news = fashionNews[i];
+                        <div class="flex gap-3 items-center group py-4">
+                            <!-- Thumbnail Start -->
+                            <div class="overflow-hidden shrink-0 aspect-[16/9] w-[134px] relative ">
+                                <button onclick="saveNewsID(@news.NewsID)" class="opacity-0 group-hover:opacity-100 transition-all duration-500 font-semibold text-sm z-10 absolute right-1.5 top-1.5 bg-white/70 size-7 flex items-center justify-center rounded-lg">
+                                    <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 2.5C0 1.83696 0.263392 1.20107 0.732233 0.732233C1.20107 0.263392 1.83696 0 2.5 0H9.5C10.163 0 10.7989 0.263392 11.2678 0.732233C11.7366 1.20107 12 1.83696 12 2.5V15.5C11.9999 15.5922 11.9744 15.6826 11.9261 15.7611C11.8779 15.8397 11.8089 15.9034 11.7267 15.9452C11.6446 15.987 11.5525 16.0053 11.4606 15.998C11.3687 15.9907 11.2806 15.9582 11.206 15.904L6 12.118L0.794 15.904C0.719435 15.9582 0.631335 15.9907 0.539436 15.998C0.447537 16.0053 0.355417 15.987 0.273255 15.9452C0.191094 15.9034 0.122089 15.8397 0.0738659 15.7611C0.0256429 15.6826 7.93406e-05 15.5922 0 15.5V2.5ZM2.5 1C2.10218 1 1.72064 1.15804 1.43934 1.43934C1.15804 1.72064 1 2.10218 1 2.5V14.518L5.706 11.096C5.79144 11.0339 5.89436 11.0004 6 11.0004C6.10564 11.0004 6.20856 11.0339 6.294 11.096L11 14.518V2.5C11 2.10218 10.842 1.72064 10.5607 1.43934C10.2794 1.15804 9.89782 1 9.5 1H2.5Z" fill="#FF0101"></path>
+                                    </svg>
+                                </button>
+                                <a target="_blank" href="@news.NewsSlug" class="block" target="">
+                                    <img src="@news.NewsPhoto" class="w-full h-full object-cover group-hover:scale-125 transition-all duration-500" alt="@news.NewsHeadline" loading="lazy">
+                                </a>
+                            </div><!-- Thumbnail End --><!-- Content Start -->
+                            <div class="space-y-1">
+                                <!-- Title Start -->
+                                <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold text-secondary-500 line-clamp-2" target="">@news.NewsHeadline</a><!-- Title End --><!-- Description Start -->
+                                <a target="_blank" href="@news.NewsSlug" target="" class="line-clamp-2 text-xs font-medium group-hover:underline">@news.NewsUpSubtitle</a><!-- Description End -->
+                            </div><!-- Content End -->
+                        </div>
+                    }
+                </div>
+            </div> <!-- Items End -->
+        </div>
+        <!-- Sticky Start -->
+        <div class="sticky top-20" data-astro-cid-j7pv25f6>
+            <!-- Ad Start -->
+            <partial name="~/Views/Shared/AdContainers/_HomePageCultureAdArea.cshtml" />
+        </div> <!-- Sticky End -->
+    </div>
+</div> <!-- Best News Start -->

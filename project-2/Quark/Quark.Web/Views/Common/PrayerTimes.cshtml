@@ -1,0 +1,264 @@
+﻿@using Quark.Web.ViewComponents.Models
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Quark.API.Business.Models.Responses.CommonResponses.GetPrayerTimesResponse
+
+<partial name="~/Views/Shared/_Header.cshtml" />
+<main id="main" class="my-4 px-5 tablet:px-0">
+	<div class="max-w-container mx-auto space-y-6 undefined">
+		<div class="grid grid-cols-12 gap-6">
+			<div class="col-span-12 lg:col-span-8">
+				<!-- Breadcrumb Start -->
+				<nav class="flex items-center gap-2 text-xs undefined">
+					<a href="/namaz-vakitleri/istanbul" class="text-gray-500 hover:text-gray-600 transition-all font-medium">Namaz Vakitleri</a><span>
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M6 12L10 8L6 4" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+						</svg>
+					</span><a href="/namaz-vakitleri/@Model.Slug" class="text-red-600 font-semibold ">@Model.CityName Namaz Vakitleri</a>
+				</nav> <!-- Breadcrumb End -->
+				<div class="space-y-1 mt-4 text-secondary-500">
+					<h1 class="font-semibold text-xl">@Model.CityName İçin Namaz Vakitleri</h1>
+					<div class="flex text-xs font-semibold gap-2 items-center">
+						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M17.5 7.08333V14.7917C17.5 15.51 17.2147 16.1988 16.7067 16.7067C16.1988 17.2147 15.51 17.5 14.7917 17.5H5.20833C4.49004 17.5 3.80116 17.2147 3.29325 16.7067C2.78534 16.1988 2.5 15.51 2.5 14.7917V7.08333H17.5ZM6.04167 12.5C5.7654 12.5 5.50045 12.6097 5.3051 12.8051C5.10975 13.0004 5 13.2654 5 13.5417C5 13.8179 5.10975 14.0829 5.3051 14.2782C5.50045 14.4736 5.7654 14.5833 6.04167 14.5833C6.31793 14.5833 6.58289 14.4736 6.77824 14.2782C6.97359 14.0829 7.08333 13.8179 7.08333 13.5417C7.08333 13.2654 6.97359 13.0004 6.77824 12.8051C6.58289 12.6097 6.31793 12.5 6.04167 12.5ZM10 12.5C9.72373 12.5 9.45878 12.6097 9.26343 12.8051C9.06808 13.0004 8.95833 13.2654 8.95833 13.5417C8.95833 13.8179 9.06808 14.0829 9.26343 14.2782C9.45878 14.4736 9.72373 14.5833 10 14.5833C10.2763 14.5833 10.5412 14.4736 10.7366 14.2782C10.9319 14.0829 11.0417 13.8179 11.0417 13.5417C11.0417 13.2654 10.9319 13.0004 10.7366 12.8051C10.5412 12.6097 10.2763 12.5 10 12.5ZM6.04167 8.75C5.7654 8.75 5.50045 8.85975 5.3051 9.0551C5.10975 9.25045 5 9.5154 5 9.79167C5 10.0679 5.10975 10.3329 5.3051 10.5282C5.50045 10.7236 5.7654 10.8333 6.04167 10.8333C6.31793 10.8333 6.58289 10.7236 6.77824 10.5282C6.97359 10.3329 7.08333 10.0679 7.08333 9.79167C7.08333 9.5154 6.97359 9.25045 6.77824 9.0551C6.58289 8.85975 6.31793 8.75 6.04167 8.75ZM10 8.75C9.72373 8.75 9.45878 8.85975 9.26343 9.0551C9.06808 9.25045 8.95833 9.5154 8.95833 9.79167C8.95833 10.0679 9.06808 10.3329 9.26343 10.5282C9.45878 10.7236 9.72373 10.8333 10 10.8333C10.2763 10.8333 10.5412 10.7236 10.7366 10.5282C10.9319 10.3329 11.0417 10.0679 11.0417 9.79167C11.0417 9.5154 10.9319 9.25045 10.7366 9.0551C10.5412 8.85975 10.2763 8.75 10 8.75ZM13.9583 8.75C13.6821 8.75 13.4171 8.85975 13.2218 9.0551C13.0264 9.25045 12.9167 9.5154 12.9167 9.79167C12.9167 10.0679 13.0264 10.3329 13.2218 10.5282C13.4171 10.7236 13.6821 10.8333 13.9583 10.8333C14.2346 10.8333 14.4996 10.7236 14.6949 10.5282C14.8903 10.3329 15 10.0679 15 9.79167C15 9.5154 14.8903 9.25045 14.6949 9.0551C14.4996 8.85975 14.2346 8.75 13.9583 8.75ZM14.7917 2.5C15.51 2.5 16.1988 2.78534 16.7067 3.29325C17.2147 3.80116 17.5 4.49004 17.5 5.20833V5.83333H2.5V5.20833C2.5 4.49004 2.78534 3.80116 3.29325 3.29325C3.80116 2.78534 4.49004 2.5 5.20833 2.5H14.7917Z" fill="#080827"></path>
+						</svg> <h2>@Model.Date tarihli @Model.CityName Namaz Vakitleri</h2>
+					</div>
+				</div> <!-- City Bar Start -->
+				<div class="md:p-4 md:flex gap-2 md:bg-gray-50 my-4 items-center">
+					<!-- Select Start  -->
+					<div class="p-4 md:p-0 bg-gray-50 md:bg-transparent flex-1">
+						<div class="border border-black rounded-full bg-white flex-1 relative">
+							<select asp-items="@Model.Cities" id="citySelect" class="rounded-full py-1 px-4 flex items-center justify-between text-sm font-medium w-full bg-transparent border-transparent appearance-none">
+							</select>
+							<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+								<svg width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M10.8539 1.11714C10.9366 1.18343 10.9876 1.27081 10.998 1.36408C11.0084 1.45735 10.9776 1.55058 10.9109 1.62754L10.8539 1.68354L6.35394 5.28354C6.27108 5.34968 6.16185 5.39047 6.04526 5.3988C5.92868 5.40714 5.81214 5.38248 5.71594 5.32914L5.64594 5.28354L1.14594 1.68354C1.05735 1.61299 1.00502 1.51845 0.999236 1.41856C0.993457 1.31867 1.03466 1.22067 1.11471 1.14388C1.19477 1.06708 1.30788 1.01706 1.43176 1.00367C1.55563 0.990279 1.68128 1.01449 1.78394 1.07154L1.85394 1.11714L5.99994 4.43474L10.1459 1.11714C10.1924 1.07989 10.2476 1.05034 10.3083 1.03017C10.369 1.01001 10.4342 0.999626 10.4999 0.999626C10.5657 0.999626 10.6308 1.01001 10.6916 1.03017C10.7523 1.05034 10.8075 1.07989 10.8539 1.11714Z" fill="#080827" stroke="#080827" stroke-width="0.5"></path>
+								</svg>
+							</div>
+						</div>
+					</div> <!-- Select End  -->
+					<div class="flex mt-4 md:mt-0 gap-4 md:gap-2"> 
+						<a href="/namaz-vakitleri/ankara" class="py-1 px-2 rounded-full bg-black text-white text-sm font-medium">Ankara</a> 
+						<a href="/namaz-vakitleri/izmir" class="py-1 px-2 rounded-full bg-black text-white text-sm font-medium">İzmir</a>
+						<a href="/namaz-vakitleri/antalya" class="py-1 px-2 rounded-full bg-black text-white text-sm font-medium">Antalya</a>
+					</div>
+				</div> <!-- City Bar End  -->
+				<div class="lg:p-4 lg:bg-neutral-50">
+					<!-- Prayer Times Countdown -->
+					<div class="flex items-center gap-3">
+						<h3 class="text-blue-800 font-semibold">Akşam Vaktine Kalan Süre</h3>
+						<div class="bg-blue-800 rounded-3xl px-1.5 py-0.5 text-sm flex items-center gap-1 text-white font-semibold">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M14.3763 3.75H5.6263C5.57105 3.75 5.51806 3.77195 5.47899 3.81102C5.43992 3.85009 5.41797 3.90308 5.41797 3.95833V4.45833C5.42209 4.89465 5.5319 5.32346 5.73799 5.70806C5.94407 6.09266 6.2403 6.42158 6.6013 6.66667L8.33464 7.9C8.68464 8.13167 8.9763 8.44167 9.18464 8.8075C9.39915 9.16829 9.51238 9.58026 9.51238 10C9.51238 10.4197 9.39915 10.8317 9.18464 11.1925C8.9763 11.5575 8.68464 11.8683 8.33464 12.1L6.6013 13.3333C6.2403 13.5784 5.94407 13.9073 5.73799 14.2919C5.5319 14.6765 5.42209 15.1054 5.41797 15.5417V16.0417C5.41797 16.0969 5.43992 16.1499 5.47899 16.189C5.51806 16.2281 5.57105 16.25 5.6263 16.25H14.3763C14.4316 16.25 14.4845 16.2281 14.5236 16.189C14.5627 16.1499 14.5846 16.0969 14.5846 16.0417V15.5417C14.5805 15.1054 14.4707 14.6765 14.2646 14.2919C14.0585 13.9073 13.7623 13.5784 13.4013 13.3333L11.668 12.1C11.3171 11.8687 11.0258 11.5578 10.818 11.1925C10.6034 10.8317 10.4902 10.4197 10.4902 10C10.4902 9.58026 10.6034 9.16829 10.818 8.8075C11.0263 8.4425 11.318 8.13167 11.668 7.9L13.4013 6.66667C13.7623 6.42158 14.0585 6.09266 14.2646 5.70806C14.4707 5.32346 14.5805 4.89465 14.5846 4.45833V3.95833C14.5846 3.90308 14.5627 3.85009 14.5236 3.81102C14.4845 3.77195 14.4316 3.75 14.3763 3.75Z" fill="#FAFAFA"></path>
+							</svg> 00:40:12
+						</div>
+					</div> <!-- Prayer Times Table -->
+					<div class="overflow-x-auto mt-8 hidden lg:block">
+						<table class="w-full">
+							<thead>
+								<tr class="text-left border-b border-zinc-200 *:py-2">
+									<th class="text-blue-800 text-sm font-semibold">Tarih</th>
+									<th class="text-blue-800 text-sm font-semibold">İmsak</th>
+									<th class="text-blue-800 text-sm font-semibold">Güneş</th>
+									<th class="text-blue-800 text-sm font-semibold">Öğle</th>
+									<th class="text-blue-800 text-sm font-semibold">İkindi</th>
+									<th class="text-blue-800 text-sm font-semibold">Akşam</th>
+									<th class="text-blue-800 text-sm font-semibold">Yatsı</th>
+								</tr>
+							</thead>
+							<tbody>
+								@{
+									var todayPrayerTimes = Model.PrayerTimes.FirstOrDefault();
+									var otherDayPrayerTimes = Model.PrayerTimes.Skip(1).Take(8).ToList();
+								}
+								<tr class="text-sm bg-gray-100">
+									<td class="p-4 text-red-600 font-semibold">Bugün</td>
+									<td class="py-4 font-medium">@todayPrayerTimes.Fajr</td>
+									<td class="py-4 font-medium">@todayPrayerTimes.Sunrise</td>
+									<td class="py-4 font-medium">@todayPrayerTimes.Dhuhr</td>
+									<td class="py-4 font-medium">@todayPrayerTimes.Asr</td>
+									<td class="py-4 font-medium">@todayPrayerTimes.Maghrib</td>
+									<td class="py-4 font-medium">@todayPrayerTimes.Isha</td>
+								</tr>
+								@foreach(var prayerTime in otherDayPrayerTimes)
+                                {
+                                    <tr class="border-t border-gray-100 text-sm">
+                                        <td class="py-4 font-medium">@prayerTime.Date</td>
+                                        <td class="py-4 font-medium">@prayerTime.Fajr</td>
+                                        <td class="py-4 font-medium">@prayerTime.Sunrise</td>
+                                        <td class="py-4 font-medium">@prayerTime.Dhuhr</td>
+                                        <td class="py-4 font-medium">@prayerTime.Asr</td>
+                                        <td class="py-4 font-medium">@prayerTime.Maghrib</td>
+                                        <td class="py-4 font-medium">@prayerTime.Isha</td>
+                                    </tr>
+                                }
+							</tbody>
+						</table>
+					</div> <!-- Mobile Prayer Times Start -->
+					<div class="lg:hidden mt-4">
+						<div class="border border-gray-200 py-2 px-4 divide-y divide-gray-100">
+							<div class="flex justify-between py-2">
+								<div class="text-blue-800 text-sm font-semibold">Tarih</div>
+								<div class="text-red-500 text-sm font-semibold">Bugün</div>
+							</div>
+							<div class="flex justify-between py-2">
+								<div class="text-blue-800 text-sm font-semibold">İmsak</div>
+								<div class="text-slate-900 text-sm font-semibold">@todayPrayerTimes.Fajr</div>
+							</div>
+							<div class="flex justify-between py-2">
+								<div class="text-blue-800 text-sm font-semibold">Güneş</div>
+								<div class="text-slate-900 text-sm font-semibold">@todayPrayerTimes.Sunrise</div>
+							</div>
+							<div class="flex justify-between py-2">
+								<div class="text-blue-800 text-sm font-semibold">Öğle</div>
+								<div class="text-slate-900 text-sm font-semibold">@todayPrayerTimes.Dhuhr</div>
+							</div>
+							<div class="flex justify-between py-2">
+								<div class="text-blue-800 text-sm font-semibold">İkindi</div>
+								<div class="text-slate-900 text-sm font-semibold">@todayPrayerTimes.Asr</div>
+							</div>
+							<div class="flex justify-between py-2">
+								<div class="text-blue-800 text-sm font-semibold">Akşam</div>
+								<div class="text-slate-900 text-sm font-semibold">@todayPrayerTimes.Maghrib</div>
+							</div>
+							<div class="flex justify-between py-2">
+								<div class="text-blue-800 text-sm font-semibold">Yatsı</div>
+								<div class="text-slate-900 text-sm font-semibold">@todayPrayerTimes.Isha</div>
+							</div>
+						</div>
+					</div> <!-- Mobile Prayer Times End --><!-- Mobile Prayer Times Start -->
+					@foreach (var prayerTime in otherDayPrayerTimes)
+					{
+						<div class="lg:hidden mt-4">
+							<div class="border border-gray-200 py-2 px-4 divide-y divide-gray-100">
+								<div class="flex justify-between py-2">
+									<div class="text-blue-800 text-sm font-semibold">Tarih</div>
+									<div class="text-red-500 text-sm font-semibold">@prayerTime.Date</div>
+								</div>
+								<div class="flex justify-between py-2">
+									<div class="text-blue-800 text-sm font-semibold">İmsak</div>
+									<div class="text-slate-900 text-sm font-semibold">@prayerTime.Fajr</div>
+								</div>
+								<div class="flex justify-between py-2">
+									<div class="text-blue-800 text-sm font-semibold">Güneş</div>
+									<div class="text-slate-900 text-sm font-semibold">@prayerTime.Sunrise</div>
+								</div>
+								<div class="flex justify-between py-2">
+									<div class="text-blue-800 text-sm font-semibold">Öğle</div>
+									<div class="text-slate-900 text-sm font-semibold">@prayerTime.Dhuhr</div>
+								</div>
+								<div class="flex justify-between py-2">
+									<div class="text-blue-800 text-sm font-semibold">İkindi</div>
+									<div class="text-slate-900 text-sm font-semibold">@prayerTime.Asr</div>
+								</div>
+								<div class="flex justify-between py-2">
+									<div class="text-blue-800 text-sm font-semibold">Akşam</div>
+									<div class="text-slate-900 text-sm font-semibold">@prayerTime.Maghrib</div>
+								</div>
+								<div class="flex justify-between py-2">
+									<div class="text-blue-800 text-sm font-semibold">Yatsı</div>
+									<div class="text-slate-900 text-sm font-semibold">@prayerTime.Isha</div>
+								</div>
+							</div>
+						</div>
+					}
+					 <!-- Mobile Prayer Times End --><!-- Mobile Prayer Times Start -->
+
+				</div>
+			</div>
+			@await Component.InvokeAsync("News", new NewsViewComponentModel { MethodName = "MostViewedNews", NewsCount = 6 })
+
+		</div>
+	</div>
+</main>
+
+<script>
+	document.getElementById("citySelect").addEventListener("change", function () {
+		var selectedUrl = this.value;
+		if (selectedUrl) {
+			window.location.href = selectedUrl;
+		}
+	});
+
+	// Prayer times countdown functionality
+	function updatePrayerTimesCountdown() {
+		const todayPrayerTimes = {
+			fajr: '@todayPrayerTimes.Fajr',
+			sunrise: '@todayPrayerTimes.Sunrise',
+			dhuhr: '@todayPrayerTimes.Dhuhr',
+			asr: '@todayPrayerTimes.Asr',
+			maghrib: '@todayPrayerTimes.Maghrib',
+			isha: '@todayPrayerTimes.Isha'
+		};
+
+		function getNextPrayerTime() {
+			const now = new Date();
+			const currentTime = now.getHours() * 60 + now.getMinutes();
+			
+			const prayerTimes = [
+				{ name: 'İmsak', time: convertTimeToMinutes(todayPrayerTimes.fajr) },
+				{ name: 'Güneş', time: convertTimeToMinutes(todayPrayerTimes.sunrise) },
+				{ name: 'Öğle', time: convertTimeToMinutes(todayPrayerTimes.dhuhr) },
+				{ name: 'İkindi', time: convertTimeToMinutes(todayPrayerTimes.asr) },
+				{ name: 'Akşam', time: convertTimeToMinutes(todayPrayerTimes.maghrib) },
+				{ name: 'Yatsı', time: convertTimeToMinutes(todayPrayerTimes.isha) }
+			];
+
+			// Find the next prayer time
+			for (let i = 0; i < prayerTimes.length; i++) {
+				if (prayerTimes[i].time > currentTime) {
+					return prayerTimes[i];
+				}
+			}
+			
+			// If all prayers for today are passed, return first prayer of next day
+			return prayerTimes[0];
+		}
+
+		function convertTimeToMinutes(timeStr) {
+			const [hours, minutes] = timeStr.split(':').map(Number);
+			return hours * 60 + minutes;
+		}
+
+		function formatTime(minutes) {
+			const hours = Math.floor(minutes / 60);
+			const mins = minutes % 60;
+			return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+		}
+
+		function updateCountdown() {
+			const nextPrayer = getNextPrayerTime();
+			const now = new Date();
+			const currentTime = now.getHours() * 60 + now.getMinutes();
+			
+			let timeRemaining = nextPrayer.time - currentTime;
+			
+			// If time remaining is negative, it means we're past all prayers for today
+			if (timeRemaining < 0) {
+				timeRemaining += 24 * 60; // Add 24 hours
+			}
+
+			const hours = Math.floor(timeRemaining / 60);
+			const minutes = timeRemaining % 60;
+			const seconds = 60 - now.getSeconds();
+
+			// Update the countdown display
+			document.querySelector('.text-blue-800.font-semibold').textContent = `${nextPrayer.name} Vaktine Kalan Süre`;
+			document.querySelector('.bg-blue-800.rounded-3xl').innerHTML = `
+				<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M14.3763 3.75H5.6263C5.57105 3.75 5.51806 3.77195 5.47899 3.81102C5.43992 3.85009 5.41797 3.90308 5.41797 3.95833V4.45833C5.42209 4.89465 5.5319 5.32346 5.73799 5.70806C5.94407 6.09266 6.2403 6.42158 6.6013 6.66667L8.33464 7.9C8.68464 8.13167 8.9763 8.44167 9.18464 8.8075C9.39915 9.16829 9.51238 9.58026 9.51238 10C9.51238 10.4197 9.39915 10.8317 9.18464 11.1925C8.9763 11.5575 8.68464 11.8683 8.33464 12.1L6.6013 13.3333C6.2403 13.5784 5.94407 13.9073 5.73799 14.2919C5.5319 14.6765 5.42209 15.1054 5.41797 15.5417V16.0417C5.41797 16.0969 5.43992 16.1499 5.47899 16.189C5.51806 16.2281 5.57105 16.25 5.6263 16.25H14.3763C14.4316 16.25 14.4845 16.2281 14.5236 16.189C14.5627 16.1499 14.5846 16.0969 14.5846 16.0417V15.5417C14.5805 15.1054 14.4707 14.6765 14.2646 14.2919C14.0585 13.9073 13.7623 13.5784 13.4013 13.3333L11.668 12.1C11.3171 11.8687 11.0258 11.5578 10.818 11.1925C10.6034 10.8317 10.4902 10.4197 10.4902 10C10.4902 9.58026 10.6034 9.16829 10.818 8.8075C11.0263 8.4425 11.318 8.13167 11.668 7.9L13.4013 6.66667C13.7623 6.42158 14.0585 6.09266 14.2646 5.70806C14.4707 5.32346 14.5805 4.89465 14.5846 4.45833V3.95833C14.5846 3.90308 14.5627 3.85009 14.5236 3.81102C14.4845 3.77195 14.4316 3.75 14.3763 3.75Z" fill="#FAFAFA"></path>
+				</svg>
+				${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}
+			`;
+		}
+
+		// Update countdown every second
+		setInterval(updateCountdown, 1000);
+		updateCountdown(); // Initial update
+	}
+
+	// Start the countdown when the page loads
+	document.addEventListener('DOMContentLoaded', updatePrayerTimesCountdown);
+</script>

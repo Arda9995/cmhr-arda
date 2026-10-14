@@ -1,0 +1,18 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="mb-10 gap-5">
+    <div class="fv-row">
+        <label class="form-label">@_localizer["SubHeading"]</label>
+        <div class="input-group">
+            <input asp-for="SubHeading" class="form-control maxlength" maxlength="500" autocomplete="off" />
+        </div>
+        <span asp-validation-for="SubHeading" class="fv-plugins-message-container invalid-feedback"></span>
+        <div class="text-muted fs-7">@_localizer["NewsSubHeadingText"]</div>
+    </div>
+    <div class="fv-row">
+        <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+            <input asp-for="ShowSubHeading" class="form-check-input" type="checkbox" />
+            <span style="margin-left:10px;">@_localizer["Show"]</span>
+        </div>
+    </div>
+</div>

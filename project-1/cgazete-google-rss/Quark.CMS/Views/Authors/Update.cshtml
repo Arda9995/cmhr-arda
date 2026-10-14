@@ -1,0 +1,222 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["Author"]+" "+_localizer["Update"];
+    ViewData[ViewDataNames.AsideMenu] = "Content";
+    ViewData[ViewDataNames.AsideSubMenu] = "Authors";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Content"], string.Empty),
+        new BreadcrumbItem(_localizer["Authors"], "/Authors/List")
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.AuthorRequests.CreateUpdateRequest
+
+@section Scripts
+{
+    <script src="/Scripts/Authors/Validations.js" asp-append-version="true"></script>
+}
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Author"] @_localizer["Informations"]</h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data" id="authorForm">
+        <input type="hidden" asp-for="ID" />
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Author"]</label>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-lg-6 fv-row">
+                            <input asp-for="Firstname" type="text" class="form-control form-control-lg form-control-solid" placeholder="@_localizer["Name"]" />
+                            <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Firstname"></span>
+                        </div>
+                        <div class="col-lg-6 fv-row">
+                            <input asp-for="Lastname" type="text" class="form-control form-control-lg form-control-solid" placeholder="@_localizer["LastName"]" />
+                            <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Lastname"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["EMail"]</label>
+                <div class="col-lg-9">
+                    <input asp-for="Email" type="text" class="form-control form-control-lg form-control-solid emailaddress" />
+                    <div class="form-text">
+                        @_localizer["WebSiteViewersNote"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Email"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Categories"]</label>
+                <div class="col-lg-9">
+                    <select asp-items="@Model.Categories" asp-for="SelectedCategoryIDs" class="form-select form-select-lg form-select-solid" data-control="select2" multiple="multiple"></select>
+                    <span asp-validation-for="@Model.SelectedCategoryIDs" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label required fw-bold fs-6">@_localizer["ProfilePhoto"]</label>
+                <div class="col-lg-9">
+                    <div class="image-input image-input-outline" data-kt-image-input="true">
+                        <div id="backgroundPhoto" class="image-input-wrapper w-125px h-125px bgi-position-center" style="background-size: 75%;
+                            background-image: url('@(Model.ProfilePhotoUrl)')"></div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="@_localizer["Update"]">
+                            <i class="bi bi-pencil-fill fs-7"></i>
+                            <input type="file" name="ProfilePhoto" accept=".png, .jpg, .jpeg" />
+                            <input type="hidden" name="avatar_remove" />
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="@_localizer["Cancel"]">
+                            <i class="bi bi-x fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">@_localizer["UploadImageHelpText"]</div>
+                    <span class="fv-plugins-message-container invalid-feedback" id="imageValidation"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label required fw-bold fs-6">@_localizer["ClichePhoto"]</label>
+                <div class="col-lg-9">
+                    <div class="image-input image-input-outline" data-kt-image-input="true">
+                        <div id="backgroundClichePhoto" class="image-input-wrapper w-125px h-125px bgi-position-center" style="background-size: 75%;
+                            background-image: url('@(Model.ClichePhotoUrl)')"></div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="@_localizer["Update"]">
+                            <i class="bi bi-pencil-fill fs-7"></i>
+                            <input type="file" name="ClichePhoto" accept=".png, .jpg, .jpeg" />
+                            <input type="hidden" name="avatar_remove" />
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="@_localizer["Cancel"]">
+                            <i class="bi bi-x fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">@_localizer["UploadImageHelpText"]</div>
+                    <span class="fv-plugins-message-container invalid-feedback" id="imageValidationCliche"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["Order"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input asp-for="Order" type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.Order"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label for="basic-url" class="required form-label col-3">URL</label>
+                <div class="col-lg-9 fv-row">
+                    <div class="input-group">
+                        <span class="input-group-text" id="slug">@Model.BaseURL</span>
+                        <input asp-for="@Model.Url" type="text" class="form-control maxlength" maxlength="500" id="basic-url" aria-describedby="basic-addon3"/>
+                    </div>
+                    <span asp-validation-for="@Model.Url" class="fv-plugins-message-container invalid-feedback"></span>
+                    <div id="url-note" class="text-muted fs-7">@_localizer["UrlDesc"]</div>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["SeoTitle"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input asp-for="SeoTitle" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.SeoTitle"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["SeoDescription"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input asp-for="SeoDescription" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.SeoDescription"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["About"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input asp-for="About" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.About"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["ColumnName"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input asp-for="ColumnName" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.ColumnName"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">Breadcrumb</label>
+                <div class="col-lg-9 fv-row">
+                    <input asp-for="Breadcrumb" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="@Model.Breadcrumb"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["ShowInHome"]</label>
+                <div class="col-lg-9 fv-row">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <input asp-for="ShowInHome" class="form-check-input" type="checkbox" />
+                        <span class="form-check-label text-muted">@_localizer["Enabled"]</span>
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["Status"]</label>
+                <div class="col-lg-9 fv-row">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <input asp-for="IsEnabled" class="form-check-input" type="checkbox"/>
+                        <span class="form-check-label text-muted">@_localizer["Enabled"]</span>
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["ShowTodaysColumnArticles"]</label>
+                <div class="col-lg-9 fv-row">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <input asp-for="ShowDailyColumnArticles" class="form-check-input" type="checkbox" />
+                        <span class="form-check-label text-muted">@_localizer["Enabled"]</span>
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="mb-10 fv-row col-lg-6">
+                <label for="basic-url" class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["SocialMedias"]</label>
+                <div class="input-group mb-6">
+                    <span class="input-group-text">
+                        <partial name="Icons/Facebook"/>                    
+                    </span>
+                    <input asp-for="@Model.FacebookUrl" type="text" class="form-control maxlength" maxlength="500" aria-describedby="basic-addon3"/>
+                </div>
+                <div class="input-group mb-6">
+                    <span class="input-group-text">
+                        <partial name="Icons/TwitterX"/>                    
+                    </span>
+                    <input asp-for="@Model.XUrl" type="text" class="form-control maxlength" maxlength="500" aria-describedby="basic-addon3"/>
+                </div>
+                <div class="input-group mb-6">
+                    <span class="input-group-text">
+                        <partial name="Icons/Instagram"/>                    
+                    </span>
+                    <input asp-for="@Model.InstagramUrl" type="text" class="form-control maxlength" maxlength="500" aria-describedby="basic-addon3"/>
+                </div>
+                <div class="input-group mb-6">
+                    <span class="input-group-text">
+                        <partial name="Icons/Youtube"/>                    
+                    </span>
+                    <input asp-for="@Model.YoutubeUrl" type="text" class="form-control maxlength" maxlength="500" aria-describedby="basic-addon3"/>
+                </div>
+                <div class="input-group mb-6">
+                    <span class="input-group-text">
+                        <partial name="Icons/Linkedin"/>                    
+                    </span>
+                    <input asp-for="@Model.LinkedinUrl" type="text" class="form-control maxlength" maxlength="500" aria-describedby="basic-addon3"/>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/Authors/Details/@Model.ID" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

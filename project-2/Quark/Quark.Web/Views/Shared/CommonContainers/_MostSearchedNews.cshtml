@@ -1,0 +1,69 @@
+﻿@model List<PageNewsCachingResponse>
+
+@{
+    var tab1Block = Model.Where(x => x.BlockKey == "Anasayfa-EnCokArananlarTab1").ToList();
+    var tab2Block = Model.Where(x => x.BlockKey == "Anasayfa-EnCokArananlarTab2").ToList();
+    var tab3Block = Model.Where(x => x.BlockKey == "Anasayfa-EnCokArananlarTab3").ToList();
+    var tab4Block = Model.Where(x => x.BlockKey == "Anasayfa-EnCokArananlarTab4").ToList();
+
+    var tab1 = tab1Block.FirstOrDefault();
+    var tab1Title = tab1?.BlockTitle ?? string.Empty;
+
+    var tab2 = tab2Block.FirstOrDefault();
+    var tab2Title = tab2?.BlockTitle ?? string.Empty;
+
+    var tab3 = tab3Block.FirstOrDefault();
+    var tab3Title = tab3?.BlockTitle ?? string.Empty;
+
+    var tab4 = tab4Block.FirstOrDefault();
+    var tab4Title = tab4?.BlockTitle ?? string.Empty;
+}
+
+
+<div class="!mt-[72px]">
+    <!-- Title Start -->
+    <div class="font-medium text-slate-900 text-xl">En Çok Aranan Haberler</div> <!-- Title End --> <!-- Tab Start -->
+    <nav class="news-tabs *:text-zinc-400 *:text-sm *:font-semibold *:transition-all flex gap-8 mt-7 [&>.active]:text-gray-700">
+        <a class="hover:text-gray-700 active" href="#tab-1"> @tab1Title </a>
+        <a class="hover:text-gray-700 " href="#tab-2"> @tab2Title </a>
+        <a class="hover:text-gray-700 " href="#tab-3"> @tab3Title </a>
+        <a class="hover:text-gray-700 " href="#tab-4"> @tab4Title </a>
+    </nav> <!-- Tab End --> <!-- Tab Contents Start -->
+    <div class="mt-6 tab-contents">
+        <div class="tab " id="tab-1">
+            <ul class="grid lg:grid-rows-4 lg:grid-flow-col md:grid-cols-2 lg:grid-cols-4 *:border-b *:border-gray-200 gap-5 [&>*:nth-child(4n)]:lg:border-0">
+                @foreach (var news in tab1Block)
+                {
+                    <li> <a href="@news.NewsSlug" class="text-neutral-400 font-semibold hover:text-neutral-700 transition-all pb-4 block"> @news.NewsHeadline </a> </li>
+
+                }
+            </ul>
+        </div>
+        <div class="tab hidden" id="tab-2">
+            <ul class="grid lg:grid-rows-4 lg:grid-flow-col md:grid-cols-2 lg:grid-cols-4 *:border-b *:border-gray-200 gap-5 [&>*:nth-child(4n)]:lg:border-0">
+                @foreach (var news in tab2Block)
+                {
+                    <li> <a href="@news.NewsSlug" class="text-neutral-400 font-semibold hover:text-neutral-700 transition-all pb-4 block"> @news.NewsHeadline </a> </li>
+
+                }
+            </ul>
+        </div>
+        <div class="tab hidden" id="tab-3">
+            <ul class="grid lg:grid-rows-4 lg:grid-flow-col md:grid-cols-2 lg:grid-cols-4 *:border-b *:border-gray-200 gap-5 [&>*:nth-child(4n)]:lg:border-0">
+                @foreach (var news in tab3Block)
+                {
+                    <li> <a href="@news.NewsSlug" class="text-neutral-400 font-semibold hover:text-neutral-700 transition-all pb-4 block"> @news.NewsHeadline </a> </li>
+
+                }
+            </ul>
+        </div>
+        <div class="tab hidden" id="tab-4">
+            <ul class="grid lg:grid-rows-4 lg:grid-flow-col md:grid-cols-2 lg:grid-cols-4 *:border-b *:border-gray-200 gap-5 [&>*:nth-child(4n)]:lg:border-0">
+              @foreach (var news in tab1Block)
+                {
+                    <li> <a href="@news.NewsSlug" class="text-neutral-400 font-semibold hover:text-neutral-700 transition-all pb-4 block"> @news.NewsHeadline </a> </li>
+
+                } </ul>
+        </div>
+    </div> <!-- Tab Contents End -->
+</div> <!-- Best News End -->

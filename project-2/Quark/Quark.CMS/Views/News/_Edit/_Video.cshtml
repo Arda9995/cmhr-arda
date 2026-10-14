@@ -1,0 +1,55 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="card card-flush mb-10">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>@_localizer["Video"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0 text-center">
+        <div class="">
+            <div class="row mw-500px mb-5" data-kt-buttons="true" data-kt-buttons-target=".form-check-image, .form-check-input">
+                <input type="hidden" asp-for="SelectedVideoPlayer"/>
+                @if (Model.IsYoutubeEnabled)
+                {
+                    <div class="col-4">
+                        <label class="form-check-image active">
+                            <div class="form-check-wrapper" style="width: 75px; height: auto;">
+                                <partial name="Icons/YoutubeIMG"/>
+                            </div>
+                            <div class="form-check form-check-custom form-check-solid" >
+                                <input class="form-check-input" type="radio" checked value="@((int)VideoPlayerEnum.Youtube)" name="VideoPlayerID"/>
+                                <div class="form-check-label">
+                                    @VideoPlayerEnum.Youtube
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                }
+                @if (Model.IsDailymotionEnabled)
+                {
+                    <div class="col-4">
+                        <label class="form-check-image">
+                            <div class="form-check-wrapper" style="width: 75px; height: auto;">
+                                <partial name="Icons/DailymotionIMG"/>
+                            </div>
+                            <div class="form-check form-check-custom form-check-solid me-10">
+                                <input class="form-check-input" type="radio" value="@((int)VideoPlayerEnum.Dailymotion)" name="VideoPlayerID"/>
+                                <div class="form-check-label">
+                                    @VideoPlayerEnum.Dailymotion
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                }
+            </div>
+            <div class="mb-10 fv-row">
+                @* <label class="form-label">Video</label> *@
+                <input asp-for="@Model.Video" type="text" class="form-control" maxlength="250" />
+                <div class="text-muted fs-7 mt-2">@_appSettings.VideoTextFieldHintText</div>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>

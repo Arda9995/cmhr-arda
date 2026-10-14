@@ -1,0 +1,46 @@
+﻿using Quark.Business.Common.Caching;
+using Quark.Web.Diagnostics;
+
+namespace Quark.Web.RouteConfigs
+{
+	public static class RouteInitializer
+	{
+		public static async Task InitializeRoutes(IEndpointRouteBuilder app, WebApplication application, AppSettingsKeys appSettingsKeys)
+		{
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "RouteInitializer-start", "RouteInitializer.cs:InitializeRoutes enter");
+
+            AccountRouteConfig.RegisterRoutes(app);
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "after-AccountRouteConfig", "RouteInitializer.cs:after AccountRouteConfig.RegisterRoutes");
+
+            AuthorRouteConfig.RegisterRoutes(app);
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "after-AuthorRouteConfig", "RouteInitializer.cs:after AuthorRouteConfig.RegisterRoutes");
+
+			await CommonRouteConfig.RegisterRoutes(app, application);
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "after-CommonRouteConfig", "RouteInitializer.cs:after CommonRouteConfig.RegisterRoutes");
+
+            await SourceRouteConfig.RegisterRoutes(app, appSettingsKeys);
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "after-SourceRouteConfig", "RouteInitializer.cs:after SourceRouteConfig.RegisterRoutes");
+
+            await TagRouteConfig.RegisterRoutes(app, appSettingsKeys);
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "after-TagRouteConfig", "RouteInitializer.cs:after TagRouteConfig.RegisterRoutes");
+
+			HomeRouteConfig.RegisterRoutes(app);
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "after-HomeRouteConfig", "RouteInitializer.cs:after HomeRouteConfig.RegisterRoutes");
+
+			await CategoryRouteConfig.RegisterRoutes(app, application);
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "after-CategoryRouteConfig", "RouteInitializer.cs:after CategoryRouteConfig.RegisterRoutes");
+
+			NewsRouteConfig.RegisterRoutes(app);
+            EndpointDuplicateDiagnostics.LogBuilderSnapshot(
+                application.Services, app, application, "after-NewsRouteConfig", "RouteInitializer.cs:after NewsRouteConfig.RegisterRoutes");
+        }
+	}
+}

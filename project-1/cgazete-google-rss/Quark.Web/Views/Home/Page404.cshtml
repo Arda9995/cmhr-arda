@@ -1,0 +1,23 @@
+﻿@{
+	Layout = "~/Views/Shared/_LayoutNoAds.cshtml";
+}
+@section MetaTags {
+	<meta http-equiv="refresh" content="10; url = https://www.cumhuriyet.com.tr">
+}
+
+<!-- MAIN START -->
+<partial name="~/Views/Shared/_Header.cshtml" />
+<main id="main" class="my-4 px-5 tablet:px-0">
+	<div class="max-w-container mx-auto space-y-6 undefined">
+		<div class="py-24 md:py-32 relative">
+			<img src="~/assets/img/error-img.png" class="mx-auto aspect-[16/9]" alt=""> <!-- Content Start -->
+			<div class="text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+				<!-- Title Start -->
+				<h1 class="text-slate-900 text-2xl md:text-5xl font-bold mb-2"> Sayfa Bulunamadı! </h1> <!-- Title End  --> <!-- Description Start -->
+				<p class="text-slate-900 font-helvetica"> Aradığınız Sayfa Bulunamadı <br> 10 Saniye Sonra Anasayfaya Yönlendireceksiniz </p> <!-- Description End --> <!-- Button Start --> 
+
+				<a href="/" class="px-20 md:px-36 py-4 bg-[#FF0101] hover:bg-red-600 transition-all text-white inline-block font-bold mt-5">Anasayfa</a> <!-- Button End -->
+			</div> <!-- Content End  -->
+		</div>
+	</div>
+</main>

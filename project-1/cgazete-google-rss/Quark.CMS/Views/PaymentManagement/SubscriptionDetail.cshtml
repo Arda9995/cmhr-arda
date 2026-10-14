@@ -1,0 +1,213 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["Subscriptions"];
+    ViewData[ViewDataNames.AsideMenu] = "PaymentManagements";
+    ViewData[ViewDataNames.AsideSubMenu] = "Subscriptions";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["PaymentManagements"], string.Empty),
+        new BreadcrumbItem(_localizer["Subscriptions"], "/PaymentManagement/Subscriptions"),
+    };
+}
+
+@model Quark.CMS.Business.Models.Responses.PaymentManagementResponses.SubscriptionDetailResponse
+
+<div class="row g-5 g-xl-8">
+    <!-- Member Information Card -->
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-header border-0">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-dark">@_localizer["Member Information"]</span>
+                </h3>
+            </div>
+            <div class="card-body pt-0">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-person me-2 text-gray-400"></i>@_localizer["Member Name"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.MemberName</div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-envelope me-2 text-gray-400"></i>@_localizer["Email"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.Email</div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-telephone me-2 text-gray-400"></i>@_localizer["Phone Number"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.PhoneNumber</div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-credit-card-2-front me-2 text-gray-400"></i>@_localizer["Identity Number"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.IdentityNumber</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-person-badge me-2 text-gray-400"></i>@_localizer["Billing Person Name"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.BillingPersonName</div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-hash me-2 text-gray-400"></i>@_localizer["Customer Reference Code"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.IyzicoCustomerReferenceCode</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Information Card -->
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-header border-0">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-dark">@_localizer["Address Information"]</span>
+                </h3>
+            </div>
+            <div class="card-body pt-0">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-geo-alt me-2 text-gray-400"></i>@_localizer["Address"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.SubscriptionAddress.Address</div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-building me-2 text-gray-400"></i>@_localizer["City"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.SubscriptionAddress.City</div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-flag me-2 text-gray-400"></i>@_localizer["State"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.SubscriptionAddress.State</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-geo me-2 text-gray-400"></i>@_localizer["District"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.SubscriptionAddress.District</div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-mailbox me-2 text-gray-400"></i>@_localizer["Zip Code"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.SubscriptionAddress.ZipCode</div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-bank me-2 text-gray-400"></i>@_localizer["Tax Office"]
+                            </label>
+                            <div class="form-control-plaintext">@Model.SubscriptionAddress.TaxOffice</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Details Card -->
+    <div class="col-xl-12">
+        <div class="card card-xl-stretch mb-xl-8">
+            <div class="card-header border-0">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-dark">@_localizer["Subscription Details"]</span>
+                </h3>
+            </div>
+            <div class="card-body pt-0">
+                <div class="accordion" id="subscriptionAccordion">
+                    @{ var idx = 0; }
+                    @foreach (var subscription in Model.SubscriptionDetailResponseItems)
+                    {
+                        var rowClass = idx % 2 == 0 ? "bg-light" : "";
+                        <div class="accordion-item @rowClass">
+                            <h2 class="accordion-header" id="heading@(subscription.SubscriptionReferenceCode)">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse@(subscription.SubscriptionReferenceCode)" 
+                                        aria-expanded="false" aria-controls="collapse@(subscription.SubscriptionReferenceCode)">
+                                    <div class="container-fluid px-0">
+                                        <div class="row w-100 align-items-center">
+                                            <div class="col-5 text-start">
+                                                <span class="fw-bold text-gray-800">@subscription.PaymentPlanName</span>
+                                            </div>
+                                            <div class="col-2 text-center">
+                                                <span class="badge badge-light-@(subscription.SubscriptionStatu == "Active" ? "success" : "danger")">
+                                                    @subscription.SubscriptionStatu
+                                                </span>
+                                            </div>
+                                            <div class="col-2 text-end">
+                                                <span class="fw-bold">@subscription.PaymentPlanPrice</span>
+                                            </div>
+                                            <div class="col-3 text-end text-muted">
+                                                <span>@subscription.StartDate - @subscription.EndDate</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse@(subscription.SubscriptionReferenceCode)" class="accordion-collapse collapse" 
+                                 aria-labelledby="heading@(subscription.SubscriptionReferenceCode)" data-bs-parent="#subscriptionAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-5">
+                                        <div class="col-md-4">
+                                            <div class="border rounded p-5 bg-light-primary">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold text-muted">@_localizer["Subscription Reference"]</label>
+                                                    <div class="fw-bold text-gray-800">@subscription.SubscriptionReferenceCode</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="border rounded p-5 bg-light-success">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold text-muted">@_localizer["Payment Plan Reference"]</label>
+                                                    <div class="fw-bold text-gray-800">@subscription.PaymentPlanReferenceCode</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="border rounded p-5 bg-light-warning">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold text-muted">@_localizer["Product Reference"]</label>
+                                                    <div class="fw-bold text-gray-800">@subscription.ProductReferenceCode</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        idx++;
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.accordion-button').on('click', function() {
+                $('.accordion-button').not(this).addClass('collapsed');
+                $('.accordion-collapse').not($(this).attr('data-bs-target')).removeClass('show');
+            });
+        });
+    </script>
+}

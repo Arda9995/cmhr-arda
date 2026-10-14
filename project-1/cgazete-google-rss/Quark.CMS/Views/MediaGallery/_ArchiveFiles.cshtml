@@ -1,0 +1,50 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Quark.CMS.Business.Constants
+
+<div class="card card-flush card-stretch">
+    <div class="card-header pt-8">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-6">
+                    <span class="path1"></span><span class="path2"></span>
+                </i> 
+                <input id="search-value" data-kt-filter="datatable-search" type="text" onchange="applyArchiveFilterData()" class="form-control form-control-solid w-250px ps-15" placeholder="@_localizer["Search"]">
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="filePath" class="d-flex flex-stack">
+        </div>
+        <table id="archivesDatatable" class="table align-middle table-row-dashed fs-6 mt-10">
+            <thead>
+            <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                <th class="min-w-250px">@_localizer["File"]</th>
+                <th class="min-w-250px">@_localizer["CreatedBy"]</th>
+            </tr>
+            </thead>
+            <tbody class="fw-semibold text-gray-600">
+            <div style="display: none">
+                <div id="ColB1">
+                    <div class="d-flex align-items-center">
+                        <div class="overlay overflow-hidden w-100px me-3">
+                            <div class="overlay-wrapper">
+                                <img class="w-100px me-3 rounded" src="{0}" alt="{1}"/>
+                            </div>
+                            <div class="overlay-layer bg-dark bg-opacity-25 w-100px">
+                                <a data-fslightbox href="{0}" class="btn btn-primary btn-shadow" target="_blank">
+                                    <i class="bi bi-eye pe-0 fs-4"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <span class="text-gray-800 text-hover-primary" data-bs-toggle="tooltip"  data-bs-trigger="hover" data-bs-placement="top" title="{2}">{1}</span>
+                    </div>
+                </div>
+                <div id="ColB2">
+                    {0}
+                </div>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>

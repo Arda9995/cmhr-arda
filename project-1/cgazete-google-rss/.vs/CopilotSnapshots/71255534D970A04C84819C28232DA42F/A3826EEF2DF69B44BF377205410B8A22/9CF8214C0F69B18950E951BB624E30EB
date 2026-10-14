@@ -1,0 +1,203 @@
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Core.Bulk;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using Elasticsearch.Net;
+using Quark.Business.ElasticSearch.Abstractions;
+using Quark.Business.ElasticSearch.Models.Responses.NewsResponses;
+using Id = Elastic.Clients.Elasticsearch.Id;
+
+namespace Quark.Business.ElasticSearch.Implementations;
+
+public class ElasticSearchService(ElasticsearchClient elasticClient) : IElasticSearchService
+{
+    public async Task<bool> HealtyElastic()
+    {
+        var response = await elasticClient.PingAsync();
+        return response.IsValidResponse;
+    }
+
+    public async Task<bool> DeleteIndexAsync(string indexName)
+    {
+        var isExist = await elasticClient.Indices.ExistsAsync(indexName);
+        if (!isExist.Exists)
+        {
+            return true;
+        }
+
+        var response = await elasticClient.Indices.DeleteAsync(indexName);
+        return response.IsValidResponse;
+    }
+
+    public async Task<bool> DeleteIndexDocuments(string indexName, List<string> ids)
+    {
+        if (string.IsNullOrWhiteSpace(indexName))
+            return false;
+
+        if (ids == null || !ids.Any())
+            return true;
+
+        var isExist = await elasticClient.Indices.ExistsAsync(indexName);
+        if (!isExist.Exists)
+        {
+            return true;
+        }
+
+        foreach (var id in ids)
+        {
+            var response = await elasticClient.DeleteAsync(
+                new Elastic.Clients.Elasticsearch.DeleteRequest(indexName, id)
+            );
+
+            if (!response.IsValidResponse)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public async Task<bool> BulkDeleteDocumentsAsync<T>(string indexName, IEnumerable<string> ids) where T : class
+    {
+        if (string.IsNullOrWhiteSpace(indexName) || ids == null || !ids.Any())
+            return false;
+
+        if (ids == null || !ids.Any())
+            return true;
+
+        var isExist = await elasticClient.Indices.ExistsAsync(indexName);
+        if (!isExist.Exists)
+            return true;
+
+        var bulkRequest = new BulkRequest(indexName);
+        var operations = new List<IBulkOperation>();
+
+        foreach (var id in ids)
+        {
+            operations.Add(new BulkDeleteOperation(new Id(id)));
+        }
+    
+        bulkRequest.Operations = operations;
+        var response = await elasticClient.BulkAsync(bulkRequest);
+        return response.IsValidResponse && !response.Errors;
+    }
+
+    public async Task<bool> IsExistDocumentAsync(string id, string indexName)
+    {
+        var response = await elasticClient.ExistsSourceAsync(id, e => e.Index(indexName));
+        return response.Exists;
+    }
+
+    public async Task<bool> IndexDocumentAsync<T>(T document, string indexName) where T : class
+    {
+        var response = await elasticClient.IndexAsync(document, idx => idx.Index(indexName));
+        return response.IsValidResponse;
+    }
+
+    public async Task<bool> UpdateDocumentAsync<T>(T document, string id, string indexName) where T : class
+    {
+        var isExist = await elasticClient.ExistsAsync<T>(id, e => e.Index(indexName));
+
+        if (!isExist.Exists)
+        {
+            var createResponse = await IndexDocumentAsync(document, indexName);
+            return createResponse;
+        }
+
+        var response = await elasticClient.UpdateAsync<T, T>(indexName, id, u => u
+            .Doc(document));
+
+        return response.IsValidResponse;
+    }
+
+    public async Task<List<T>> GetAllDocumentsAsync<T>(string indexName) where T : class
+    {
+        var isExist = await elasticClient.Indices.ExistsAsync(indexName);
+
+        if (!isExist.Exists)
+        {
+            return new List<T>();
+        }
+
+        var response = await elasticClient.SearchAsync<T>(s => s
+            .Index(indexName)
+            .Size(10000)
+        );
+
+        return response.Documents.ToList();
+    }
+
+    public async Task<List<T>> SearchDocumentsAsync<T>(string indexName, Action<QueryDescriptor<T>> query,
+        Action<SortOptionsDescriptor<T>> sort = null, int size = 10000) where T : class
+    {
+        var response = await elasticClient.SearchAsync<T>(s =>
+        {
+            if (sort != null)
+                s
+                    .Index(indexName)
+                    .Sort(sort)
+                    .Size(size)
+                    .Query(query);
+            else
+                s
+                    .Index(indexName)
+                    .Size(size)
+                    .Query(query);
+        });
+
+        return response.Documents.ToList();
+    }
+
+    public async Task<SearchResponse<T>> SearchDocumentsWithSearchAfterAsync<T>(string indexName,
+        Action<QueryDescriptor<T>> query, Action<SortOptionsDescriptor<T>> sort = null, int size = 10000,
+        List<FieldValue> searchAfter = null) where T : class
+    {
+        var response = await elasticClient.SearchAsync<T>(s =>
+        {
+            s
+                .Index(indexName)
+                .Sort(sort)
+                .Size(size > 10000 ? 10000 : size)
+                .Query(query)
+                .SearchAfter(searchAfter);
+        });
+
+        return response;
+    }
+
+    public async Task<T> GetDocumentAsync<T>(string id, string indexName) where T : class
+    {
+        var response = await elasticClient.GetAsync<T>(id, g => g.Index(indexName));
+        return response.Source;
+    }
+
+    public async Task<List<T>> GetByIdsDocumentAsync<T>(List<string> ids, string indexName = null) where T : class
+    {
+        var list = new List<T>();
+        var isExist = await elasticClient.Indices.ExistsAsync(indexName);
+        if (!isExist.Exists)
+        {
+            return list;
+        }
+
+        foreach (var id in ids)
+        {
+            var response = await elasticClient.GetAsync<T>(id, g => g.Index(indexName));
+            if (response.Source != null)
+            {
+                list.Add(response.Source);
+            }
+        }
+
+        return list;
+    }
+
+    public async Task<bool> BulkIndexDocumentsAsync<T>(IEnumerable<T> documents, string indexName) where T : class
+    {
+        var response = await elasticClient.BulkAsync(b => b
+            .Index(indexName)
+            .IndexMany(documents)
+        );
+        return response.IsValidResponse;
+    }
+}

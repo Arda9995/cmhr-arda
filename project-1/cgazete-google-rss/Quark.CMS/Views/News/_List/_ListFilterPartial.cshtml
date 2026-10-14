@@ -1,0 +1,74 @@
+﻿@model Quark.CMS.Business.Models.Requests.NewsRequests.GetNewsFiltersRequest
+<div class="card mb-7">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            <div class="position-relative w-md-400px me-md-2">
+                <span class="svg-icon svg-icon-3 svg-icon-gray-500 position-absolute top-50 translate-middle ms-6">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor"/>
+                        <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor"/>
+                    </svg>
+                </span>
+                <input id="searchValue" type="text" data-kt-filter="datatable-search" class="form-control form-control-solid ps-10" name="search" value="" placeholder="@_localizer["Search"]"/>
+            </div>
+            <div class="d-flex align-items-center">
+                <button onclick="applyFilter()" class="btn btn-primary me-5">@_localizer["Search"]</button>
+                <a id="kt_horizontal_search_advanced_link" class="btn btn-link" data-bs-toggle="collapse" href="#kt_advanced_search_form">@_localizer["AdvancedSearch"]</a>
+            </div>
+        </div>
+        <div class="collapse" id="kt_advanced_search_form">
+            <div class="separator separator-dashed mt-9 mb-6"></div>
+            <div class="row">
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">@_localizer["Author"]</label>
+                    <select asp-items="@Model.Authors" id="author" class="form-select form-select-solid" data-control="select2" data-placeholder="-- Seçiniz --"></select>
+                </div>    
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">Kullanıcılar</label>
+                    <select asp-items="@Model.Users" id="user" class="form-select form-select-solid" data-control="select2" data-placeholder="-- Seçiniz --"></select>
+                </div>
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">@_localizer["CreatedDate"]</label>
+                    <input class="form-control form-control-solid daterange" id="createdDate"/>
+                </div>
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">@_localizer["PublishDate"]</label>
+                    <input class="form-control form-control-solid daterange-empty" id="publishDate"/>
+                </div>
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">@_localizer["Status"]</label>
+                    <select asp-items="@Model.StatusList" id="status" class="form-select form-select-solid" data-control="select2"></select>
+                </div>
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">@_localizer["Category"]</label>
+                    <select asp-items="@Model.Categories" id="category" class="form-select form-select-solid" data-control="select2"></select>
+                </div>
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">@_localizer["NewsType"]</label>
+                    <select asp-items="@Model.Types" id="type" class="form-select form-select-solid" data-control="select2"></select>
+                </div>      
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">@_localizer["Source"]</label>
+                    <select asp-items="@Model.Sources" id="source" class="form-select form-select-solid" data-control="select2"></select>
+                </div>
+                <div class="mb-10 col-xxl-3 col-xl-6">
+                    <label class="fs-6 form-label fw-bolder text-dark">@_localizer["ViewRange"]</label>
+                    <select id="range" class="form-select form-select-solid" data-control="select2" data-placeholder="-- Seçiniz --"><option></option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15" selected>15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                        <option value="40">40</option>
+                        <option value="45">45</option>
+                        <option value="50">50</option>
+                        <option value="55">55</option>
+                        <option value="60">60</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

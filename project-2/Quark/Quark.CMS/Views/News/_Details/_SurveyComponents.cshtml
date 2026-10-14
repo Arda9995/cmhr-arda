@@ -1,0 +1,84 @@
+﻿@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+@using System.Text.Json
+
+
+<div class="row g-5 mb-10">
+    <div class="col-xl-7 col-lg-12">
+        <div class="card card-stretch h-100">
+            <div class="card-header border-0">
+                <div class="card-title m-0">
+                    <h3 class="fw-bolder m-0">@_localizer["Survey"] @_localizer["Informations"]</h3>
+                </div>
+                @*<div class="card-toolbar">
+                <button class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end"><i class="ki-solid ki-dots-horizontal fs-2x me-1"></i></button>
+                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+                <div class="menu-item px-3"><a onclick="RefreshAnswers(@Model.SurveyItemRequest.ID)" class="menu-link px-3">@_localizer["UpdateData"]</a></div>
+                </div>
+                </div>*@
+            </div>
+            <div class="card-body border-top pt-5">
+                <h3 class="fw-bolder m-5 mb-10">@Model.SurveyItemRequest.Question</h3>
+                @{
+                    var options = JsonSerializer.Serialize(Model.SurveyItemRequest.OptionWithAnswerCount); ;
+                }
+                
+                <input type="hidden" id="options-dictionary" value="@options" />
+
+
+                @foreach (var option in Model.SurveyItemRequest.OptionWithAnswerCount)
+                {
+                    <div class="row mb-4">
+                        <div class="col-lg-9 d-flex align-items-center fs-6">
+                            <div class="bullet" data-option="@option.Key" style="border-radius: 3px; width: 12px; height: 12px; margin-right: 10px;"></div>
+                            <div class="fs-5 fw-bold text-gray-800 fv-row ">@option.Key</div>
+                        </div>
+                        <div class="col-lg-3 fw-bold text-gray-800 text-end fs-5">@option.Value</div>
+                    </div>
+                }
+
+                <div class="row mb-4">
+                    <div class="col-lg-9 d-flex align-items-center">
+                        <div class="me-3" style="border-radius: 3px;width: 12px;height: 12px"></div>
+                        <div class="fs-5 fw-bold text-gray-800 me-5"></div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="separator separator-dashed border-1 mb-3 border-dark"></div>
+                        <div class="fw-bold text-gray-800 text-end fs-5">@Model.SurveyItemRequest.TotalCount</div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-grow-1 pe-8 pt-20">
+                    <div class="d-flex flex-wrap">
+                        <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="fs-6 fw-bold counted">@Model.SurveyItemRequest.StartDate</div>
+                            </div>
+                            <div class="fw-semibold fs-6 text-gray-500">@_localizer["StartDate"]</div>
+                        </div>
+                        <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="fs-6 fw-bold counted">@Model.SurveyItemRequest.EndDate</div>
+                            </div>
+                            <div class="fw-semibold fs-6 text-gray-500">@_localizer["EndDate"]</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5 col-lg-12">
+        <div class="card card-stretch h-100">
+            <div class="card-header border-0">
+                <div class="card-title m-0">
+                    <h3 class="fw-bolder m-0">Grafik Görünümü</h3>
+                </div>
+            </div>
+            <div class="card-body border-top p-9">
+                <div id="kt_docs_google_chart_pie" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

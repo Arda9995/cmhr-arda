@@ -1,0 +1,10 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="mb-10 fv-row">
+    <label class="form-label">@_localizer["SeoTitle"]</label>
+    <input asp-for="@Model.SeoTitle" type="text" class="form-control maxlength" maxlength="500" autocomplete="off" />
+</div>
+<div class="mb-10 fv-row">
+    <label class="form-label">@_localizer["SeoDescription"]</label>
+    <input asp-for="@Model.SeoDescription" type="text" class="form-control maxlength" maxlength="500" autocomplete="off" />
+</div>

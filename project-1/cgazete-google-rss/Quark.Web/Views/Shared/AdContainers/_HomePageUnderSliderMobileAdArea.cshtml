@@ -1,0 +1,25 @@
+@{
+    var hasPremiumMembership = "False";
+
+    var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    if (id !=  null)
+    {
+        hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+    }
+}
+
+@if (hasPremiumMembership == "True")
+{
+    
+}
+else
+{
+    <div class="ads-box" style="">
+        <div class="mb-5 flex justify-center items-center" style="max-height:150px;min-height:150px;">
+            <cmh-ads data-adunit="/cumhuriyet.com.tr/anasayfa_slider_alti"
+                     data-sizes="[[320, 150], [320, 100], [300, 150], [300, 100], 'fluid']"
+                     data-device="mobile"></cmh-ads>
+        </div>
+    </div>
+
+}

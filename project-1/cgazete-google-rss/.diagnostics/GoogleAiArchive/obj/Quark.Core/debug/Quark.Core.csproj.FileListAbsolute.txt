@@ -1,0 +1,17 @@
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\bin\Quark.Core\debug\Quark.Core.deps.json
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\bin\Quark.Core\debug\Quark.Core.dll
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\bin\Quark.Core\debug\Quark.Core.pdb
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\bin\Quark.Core\debug\Quark.Resources.dll
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\bin\Quark.Core\debug\Quark.Resources.pdb
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\bin\Quark.Core\debug\en\Quark.Resources.resources.dll
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\bin\Quark.Core\debug\tr\Quark.Resources.resources.dll
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\Quark.Core.csproj.AssemblyReference.cache
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\Quark.Core.GeneratedMSBuildEditorConfig.editorconfig
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\Quark.Core.AssemblyInfoInputs.cache
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\Quark.Core.AssemblyInfo.cs
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\Quark.Core.csproj.CoreCompileInputs.cache
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\Quark.Core.csproj.Up2Date
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\Quark.Core.dll
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\refint\Quark.Core.dll
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\Quark.Core.pdb
+E:\GitHub\cgazete-google-rss\.diagnostics\GoogleAiArchive\obj\Quark.Core\debug\ref\Quark.Core.dll

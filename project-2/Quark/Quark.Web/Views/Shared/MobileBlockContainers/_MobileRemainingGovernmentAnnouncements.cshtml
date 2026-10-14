@@ -1,0 +1,50 @@
+@using Quark.Business.Caching.Models.Responses.NewsCachingResponses
+@model GovernmentFilledBlock
+@{
+
+    var remainingCount = Model.GovernmentAnnouncementItems.Count % 2;
+    var orderGroupID = Model.GovernmentAnnouncementItems.FirstOrDefault().OrderGroup;
+    var fillerNews = new List<PageNewsCachingResponse>();
+    if (remainingCount > 0)
+    {
+        fillerNews = Model.FillerBlockNews
+            .Take(remainingCount)
+            .ToList();
+    }
+}
+
+<div class="grid grid-cols-2 gap-5 my-5">
+    @foreach (var news in fillerNews)
+    {
+        <div class="space-y-1 relative">
+            <!-- Favorite Button Start --> <button onclick="saveNewsID(@news.NewsID)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z" fill="#FF0101"></path>
+                </svg>
+            </button> <!-- Favorite Button End --> <!-- Thumbnail Start -->
+            <a href="@news.NewsSlug" target="_blank">
+                <div class="aspect-[16/9]">
+                    <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline" loading="lazy">
+                </div>
+            </a> <!-- Thumbnail End --> <!-- Title Start -->
+            <a href="@news.NewsSlug" target="_blank" class="font-semibold line-clamp-2 text-sm"> @news.NewsHeadline</a>
+        </div>
+    }
+    @foreach (var announcement in Model.GovernmentAnnouncementItems)
+    {
+        <div class="space-y-1 relative basin-ilan" id="bik-ilan-@announcement.PressNo">
+            <!-- Favorite Button Start -->
+            <button onclick="saveNewsID(@announcement.ID)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z" fill="#FF0101"></path>
+                </svg>
+            </button> <!-- Favorite Button End --> <!-- Thumbnail Start -->
+            <a href="@announcement.Slug" target="_blank">
+                <div class="aspect-[16/9]">
+                    <img src="@announcement.CoverPhoto" class="w-full h-full object-cover" alt="@announcement.Headline" loading="lazy">
+                </div>
+            </a> <!-- Thumbnail End --> <!-- Title Start -->
+            <a href="@announcement.Slug" target="_blank" class="font-semibold line-clamp-2 text-sm"> @announcement.Headline</a>
+        </div>
+    }
+</div> 

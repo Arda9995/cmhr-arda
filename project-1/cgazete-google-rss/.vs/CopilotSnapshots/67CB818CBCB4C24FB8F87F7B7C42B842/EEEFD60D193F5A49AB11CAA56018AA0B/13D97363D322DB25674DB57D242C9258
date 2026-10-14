@@ -1,0 +1,27 @@
+﻿{
+  "ConnectionStrings": {
+    "ConnectionString": "Server=3.76.151.226;Database=News-Staging;User Id=Quark;Password=b4ba0f86-2aa1-493f-8a1b-412a62e71fd2;Trust Server Certificate=true;  Pooling=true; Max Pool Size=400;Min Pool Size=200; "
+  },
+  "RedisConnectionString": "192.168.35.33:6390,password=redispw",
+  "ElasticSearchOptions": {
+    "Uri": "https://192.168.35.34:9200",
+    "ElasticUserName": "elastic",
+    "ElasticPassword": "XkmEjEvWDTIiHkU8vX+6"
+  },
+  "Firebase": {
+    "CredentialsPath": "/Configs/FCM/cumhuriyet-mobil.json"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "XmlSettings": {
+    "StoragePath": "xml",
+    "SiteUrl": "https://staging.example.com",
+    "RssFileName": "rss.xml",
+    "SitemapFileName": "sitemap.xml"
+  }
+
+}

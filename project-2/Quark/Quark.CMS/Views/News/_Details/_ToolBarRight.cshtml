@@ -1,0 +1,48 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+@if (!Model.IsLocked)
+{
+    <a id="lock" class="btn btn-sm btn-danger">
+        <partial name="Icons/Lock" />
+        @_localizer["Lock"]
+    </a>
+}
+else if (Model.HasRights.Unlock)
+{
+    <a id="unlock" class="btn btn-sm btn-success">
+        <partial name="Icons/Lock" />
+        @_localizer["UnLock"]
+    </a>
+}
+
+@if (!(Model.IsLocked && Model.IsLockedByCurrentUser == false && Model.HasRights.NewsCreateUpdate))
+{
+    <a class="btn btn-sm btn-primary" href="/News/Update/@Model.NewsID">
+        <i class="ki-duotone ki-pencil fs-2">
+            <span class="path1"></span>
+            <span class="path2"></span>
+        </i>
+        @_localizer["Update"]
+    </a>
+}
+
+@if (Model.IsPublished)
+{
+    <button data-bs-toggle="modal" data-bs-target="#notification_modal" class="btn btn-sm btn-success">
+        <i class="ki-duotone ki-notification">
+            <span class="path1"></span>
+            <span class="path2"></span>
+            <span class="path3"></span>
+        </i>
+        @_localizer["SendNotification"]
+    </button>
+
+    <button onclick="ClearCloudflareCache()" class="btn btn-sm btn-warning">
+        @_localizer["CloudflareCacheUpdate"]
+    </button>
+}
+
+
+<a class="btn btn-secondary btn-icon" data-kt-drawer-show="true" data-kt-drawer-target="#drawerHistory" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="left" title="@_localizer["History"]">
+    <partial name="Icons/History" />
+</a>

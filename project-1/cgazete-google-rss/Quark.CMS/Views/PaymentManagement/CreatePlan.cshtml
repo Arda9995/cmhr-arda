@@ -1,0 +1,105 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["Plans"];
+    ViewData[ViewDataNames.AsideMenu] = "PaymentManagements";
+    ViewData[ViewDataNames.AsideSubMenu] = "Plans";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["PaymentManagements"], string.Empty),
+        new BreadcrumbItem(_localizer["Plans"], "/PaymentManagement/Plans"),
+    };
+}
+
+@model Quark.Business.Common.PaymentServices.Models.Requests.CreateCumhuriyetPlanRequest
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["PaymentPlanInformation"]</h3>
+        </div>
+    </div>
+    <form class="form" method="post" id="planForm">
+        <div class="card-body top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["PaymentPlanName"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input type="text" asp-for="Name" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"/>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["PaymentProduct"]</label>
+                <div class="col-lg-9 fv-row">
+                    <select asp-items="@Model.ProductReferenceCodes" asp-for="@Model.ProductReferenceCode" class="form-control form-control-lg form-control-solid" data-control="select2"></select>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Price"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input type="number" asp-for="Price" class="form-control form-control-lg form-control-solid" step="0.01"/>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Currency"]</label>
+                <div class="col-lg-9 fv-row">
+                    <select asp-for="Currency" class="form-control form-control-lg form-control-solid" data-control="select2">
+                        <option value=@Iyzipay.Model.Currency.TRY.ToString()>TRY</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["PaymentInterval"]</label>
+                <div class="col-lg-9 fv-row">
+                    <select asp-for="PaymentInterval" class="form-control form-control-lg form-control-solid">
+                        <option value="DAILY">Daily</option>
+                        <option value="WEEKLY">Weekly</option>
+                        <option value="MONTHLY">Monthly</option>
+                        <option value="YEARLY">Yearly</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["PaymentIntervalCount"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input type="number" asp-for="PaymentIntervalCount" value="1" class="form-control form-control-lg form-control-solid" step="0.01"/>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["PaymentIntervalDisplayName"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input asp-for="PaymentIntervalDisplayName" placeholder="Aylık, 3 Aylık, Yıllık vb." class="form-control form-control-lg form-control-solid"/>
+                </div>
+            </div>
+            
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["PlanPaymentType"]</label>
+                <div class="col-lg-9 fv-row">
+                    <select asp-for="PlanPaymentType" class="form-control form-control-lg form-control-solid">
+                        <option value="RECURRING">Abonelik</option>
+                        <option value="ONE_TIME">Tek Seferlik Ödeme</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["Popularity"]</label>
+                <div class="col-lg-9 fv-row">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <input asp-for="IsPopular" class="form-check-input" type="checkbox" />
+                        <span class="form-check-label text-muted">@_localizer["Enabled"]</span>
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/PaymentManagement/Plans" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>
+

@@ -1,0 +1,49 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Quark.Resources/1.0.0": {
+        "dependencies": {
+          "Microsoft.Extensions.Localization.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "Quark.Resources.dll": {}
+        },
+        "resources": {
+          "en/Quark.Resources.resources.dll": {
+            "locale": "en"
+          },
+          "tr/Quark.Resources.resources.dll": {
+            "locale": "tr"
+          }
+        }
+      },
+      "Microsoft.Extensions.Localization.Abstractions/8.0.2": {
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.Localization.Abstractions.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.224.6804"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Quark.Resources/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Extensions.Localization.Abstractions/8.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-OayukRVoRD6v7SSVb9AJXtWPpkpYNHWd8yq2DwX/KgyyefP4pf6NuEfEEXDjm7Emf+C3XfZTPEBeZfWDTE+4EQ==",
+      "path": "microsoft.extensions.localization.abstractions/8.0.2",
+      "hashPath": "microsoft.extensions.localization.abstractions.8.0.2.nupkg.sha512"
+    }
+  }
+}

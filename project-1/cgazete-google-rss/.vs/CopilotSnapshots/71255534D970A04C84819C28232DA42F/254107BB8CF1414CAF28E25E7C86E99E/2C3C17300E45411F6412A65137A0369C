@@ -1,0 +1,32 @@
+﻿@model MainPageResponse
+@{
+    var subHeadingSliderNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-SurmansetSlider").ToList();
+}
+
+<div class="splide slider mt-5" role="group">
+    <div class="splide__track">
+        <ul class="splide__list">
+            @foreach (var news in subHeadingSliderNews)
+            {
+                <li class="splide__slide">
+                    <a href="@news.NewsSlug" target="_blank" class="block relative before:absolute before:primary-mobile-manset-gradient before:inset-0 before:right-24 before:z-30 h-[138px]">
+                        <div class="absolute top-0 right-0 bottom-0 w-[65%] aspect-[16/9]">
+                            <img class="w-full h-full object-cover" src="@news.NewsPhoto" alt="@news.NewsHeadline" loading="lazy">
+                        </div>
+                        <div class="absolute inset-0 w-2/3 text-white z-30 p-3 font-black space-y-3 flex flex-col justify-center">
+                            <div class="text-yellow-500 " data-astro-cid-j7pv25f6>@news.NewsSubHeading</div>
+                            @if (news.ShowUpSubHeading && !string.IsNullOrEmpty(news.NewsUpSubHeading))
+                            {
+                                <div data-astro-cid-j7pv25f6>@news.NewsUpSubHeading</div>
+                            }
+                            else
+                            {
+                                <div data-astro-cid-j7pv25f6>@news.NewsHeadline</div>
+                            }
+                        </div>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

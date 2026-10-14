@@ -1,0 +1,188 @@
+﻿## PROCESSES
+Currently debugging:
+- iisexpress.exe (PID: 13952)
+- Quark.CMS.exe (PID: 4912)
+
+## EXCEPTION
+Exception Type: TypeError: Promise executor has already been invoked with non-undefined arguments
+Exception Message: TypeError: Promise executor has already been invoked with non-undefined arguments
+The callstack context, if included, corresponds to the thread where this exception occurred. There is no need to identify this thread by other means.
+The top most frame in the callstack context should correspond to the place the exception message was thrown from. Code may or may not have been provided for it but can be requested.
+
+## CALLSTACK
+Thread ID: 0
+[1] e.constructor [metronic.avvamobile.com/8.2.1/Layout1/assets/plugins/global/plugins.bundle.js]
+This is the current user focused stack frame. The provided locals context corresponds to this stack frame, but you may evaluate expressions and retrieve code for any frame.
+[2] <anonymous> [metronic.avvamobile.com/8.2.1/Layout1/assets/plugins/global/plugins.bundle.js]
+[3] o [metronic.avvamobile.com/8.2.1/Layout1/assets/plugins/global/plugins.bundle.js]
+[4] <anonymous> [metronic.avvamobile.com/8.2.1/Layout1/assets/plugins/global/plugins.bundle.js]
+[5] <anonymous> [metronic.avvamobile.com/8.2.1/Layout1/assets/plugins/global/plugins.bundle.js]
+[6] <anonymous> [metronic.avvamobile.com/8.2.1/Layout1/assets/plugins/global/plugins.bundle.js]
+
+## LOCALS
+Variable: '_' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i){if(c){var n=Object.getOwnPropertyDescriptor(e,t);n.value=i,Object.defineProperty(e,t,n)}else e[t]=i}
+Variable: '_e' of type 'undefined' has value: undefined
+Variable: '_i' of type 'number' has value: 1
+Variable: '_t' of type 'undefined' has value: undefined
+Variable: '$' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: '$e' of type 'Function' is a complex object with child properties and has value: ƒ (e){return{value:e,done:0===arguments.length}}
+Variable: 'a' of type 'Function' is a complex object with child properties and has value: ƒ keys()
+Variable: 'A' of type 'Function' is a complex object with child properties and has value: ƒ isFinite()
+Variable: 'ae' of type 'Function' is a complex object with child properties and has value: ƒ (e){return"[object String]"===v(e)}
+Variable: 'Ae' of type 'undefined' has value: undefined
+Variable: 'ai' of type 'Object' is a complex object with child properties and has value: {input: '$_', lastMatch: '$&', lastParen: '$+', leftContext: '$`', rightContext: "$'"}
+Variable: 'at' of type 'undefined' has value: undefined
+Variable: 'At' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'b' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i){if(!c)throw new TypeError("getters require true ES5 support");Object.defineProperty(e,t,{configurable:!0,enumerable:!1,get:i})}
+Variable: 'B' of type 'Function' is a complex object with child properties and has value: ƒ sqrt()
+Variable: 'be' of type 'undefined' has value: undefined
+Variable: 'Be' of type 'Function' is a complex object with child properties and has value: ƒ (){return ge.ToString(ge.RequireObjectCoercible(this)).replace(ze,"")}
+Variable: 'Bi' of type 'undefined' has value: undefined
+Variable: 'bn' of type 'undefined' has value: undefined
+Variable: 'bt' of type 'undefined' has value: undefined
+Variable: 'Bt' of type 'undefined' has value: undefined
+Variable: 'c' of type 'boolean' has value: true
+Variable: 'C' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'ce' of type 'boolean' has value: true
+Variable: 'Ce' of type 'Function' is a complex object with child properties and has value: ƒ (){return this}
+Variable: 'ci' of type 'number' has value: 1.1754943508222875e-38
+Variable: 'Ci' of type 'Function' is a complex object with child properties and has value: ƒ e(t){var i=new Promise(t);t(3,(function(){})),this.then=i.then,this.constructor=e}
+Variable: 'ct' of type 'undefined' has value: undefined
+Variable: 'Ct' of type 'Function' is a complex object with child properties and has value: ƒ (){for(var e=Number(this),t=arguments.length,i=t-e,n=new Array(i<0?0:i),r=e;r<t;++r)n[r-e]=arguments[r];return n}
+Variable: 'd' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'D' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'di' of type 'number' has value: 1.4426950408889634
+Variable: 'dn' of type 'undefined' has value: undefined
+Variable: 'dt' of type 'undefined' has value: undefined
+Variable: 'Dt' of type 'Function' is a complex object with child properties and has value: ƒ (e){return function(t,i){return t[i]=e[i],t}}
+Variable: 'e' of type 'Function' is a complex object with child properties and has value: ƒ (e){try{return e(),!1}catch(e){return!0}}
+Variable: 'E' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'ee' of type 'Function' is a complex object with child properties and has value: ƒ sign()
+Variable: 'Ee' of type 'Function' is a complex object with child properties and has value: ƒ (e,t){var i=t||function(){return this};m(e,ue,i),!e[ue]&&oe(ue)&&(e[ue]=i)}
+Variable: 'ei' of type 'undefined' has value: undefined
+Variable: 'Ei' of type 'undefined' has value: undefined
+Variable: 'Et' of type 'Function' is a complex object with child properties and has value: ƒ (e,t){var i,n=a(Object(t));return ge.IsCallable(Object.getOwnPropertySymbols)&&(i=f(Object.getOwnPropertySymbols(Object(t)),At(t))),h(D(n,i||[]),Dt(t),e)}
+Variable: 'f' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'F' of type 'Function' is a complex object with child properties and has value: ƒ abs()
+Variable: 'fe' of type 'Function' is a complex object with child properties and has value: ƒ String()
+Variable: 'fi' of type 'undefined' has value: undefined
+Variable: 'Fi' of type 'undefined' has value: undefined
+Variable: 'fn' of type 'undefined' has value: undefined
+Variable: 'Ft' of type 'undefined' has value: undefined
+Variable: 'g' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i){d(a(t),(function(n){var r=t[n];m(e,n,r,!!i)}))}
+Variable: 'G' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'ge' of type 'Object' is a complex object with child properties and has value: {Call: ƒ, RequireObjectCoercible: ƒ, TypeIsObject: ƒ, ToObject: ƒ, IsCallable: ƒ, …}
+Variable: 'gn' of type 'undefined' has value: undefined
+Variable: 'h' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'H' of type 'Function' is a complex object with child properties and has value: ƒ floor()
+Variable: 'he' of type 'Reflect' is a complex object with child properties and has value: Reflect {defineProperty: ƒ, deleteProperty: ƒ, apply: ƒ, construct: ƒ, get: ƒ, …}
+Variable: 'hi' of type 'number' has value: 0.4342944819032518
+Variable: 'Hi' of type 'undefined' has value: undefined
+Variable: 'hn' of type 'undefined' has value: undefined
+Variable: 'Ht' of type 'undefined' has value: undefined
+Variable: 'I' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'It' of type 'undefined' has value: undefined
+Variable: 'i' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'ii' of type 'undefined' has value: undefined
+Variable: 'it' of type 'undefined' has value: undefined
+Variable: 'j' of type 'Function' is a complex object with child properties and has value: ƒ max()
+Variable: 'J' of type 'Function' is a complex object with child properties and has value: ƒ isNaN()
+Variable: 'je' of type 'Function' is a complex object with child properties and has value: ƒ e(t,i){if(i<1)return"";if(i%2)return e(t,i-1)+t;var n=e(t,i/2);return n+n}
+Variable: 'Ji' of type 'undefined' has value: undefined
+Variable: 'jt' of type 'undefined' has value: undefined
+Variable: 'k' of type 'Function' is a complex object with child properties and has value: ƒ (e,t){t&&y(t.toString)&&m(e,"toString",t.toString.bind(t),!0)}
+Variable: 'K' of type 'symbol' is a complex object with child properties and has value: Symbol(Symbol.species)
+Variable: 'ke' of type 'undefined' has value: undefined
+Variable: 'Ke' of type 'undefined' has value: undefined
+Variable: 'Ki' of type 'undefined' has value: undefined
+Variable: 'L' of type 'Window' is a complex object with child properties and has value: Window {window: Window, self: Window, document: #document, name: '', location: Location, …}
+Variable: 'le' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i){var n=e[t];m(e,t,i,!0),k(e[t],n)}
+Variable: 'Le' of type 'undefined' has value: undefined
+Variable: 'li' of type 'number' has value: 3.4028234663852886e+38
+Variable: 'ln' of type 'undefined' has value: undefined
+Variable: 'lt' of type 'undefined' has value: undefined
+Variable: 'Lt' of type 'undefined' has value: undefined
+Variable: 'm' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i,n){!n&&t in e||(c?Object.defineProperty(e,t,{configurable:!0,enumerable:!1,writable:!0,value:i}):e[t]=i)}
+Variable: 'M' of type 'Function' is a complex object with child properties and has value: ƒ create()
+Variable: 'me' of type 'Function' is a complex object with child properties and has value: ƒ (e){return null==e}
+Variable: 'mn' of type 'undefined' has value: undefined
+Variable: 'mt' of type 'undefined' has value: undefined
+Variable: 'Mt' of type 'undefined' has value: undefined
+Variable: 'n' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'N' of type 'Function' is a complex object with child properties and has value: ƒ min()
+Variable: 'ne' of type 'Function' is a complex object with child properties and has value: ƒ (e){return"[object Arguments]"===v(e)}
+Variable: 'ni' of type 'undefined' has value: undefined
+Variable: 'nt' of type 'number' has value: -4294967295
+Variable: 'Nt' of type 'undefined' has value: undefined
+Variable: 'o' of type 'Function' is a complex object with child properties and has value: ƒ (e){try{return e()}catch(e){return!1}}
+Variable: 'O' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'oe' of type 'Function' is a complex object with child properties and has value: ƒ (e){return"function"==typeof L.Symbol&&"symbol"==typeof e}
+Variable: 'Oe' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i){if(function(e,t,i){c?Object.defineProperty(e,t,{configurable:!0,enumerable:!0,writable:!0,value:i}):e[t]=i}(e,t,i),!ge.SameValue(e[t],i))throw new TypeError("property is nonconfigurable")}
+Variable: 'oi' of type 'number' has value: 1.1920928955078125e-7
+Variable: 'Oi' of type 'undefined' has value: undefined
+Variable: 'on' of type 'undefined' has value: undefined
+Variable: 'ot' of type 'undefined' has value: undefined
+Variable: 'P' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'pe' of type 'HTMLAllCollection' is a complex object with child properties and has value: HTMLAllCollection(63) [html, head, title, meta, meta, meta, link, link, link, link, link, body#kt_body.bg-body, div.d-flex.flex-column.flex-root, style, div.d-flex.flex-column.flex-column-fluid.flex-l...
+Variable: 'Pe' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i,n){if(!ge.TypeIsObject(e))throw new TypeError("Constructor requires `new`: "+t.name);var r=t.prototype;ge.TypeIsObject(r)||(r=i);var a=M(r);for(var s in n)if(V(n,s)){var o=n[s];m(a,s,o,!0)}re...
+Variable: 'Pi' of type 'undefined' has value: undefined
+Variable: 'pn' of type 'undefined' has value: undefined
+Variable: 'q' of type 'Function' is a complex object with child properties and has value: ƒ delete()
+Variable: 'Q' of type 'Function' is a complex object with child properties and has value: ƒ isFinite()
+Variable: 'Qi' of type 'undefined' has value: undefined
+Variable: 'Qt' of type 'Function' is a complex object with child properties and has value: ƒ toString()
+Variable: 'r' of type 'Function' is a complex object with child properties and has value: ƒ isArray()
+Variable: 'R' of type 'Function' is a complex object with child properties and has value: ƒ exp()
+Variable: 're' of type 'Function' is a complex object with child properties and has value: ƒ (e){return null===e||"function"!=typeof e&&"object"!=typeof e}
+Variable: 'Ri' of type 'undefined' has value: undefined
+Variable: 'Rt' of type 'undefined' has value: undefined
+Variable: 's' of type 'Function' is a complex object with child properties and has value: ƒ (e){try{return e(),!1}catch(e){return!0}}
+Variable: 'se' of type 'Function' is a complex object with child properties and has value: ƒ (e){return"[object RegExp]"===v(e)}
+Variable: 'si' of type 'number' has value: 4503599627370496
+Variable: 'st' of type 'undefined' has value: undefined
+Variable: 'St' of type 'undefined' has value: undefined
+Variable: 't' of type 'Function' is a complex object with child properties and has value: ƒ (e,t){m(this,"i",0),m(this,"array",e),m(this,"kind",t)}
+Variable: 'T' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'te' of type 'Function' is a complex object with child properties and has value: ƒ (e){var t=Number(e);return t<-1||J(t)?NaN:0===t||t===1/0?t:-1===t?-1/0:1+t-1==0?t:t*(z(1+t)/(1+t-1))}
+Variable: 'U' of type 'Function' is a complex object with child properties and has value: ƒ Map()
+Variable: 'ue' of type 'symbol' is a complex object with child properties and has value: Symbol(Symbol.iterator)
+Variable: 'ui' of type 'number' has value: 2.718281828459045
+Variable: 'un' of type 'undefined' has value: undefined
+Variable: 'ut' of type 'undefined' has value: undefined
+Variable: 'Ut' of type 'undefined' has value: undefined
+Variable: 'v' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'V' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'Vi' of type 'undefined' has value: undefined
+Variable: 'vn' of type 'undefined' has value: undefined
+Variable: 'Vt' of type 'undefined' has value: undefined
+Variable: 'w' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i){c?Object.defineProperty(e,t,i):"value"in i&&(e[t]=i.value)}
+Variable: 'W' of type 'Function' is a complex object with child properties and has value: ƒ (){}
+Variable: 'we' of type 'undefined' has value: undefined
+Variable: 'Wi' of type 'undefined' has value: undefined
+Variable: 'wn' of type 'undefined' has value: undefined
+Variable: 'Wt' of type 'undefined' has value: undefined
+Variable: 'x' of type 'Function' is a complex object with child properties and has value: ƒ (e,t,i){if(!c)throw new TypeError("getters require true ES5 support");var n=Object.getOwnPropertyDescriptor(e,t);Object.defineProperty(i,t,{configurable:n.configurable,enumerable:n.enumerable,get:fu...
+Variable: 'X' of type 'Function' is a complex object with child properties and has value: ƒ has()
+Variable: 'xe' of type 'undefined' has value: undefined
+Variable: 'Xe' of type 'Function' is a complex object with child properties and has value: ƒ (e){ge.RequireObjectCoercible(e),m(this,"_s",ge.ToString(e)),m(this,"_i",0)}
+Variable: 'xi' of type 'Function' is a complex object with child properties and has value: ƒ imul()
+Variable: 'xt' of type 'undefined' has value: undefined
+Variable: 'y' of type 'Function' is a complex object with child properties and has value: ƒ (e){return"function"==typeof e}
+Variable: 'Y' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'ye' of type 'undefined' has value: undefined
+Variable: 'Ye' of type 'undefined' has value: undefined
+Variable: 'Yi' of type 'undefined' has value: undefined
+Variable: 'yn' of type 'undefined' has value: undefined
+Variable: 'yt' of type 'undefined' has value: undefined
+Variable: 'Yt' of type 'undefined' has value: undefined
+Variable: 'z' of type 'Function' is a complex object with child properties and has value: ƒ log()
+Variable: 'Z' of type 'Function' is a complex object with child properties and has value: ƒ Symbol()
+Variable: 'ze' of type 'object' has value: /(^[	\n\r   ᠎             　\u2028\u2029﻿]+)|([	\n\r   ᠎             　\u2028\u2029﻿]+$)/g
+Variable: 'zi' of type 'undefined' has value: undefined
+Variable: 'zt' of type 'undefined' has value: undefined
+Variable: 'e' of type 'Function' is a complex object with child properties and has value: ƒ e(t){var i=new Promise(t);t(3,(function(){})),this.then=i.then,this.constructor=e}
+Variable: 'i' of type 'Promise' is a complex object with child properties and has value: Promise {[[PromiseState]]: 'pending', [[PromiseResult]]: undefined}
+Variable: 't' of type 'Function' is a complex object with child properties and has value: ƒ ()
+Variable: 'this' of type 'e' is a complex object with child properties and has value: e
+Variable: 'Global' of type '' is a complex object with child properties and has value: 
+

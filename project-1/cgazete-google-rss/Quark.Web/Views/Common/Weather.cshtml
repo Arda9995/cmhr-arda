@@ -1,0 +1,118 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutNoAds.cshtml";
+}
+
+@using Quark.Core.Extentions
+@using Quark.Web.ViewComponents.Models
+@model Quark.API.Business.Models.Responses.CommonResponses.WeatherPageResponse
+<partial name="~/Views/Shared/_Header.cshtml" />
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <div class="max-w-container mx-auto space-y-6 undefined">
+        <div class="grid grid-cols-12 gap-6">
+            <div class="col-span-12 lg:col-span-8">
+                <!-- Breadcrumb Start -->
+                <nav class="flex items-center gap-2 text-xs undefined">
+                    <a href="/" class="text-gray-500 hover:text-gray-600 transition-all font-medium"> Anasayfa </a>
+                    <span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 12L10 8L6 4" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </span>
+                    <a href="/hava-durumu" class="text-red-600 font-semibold "> Hava Durumu </a>
+                </nav> <!-- Breadcrumb End --> <!-- City Bar Start -->
+                <div class="md:p-4 md:flex gap-2 md:bg-gray-50 my-4 items-center">
+                    <!-- Select Start  -->
+                    <div class="p-4 md:p-0 bg-gray-50 md:bg-transparent flex-1">
+                        <div class="border border-black rounded-full bg-white flex-1 relative">
+                            <select asp-items="@Model.CitySelectListItems" id="citySelect" class="rounded-full py-1 px-4 flex items-center justify-between text-sm font-medium w-full bg-transparent border-transparent appearance-none">
+                             
+                            </select>
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                                <svg width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10.8539 1.11714C10.9366 1.18343 10.9876 1.27081 10.998 1.36408C11.0084 1.45735 10.9776 1.55058 10.9109 1.62754L10.8539 1.68354L6.35394 5.28354C6.27108 5.34968 6.16185 5.39047 6.04526 5.3988C5.92868 5.40714 5.81214 5.38248 5.71594 5.32914L5.64594 5.28354L1.14594 1.68354C1.05735 1.61299 1.00502 1.51845 0.999236 1.41856C0.993457 1.31867 1.03466 1.22067 1.11471 1.14388C1.19477 1.06708 1.30788 1.01706 1.43176 1.00367C1.55563 0.990279 1.68128 1.01449 1.78394 1.07154L1.85394 1.11714L5.99994 4.43474L10.1459 1.11714C10.1924 1.07989 10.2476 1.05034 10.3083 1.03017C10.369 1.01001 10.4342 0.999626 10.4999 0.999626C10.5657 0.999626 10.6308 1.01001 10.6916 1.03017C10.7523 1.05034 10.8075 1.07989 10.8539 1.11714Z" fill="#080827" stroke="#080827" stroke-width="0.5"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div> <!-- Select End  -->
+                    <div class="flex mt-4 md:mt-0 gap-4 md:gap-2">
+                        <a href="/hava-durumu/ankara" class="py-1 px-2 rounded-full bg-black text-white text-sm font-medium">Ankara</a>
+                        <a href="/hava-durumu/izmir" class="py-1 px-2 rounded-full bg-black text-white text-sm font-medium">İzmir</a>
+                        <a href="/hava-durumu/antalya" class="py-1 px-2 rounded-full bg-black text-white text-sm font-medium">Antalya</a>
+                    </div>
+                </div> <!-- City Bar End  --> <!-- Weather Items Start -->
+                <div class="space-y-4">
+                    @foreach (var weather in Model.WeatherDataResponse)
+                    {
+                        <div class="bg-gray-50 p-4">
+                            <!-- Head Start -->
+                            <div class="space-y-2 mb-3">
+                                <div class="flex gap-1 items-center">
+                                    <a href="/hava-durumu/@weather.Value.Select(x=>x.City).FirstOrDefault().ToSlug()" class="text-red-500 text-xl lg:text-xl font-semibold">@weather.Key Hava Durumu</a>
+                                    <div class="text-xs lg:text-sm font-helvetica">@weather.Value.FirstOrDefault().Day</div>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <div class="text-xl lg:text-2xl font-semibold">@weather.Value.FirstOrDefault().Max°C</div>
+                                    <div class="text-sm lg:text-base font-semibold">@weather.Value.FirstOrDefault().Description</div>
+                                    <img style="width:19px; height:18px;" src="@weather.Value.FirstOrDefault().IconURL" />
+                                </div>
+                            </div> <!-- Head End --> <!-- Content Start -->
+                            <div class="grid grid-cols-1 md:grid-cols-5 gap-1 md:gap-4">
+                                @{
+                                    var weatherList = weather.Value.Skip(1).ToList();
+                                }
+
+                                @foreach (var weatherData in weatherList)
+                                {
+                                    <div class="bg-white p-2 lg:py-3 lg:px-6 text-sm text-center space-y-2 flex md:block items-center gap-5">
+                                        <div class="text-sm font-semibold order-2 md:order-1">
+                                            @(weatherData == weatherList.First() ? "Yarın" : weatherData.Day)
+                                        </div> <!-- Icon Start  -->
+                                        <div class="flex justify-center order-1 md:order-2">
+                                            <img style="width:19px; height:18px;" src="@weatherData.IconURL" />
+                                        </div> <!-- Icon End  -->
+                                        <div class="text-xs space-x-1 ml-auto order-3">
+                                            <span class="font-semibold text-red-500">@weatherData.Max°C</span>
+                                            <span class="text-blue-600 font-helvetica">@weatherData.Min°C</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div> <!-- Content End  -->
+                        </div>
+                    }
+
+
+                </div> <!-- Weather Items End --> <!-- Other Cities Start -->
+                <div class="bg-gray-50 p-4 mt-4">
+                    <!-- Head Start -->
+                    <div class="flex justify-between mb-3">
+                        <!-- Title Start -->
+                        <div class="font-semibold">Diğer Tüm İller</div> <!-- Title End  --> <!-- Button Start --> <button id="citySortButton">
+                            <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.28842 0.292937L0.293425 4.29294L0.209425 4.38794C0.0603017 4.58046 -0.0134456 4.82078 0.00201987 5.06381C0.0174853 5.30684 0.121101 5.53587 0.293425 5.70794L0.388425 5.79094C0.580946 5.94006 0.821267 6.01381 1.0643 5.99834C1.30732 5.98288 1.53636 5.87926 1.70842 5.70694L4.00042 3.40994V14.9999L4.00742 15.1169C4.03585 15.3604 4.15269 15.5849 4.33575 15.7478C4.51881 15.9108 4.75534 16.0009 5.00042 16.0009L5.11742 15.9939C5.36085 15.9653 5.58526 15.8482 5.74804 15.6649C5.91082 15.4817 6.00064 15.245 6.00042 14.9999V3.41694L8.29342 5.70694L8.38842 5.79094C8.58944 5.94826 8.84301 6.02275 9.09717 5.99915C9.35134 5.97556 9.58686 5.85566 9.75548 5.66403C9.9241 5.47239 10.0131 5.22353 10.0041 4.96843C9.99519 4.71333 9.88904 4.4713 9.70742 4.29194L5.70142 0.291936L5.60742 0.208937C5.4149 0.0598136 5.17458 -0.0139339 4.93155 0.00153158C4.68852 0.0169971 4.46049 0.120613 4.28842 0.292937ZM15.0004 0.00293634L14.8834 0.00993679C14.6402 0.038594 14.4159 0.155529 14.2531 0.338564C14.0904 0.521599 14.0005 0.758003 14.0004 1.00294V12.5829L11.7074 10.2929L11.6124 10.2089C11.4113 10.0535 11.1586 9.98038 10.9056 10.0046C10.6525 10.0288 10.4182 10.1484 10.2502 10.3392C10.0822 10.53 9.99321 10.7776 10.0012 11.0316C10.0093 11.2857 10.1137 11.5271 10.2934 11.7069L14.2974 15.7069L14.3914 15.7909C14.5839 15.9401 14.8243 16.0138 15.0673 15.9983C15.3103 15.9829 15.5394 15.8793 15.7114 15.7069L19.7074 11.7069L19.7914 11.6119C19.9405 11.4194 20.0143 11.1791 19.9988 10.9361C19.9834 10.693 19.8797 10.464 19.7074 10.2919L19.6124 10.2089C19.4199 10.0598 19.1796 9.98607 18.9366 10.0015C18.6935 10.017 18.4645 10.1206 18.2924 10.2929L16.0004 12.5869V1.00294L15.9934 0.886937C15.965 0.643505 15.8482 0.418989 15.6651 0.256025C15.482 0.0930614 15.2455 0.00299742 15.0004 0.00293634Z" fill="black"></path>
+                            </svg>
+                        </button> <!-- Button End  -->
+                    </div> <!-- Head End --> <!-- City List Start -->
+                    <div class="grid grid-cols-3 xs:grid-cols-4 gap-x-8 gap-y-4 city-list">
+                        @foreach (var city in Model.Cities)
+                        {
+                            <a href="/hava-durumu/@city.Name.ToSlug()" class="flex flex-col md:flex-row items-center justify-center md:items-start md:justify-start gap-1 city">
+                                <div class="bg-black text-white px-1 py-px font-semibold text-xs w-6 text-center"> @(city.Order < 9 ? "0" + city.Order.ToString() : city.Order) </div>
+                                <div class="text-sm font-semibold">@city.Name</div>
+                            </a>
+                        }
+                    </div> <!-- City List End  -->
+                </div> <!-- Other Cities End  -->
+            </div>
+            @await Component.InvokeAsync("News", new NewsViewComponentModel { MethodName = "MostViewedNews", NewsCount = 6 })
+        </div>
+    </div>
+</main>
+
+<script>
+    document.getElementById("citySelect").addEventListener("change", function () {
+        var selectedUrl = this.value;
+        if (selectedUrl) {
+            window.location.href = selectedUrl;
+        }
+    });
+</script>

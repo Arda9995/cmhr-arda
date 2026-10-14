@@ -1,0 +1,253 @@
+﻿Quark.API.Business.Services.NewsService.GetNewsDetail Method (E:\GitHub\cgazete-google-rss\Quark.API.Business\Services\NewsService.cs):
+```
+        public async Task<ServiceResult<GetNewsDetailResponse>> GetNewsDetail(int ID)
+        {
+            var result = new ServiceResult<GetNewsDetailResponse>();
+
+            var news = await _newsCachingService.GetNewsDetailByID(ID);
+
+            if (!news.IsSuccess)
+            {
+                var newsDetail = await GetNewsDetailService(ID);
+                if (!newsDetail.IsSuccess)
+                {
+                    result.SetError(newsDetail.Message);
+                    return result;
+                }
+
+                result.Data = newsDetail.Data;
+            }
+            else
+            {
+                result.Data = new GetNewsDetailResponse()
+                {
+                    ID = news.Data.ID,
+                    NewsSlug = news.Data.NewsSlug,
+                    NewsTypeID = news.Data.NewsTypeID,
+                    Title = news.Data.Title,
+                    UpHeadline = news.Data.UpHeadline,
+                    Headline = news.Data.Headline,
+                    SubTitle = news.Data.SubTitle,
+                    Content = news.Data.Content,
+                    CoverPhoto = news.Data.CoverPhoto,
+                    CreatedDate = news.Data.CreatedDate,
+                    UpdateDate = news.Data.UpdateDate,
+                    UpdateDateForMetaTag = news.Data.UpdateDateForMetaTag,
+                    PublishDate = news.Data.PublishDate,
+                    PublishDateForMetaTag = news.Data.PublishDateForMetaTag,
+                    SecondaryCategoryIDList = news.Data.SecondaryCategoryIDList,
+                    SecondaryCategoryNameList = news.Data.SecondaryCategoryNameList,
+                    Subheading = news.Data.Subheading,
+                    UpSubheading = news.Data.UpSubheading,
+                    UpSubtitle = news.Data.UpSubtitle,
+                    RelatedNewsList = news.Data.RelatedNewsList.Select(x => new RelatedNews
+                    {
+                        ID = x.ID,
+                        Title = x.Title,
+                        Subtitle = x.Subtitle,
+                        Slug = x.Slug,
+                        ImageURL = x.ImageURL
+                    }).ToList(),
+                    CategoryNewsList = news.Data.CategoryNewsList.Select(x => new CategoryNews
+                    {
+                        ID = x.ID,
+                        Headline = x.Headline,
+                        UpHeadline = x.UpHeadline,
+                        Slug = x.Slug,
+                        SlugWithOutClientURL = x.SlugWithOutClientURL,
+                        UpSubtitle = x.UpSubtitle,
+                        ImageURL = x.ImageURL,
+                        PublishDate = x.PublishDate,
+                        PressNo = x.PressNo
+                    }).ToList(),
+                    PhotoGalleryItems = news.Data.PhotoGalleryItems.Select(x => new PhotoGalleryItem
+                    {
+                        ImageURL = x.ImageURL,
+                        Content = x.Content
+                    }).ToList(),
+                    TagList = news.Data.TagList.Select(x => new TagList
+                    {
+                        ID = x.ID,
+                        Text = x.Text,
+                        Slug = x.Slug
+                    }).ToList(),
+                    Tags = news.Data.Tags,
+                    SourceList = news.Data.SourceList.Select(x => new SourceList
+                    {
+                        ID = x.ID,
+                        Name = x.Name,
+                        Slug = x.Slug
+                    }).ToList(),
+                    Sources = news.Data.Sources,
+                    ColumnArticleDetails = new ColumnArticleDetails
+                    {
+                        AuthorPhoto = news.Data.CachingNewsDetailColumnArticleDetails.AuthorPhoto,
+                        AuthorFullName = news.Data.CachingNewsDetailColumnArticleDetails.AuthorFullName,
+                        AuthorSlug = news.Data.CachingNewsDetailColumnArticleDetails.AuthorSlug,
+                        AuthorSocialX = news.Data.CachingNewsDetailColumnArticleDetails.AuthorSocialX,
+                        AuthorSocialInstagram = news.Data.CachingNewsDetailColumnArticleDetails.AuthorSocialInstagram,
+                        AuthorSocialFacebook = news.Data.CachingNewsDetailColumnArticleDetails.AuthorSocialFacebook,
+                        AuthorSocialLinkedIn = news.Data.CachingNewsDetailColumnArticleDetails.AuthorSocialLinkedIn,
+                        AuthorSocialMail = news.Data.CachingNewsDetailColumnArticleDetails.AuthorSocialMail,
+                    },
+                    SurveyElements = news.Data.CachingNewsDetailSurveyElements == null
+                        ? null
+                        : new SurveyElements
+                        {
+                            SurveyQuestion = news.Data.CachingNewsDetailSurveyElements.SurveyQuestion,
+                            JoinedUserCount = news.Data.CachingNewsDetailSurveyElements.JoinedUserCount,
+                            RemainingTime = news.Data.CachingNewsDetailSurveyElements.RemainingTime,
+                            SurveySections = news.Data.CachingNewsDetailSurveyElements.SurveySections.Select(x =>
+                                new SurveySection
+                                {
+                                    OptionID = x.OptionID,
+                                    SurveyID = x.SurveyID,
+                                    Option = x.Option,
+                                    Percent = x.Percent
+                                }).ToList(),
+                            CategoryNews = news.Data.CachingNewsDetailSurveyElements.CategoryNews.Select(x =>
+                                new CategoryNews
+                                {
+                                    ID = x.ID,
+                                    Headline = x.Headline,
+                                    UpHeadline = x.UpHeadline,
+                                    Slug = x.Slug,
+                                    SlugWithOutClientURL = x.SlugWithOutClientURL,
+                                    UpSubtitle = x.UpSubtitle,
+                                    ImageURL = x.ImageURL,
+                                    PublishDate = x.PublishDate,
+                                    PressNo = x.PressNo
+                                }).ToList(),
+                            SurveyNewsThird = news.Data.CachingNewsDetailSurveyElements.SurveyNewsThird.Select(x =>
+                                new SurveyNews
+                                {
+                                    ID = x.ID,
+                                    Title = x.Title,
+                                    Question = x.Question,
+                                    Slug = x.Slug,
+                                    ImageURL = x.ImageURL,
+                                    RemainingTime = x.RemainingTime,
+                                    JoinedUserCount = x.JoinedUserCount
+                                }).ToList(),
+                            SurveyNewsQuad = news.Data.CachingNewsDetailSurveyElements.SurveyNewsQuad.Select(x =>
+                                new SurveyNews
+                                {
+                                    ID = x.ID,
+                                    Title = x.Title,
+                                    Question = x.Question,
+                                    Slug = x.Slug,
+                                    ImageURL = x.ImageURL,
+                                    RemainingTime = x.RemainingTime,
+                                    JoinedUserCount = x.JoinedUserCount
+                                }).ToList()
+                        },
+                    SourceIDs = news.Data.SourceIDs,
+                    AuthorID = news.Data.AuthorID,
+                    AuthorName = news.Data.AuthorName,
+                    AuthorSlug = news.Data.AuthorSlug,
+                    CategoryName = news.Data.CategoryName,
+                    CategoryBreadcrumb = news.Data.CategoryBreadcrumb,
+                    CategorySlug = news.Data.CategorySlug,
+                    BlockQuote = news.Data.BlockQuote,
+                    CategoryID = news.Data.CategoryID,
+                    PressNo = news.Data.PressNo,
+                    BoxCount = news.Data.BoxCount,
+                    VideoPlayerID = news.Data.VideoPlayerID,
+                    Video = news.Data.Video,
+                    ScrollNewsIDs = news.Data.ScrollNewsIDs,
+                    NewsDetailNextNewsIDs = news.Data.NewsDetailNextNewsIDs,
+                    SecondaryCategoryMap = news.Data.SecondaryCategoryMap,
+                    SeoDescription = news.Data.SeoDescription,
+                    SeoTitle = news.Data.SeoTitle
+                };
+
+                if (news.Data.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+                {
+                    var authorsLastColumnArticles = await _newsCachingService.GetAuthorLastNews(news.Data.AuthorID ?? 0);
+
+                    result.Data.ColumnArticleDetails.AuthorsLastColumnArticles = authorsLastColumnArticles.Data.Select(x => new AuthorsLastColumnArticles
+                    {
+                        Headline = x.Headline,
+                        Slug = x.Slug,
+                        UpSubtitle = x.UpSubtitle,
+                        NewsID = x.NewsID,
+                        PublishDate = x.PublishDate
+                    }).ToList();
+                }
+            }
+
+            #region Scrool News
+
+            List<int> randomNewsIds;
+
+            if (news.Data.NewsTypeID == (int)NewsTypesEnum.PhotoGallery || news.Data.NewsTypeID == (int)NewsTypesEnum.News)
+            {
+                var randomNewsIdsByElastic = await _newsCachingService.GetNewsIdsByNewsType(news.Data.NewsTypeID, 10);
+                if (!randomNewsIdsByElastic.IsSuccess || randomNewsIdsByElastic.Data == null || !randomNewsIdsByElastic.Data.Any())
+                {
+                    randomNewsIds = await GetRandomRelatedNewsIds(result.Data.ID, result.Data.NewsTypeID,
+                        result.Data.CategoryID,
+                        result.Data.SecondaryCategoryMap);
+                }
+                else
+                {
+                    randomNewsIds = randomNewsIdsByElastic.Data;
+                }
+            }
+            else if (news.Data.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+            {
+                var zodiacSignNews = await GetZodiacSignNewsListForIndex();
+                if (!zodiacSignNews.IsSuccess || zodiacSignNews.Data.ZodiacSignItems == null ||
+                    !zodiacSignNews.Data.ZodiacSignItems.Any())
+                {
+                    randomNewsIds = await GetRandomRelatedNewsIds(result.Data.ID, result.Data.NewsTypeID,
+                        result.Data.CategoryID,
+                        result.Data.SecondaryCategoryMap);
+                }
+                else
+                {
+                    randomNewsIds = zodiacSignNews.Data.ZodiacSignItems.Select(x => (int)x.NewsID).ToList();
+                }
+            }
+            else if (news.Data.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+            {
+                var columnArticlesNews = await _newsCachingService.GetAuthorSideColumnArticles();
+                if (!columnArticlesNews.IsSuccess || columnArticlesNews.Data == null ||
+                    !columnArticlesNews.Data.Any())
+                {
+                    randomNewsIds = await GetRandomRelatedNewsIds(result.Data.ID, result.Data.NewsTypeID,
+                        result.Data.CategoryID,
+                        result.Data.SecondaryCategoryMap);
+                }
+                else
+                {
+                    randomNewsIds = columnArticlesNews.Data.Select(x => (int)x.NewsID).ToList();
+                }
+            }
+            else
+            {
+                var randomNewsIdsByElastic = await _newsCachingService.GetNewsIdsByNewsType(news.Data.NewsTypeID, 7);
+                if (!randomNewsIdsByElastic.IsSuccess || randomNewsIdsByElastic.Data == null || !randomNewsIdsByElastic.Data.Any())
+                {
+                    randomNewsIds = await GetRandomRelatedNewsIds(result.Data.ID, result.Data.NewsTypeID,
+                        result.Data.CategoryID,
+                        result.Data.SecondaryCategoryMap);
+                }
+                else
+                {
+                    randomNewsIds = randomNewsIdsByElastic.Data;
+                }
+            }
+
+
+            if (randomNewsIds != null)
+            {
+                result.Data.ScrollNewsIDs = string.Join(",", randomNewsIds);
+                result.Data.NewsDetailNextNewsIDs = randomNewsIds;
+            }
+
+            #endregion
+
+            return result;
+        }
+```

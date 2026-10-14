@@ -1,0 +1,41 @@
+﻿<div class="w-full lg:w-64 shrink-0">
+	<nav class="space-y-1">
+		<a href="/uye/anasayfa"
+		   class="flex items-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md">
+			Anasayfa
+		</a> 
+		<a href="/uye/abonelik-bilgileri"
+			  class="flex items-center px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 rounded-md">
+			Üyelik Bilgileri
+		</a> 
+	@* 	<a href="../reklamsiz/bildirim-ayarlari"
+			  class="flex items-center px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 rounded-md">
+			Bildirim Ayarları
+		</a>  *@
+		<a href="/uye/sifremi-degistir"
+			  class="flex items-center px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 rounded-md">
+			Parola Değiştir
+		</a> <a href="/uye/destek"
+			  class="flex items-center px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 rounded-md">
+			Destek
+		</a>
+	</nav>
+</div> 
+
+<script>
+	// Highlight current URL in sidebar
+	document.addEventListener('DOMContentLoaded', function () {
+		const currentPath = window.location.pathname;
+		const navLinks = document.querySelectorAll('nav a');
+
+		navLinks.forEach(link => {
+			if (link.getAttribute('href') === currentPath) {
+				link.classList.remove('text-gray-900', 'hover:bg-gray-50');
+				link.classList.add('text-red-600', 'bg-red-50', 'hover:bg-red-100');
+			} else {
+				link.classList.remove('text-red-600', 'bg-red-50', 'hover:bg-red-100');
+				link.classList.add('text-gray-900', 'hover:bg-gray-50');
+			}
+		});
+	});
+</script>

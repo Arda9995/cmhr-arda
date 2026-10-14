@@ -1,0 +1,15 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.NewsVersionResponseComparable
+
+<div class="card card-flush mb-10 shadow">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>@_localizer["Tags"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        @foreach (var tag in Model.TagsList)
+        {
+            <div class="badge badge-light-primary rounded-pill badge-lg mb-3">@tag</div>
+        }
+    </div>
+</div>

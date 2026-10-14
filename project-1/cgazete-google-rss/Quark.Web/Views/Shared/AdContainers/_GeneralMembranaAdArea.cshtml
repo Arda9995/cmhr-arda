@@ -1,0 +1,35 @@
+@{
+	var hasPremiumMembership = "False";
+
+	var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+	if (id !=  null)
+	{
+		hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+	}
+}
+<div data-astro-cid-j7pv25f6>
+	@if (hasPremiumMembership == "True")
+	{
+		
+	}
+	else
+	{
+		<!-- Ad Start -->
+		<div class="ads-box mt-4 mb-5">
+			<div style="width: unset; aspect-ratio: 16 / 9; z-index: 3;">
+				<div class="CHT_VIDEO"></div>
+			</div>
+			<script>
+			if (membranaCount == 0){
+                membranaCount++;
+				window.yieldMasterCmd = window.yieldMasterCmd || [];
+				window.yieldMasterCmd.push(function () {
+					window.yieldMaster.init({
+						pageVersionAutodetect: true
+					});
+				});
+            }
+		</script>
+		</div> <!-- Ad End -->
+	}
+</div>

@@ -1,0 +1,18 @@
+﻿namespace Quark.Business.Common.Caching;
+
+public class RedisTTLSeconds
+{
+    public static TimeSpan TodayColumnArticles_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan Authors_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan AuthorLastNews_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan AuthorDetailLastColumnArticles_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan MainPageBlockNews_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan MainPageGovernmentAnnouncement_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan NewsByCategorySlug_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan NewsBySourceSlug_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan NewsByTagSlug_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan NewsDetail_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan MainPageZodiacSignBlock_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan MostViewedNews_TTL => TimeSpan.FromSeconds(300);
+    public static TimeSpan Block_TTL => TimeSpan.FromSeconds(300);
+}

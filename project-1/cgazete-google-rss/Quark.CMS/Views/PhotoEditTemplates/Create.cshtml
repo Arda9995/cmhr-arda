@@ -1,0 +1,84 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["New"] + " " + _localizer["Template"];
+    ViewData[ViewDataNames.AsideMenu] = "Management";
+    ViewData[ViewDataNames.AsideSubMenu] = "ImageEdit";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(@_localizer["Management"], string.Empty),
+        new BreadcrumbItem(_localizer["PhotoEditTemplates"], "/PhotoEditTemplates/List")
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.PhotoEditor.CreateTemplateRequest
+
+<form id="form1" method="post" enctype="multipart/form-data">
+    <div id="divPhotoPage" class="row g-6">
+        <div class="col-5">
+            <div class="card card-stretch">
+                <div class="card-body pt-10">
+                    <div class="fv-row mb-10">
+                        <label class="fw-bold fs-6 required">@_localizer["Template"] @_localizer["Name"]</label>
+                        <input asp-for="@Model.Name" type="text" class="form-control form-control-lg form-control-solid"/>
+                        <span asp-validation-for="@Model.Name" class="fv-plugins-message-container invalid-feedback"></span>
+                        <div class="form-text">@_localizer["TemplateNameText"]</div>
+                    </div>
+                    <div class="fv-row mb-10">
+                        <label class="fw-bold fs-6">@_localizer["BackGroundColour"]</label>
+                        <input asp-for="@Model.BackgroundColor" type="text" class="form-control form-control-lg form-control-solid" placeholder="#ffffff"/>
+                        <span asp-validation-for="@Model.BackgroundColor" class="fv-plugins-message-container invalid-feedback"></span>
+                        <div class="form-text">@_localizer["BackGroundColourText"]</div>
+                    </div>
+                    <div class="fv-row mb-10">
+                        <input type="hidden" class="form-control form-control-lg form-control-solid" asp-for="@Model.Opacity"/>
+                        <span asp-validation-for="@Model.Opacity" class="fv-plugins-message-container invalid-feedback"></span>
+                        <label class="fw-bold fs-6">@_localizer["BackGroundOpacity"]</label>
+                        <div class="d-flex flex-column text-center mb-5">
+                            <div class="d-flex align-items-start justify-content-center mb-7">
+                                <span class="fw-bold fs-3x" id="opacity_value">40</span>
+                                <span class="fw-bold fs-4 mt-1 ms-2">%</span>
+                            </div>
+                            <div id="opacity_slider" class="noUi noUi-target noUi-ltr noUi-horizontal noUi-txt-dir-ltr">
+                            </div>
+                        </div>
+                        <div class="form-text">@_localizer["BackGroundOpacityText"]</div>
+                    </div>
+                    <div class="fv-row mb-10">
+                        <div class="position-relative" data-kt-dialer="true" data-kt-dialer-min="1" data-kt-dialer-max="100" data-kt-dialer-step="1" data-kt-dialer-decimals="0">
+                            <button type="button" class="btn btn-icon btn-active-color-gray-700 position-absolute translate-middle-y top-50 start-0" data-kt-dialer-control="decrease">
+                                <i class="ki-duotone ki-minus-square fs-2"><span class="path1"></span><span class="path2"></span></i>
+                            </button>
+                            <input asp-for="@Model.FontSize" type="text" class="form-control form-control-solid border-0 ps-12" data-kt-dialer-control="input" readonly />
+                            <button type="button" class="btn btn-icon btn-active-color-gray-700 position-absolute translate-middle-y top-50 end-0" data-kt-dialer-control="increase">
+                                <i class="ki-duotone ki-plus-square fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                            </button>
+                        </div>
+                        <div class="form-text">@_localizer["TextSizeText"]</div>
+                    </div>
+                    <div class="fv-row mb-10">
+                        <label class="fw-bold fs-6 required">@_localizer["TextColour"]</label>
+                        <input asp-for="@Model.TextColor" type="text" class="form-control form-control-lg form-control-solid" placeholder="#000000"/>
+                        <span asp-validation-for="@Model.TextColor" class="fv-plugins-message-container invalid-feedback"></span>
+                        <div class="form-text">@_localizer["TextColourText"]</div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-end mb-10">
+                    <button type="submit" class="btn btn-primary me-3">@_localizer["Save"]</button>
+                    <a href="/PhotoEditTemplates/List" class="btn btn-light btn-active-light-primary">@_localizer["Cancel"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-7">
+            <div class="card card-stretch">
+                <div class="card-body align-items-center justify-content-center d-flex">
+                    <img id="preview-img" class="" alt="@_localizer["PhotoEditPreview"]" src="/img/ataturk.jpg"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts{
+    <script src="/Scripts/PhotoEditorTemplate/Edit.js"></script>
+    <script src="/Scripts/PhotoEditorTemplate/Slider.js"></script>
+}

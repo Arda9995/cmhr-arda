@@ -1,0 +1,32 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+@if (Model.NewsTypeID != (int)NewsTypesEnum.GovernmentAnnouncement && Model.NewsTypeID != (int)NewsTypesEnum.Ad && Model.NewsTypeID != (int)NewsTypesEnum.CaricaturistNews)
+{
+    <div class="card card-flush mb-10">
+        <div class="card-header">
+            <div class="card-title">
+                <h2>@_localizer["Reklamlar"]</h2>
+            </div>
+            <div class="card-toolbar">
+                @if (Model.AllowAds)
+                {
+                    <partial name="Icons/Eye"/>
+                }
+                else
+                {
+                    <partial name="Icons/EyeSlash"/>
+                }
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            @if (Model.AllowAds)
+            {
+                <div>@_localizer["AllowAdsText"]</div>
+            }
+            else
+            {
+                <div>@_localizer["DontAllowAdsText"]</div>
+            }
+        </div>
+    </div>
+}

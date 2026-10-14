@@ -1,0 +1,76 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+@section Scripts
+{
+    <script>
+        var baseUrl = "blank-image.svg";
+    </script>
+}
+
+<style>
+    .image-input-placeholder {
+        background-image: url('@_appSettings.CDN_AssetsFolderFullUrl/assets/media/svg/files/blank-image.svg');
+    }
+
+    [data-bs-theme="dark"] .image-input-placeholder {
+        background-image: url('@_appSettings.CDN_AssetsFolderFullUrl/assets/media/svg/files/blank-image-dark.svg');
+    }
+</style>
+
+<div class="card card-flush mb-10">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>@_localizer["Photos"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0 text-center">
+        <div class="row">
+            @for (int i = 0; i < Model.Photos.Count; i++)
+            {
+                <div class="col-4 px-5">
+                    <div class="rounded border p-5 position-relative" id="@Model.Photos[i].Key">
+                        @if ( Model.Photos[i].IsRequired)
+                        {
+                            <span class="position-absolute top-0 end-0 translate-middle badge badge-square badge-danger p-2">@_localizer["Required"]</span>
+                        }
+                        <div class="fs-5 fw-semibold mt-2 mb-7">@Model.Photos[i].Name</div>
+                        <input type="hidden" id="uploaded-org-photo-@(i)"/>
+                        <div class="image-input image-input-empty image-input-outline image-input-placeholder mb-3" data-kt-image-input="true">
+                        
+                            <span id="mediaGalleryButton@(i)" class="mediaGalleryButton btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow custom-image-input-actions start-0" data-kt-image-input-action="custom" data-bs-toggle="tooltip" title="Galeriden Yükle">
+                                <i class="ki-duotone ki-file-left">
+                                 <span class="path1"></span>
+                                 <span class="path2"></span>
+                                </i>
+                            </span> 
+                     
+                            <div id="divImageInputWrapper_@(i)" class="image-input-wrapper w-150px h-150px" style="background-image: url('@Model.Photos[i].PhotoURL')"></div>
+                            <input id="hiddenPhotoUrl_@i" asp-for="@Model.Photos[i].PhotoURL" type="hidden" />
+                            <input id="hiddenPhotoTypeID_@i" asp-for="@Model.Photos[i].PhotoTypeID" type="hidden" />
+                             <input id="fileImage_@i" onchange="SendImageToCDN('@i');" class="mainpage-photo" type="hidden" accept=".png, .jpg, .jpeg" /> 
+                            
+                            @*      <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Bilgisayardan Yükle">
+                                <i class="ki-duotone ki-pencil fs-7">
+                                    <span class="path1"></span><span class="path2"></span>
+                                </i>
+                                
+                             
+                            </label> *@
+                            
+                            <span id="photoEditButton_@(i)" class="photoEditButton btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body bg-white shadow start-end d-none" data-kt-image-input-action="custom" data-bs-toggle="tooltip" title="Fotoğrafı Düzenle">
+                                <i class="bi bi-pencil"></i>
+                            </span>
+  
+                            <span id="removeButton_@i" class="removeButton btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Kaldır">
+                                <i class="ki-duotone ki-cross-circle fs-2">
+                                    <span class="path1"></span><span class="path2"></span>
+                                </i>
+                            </span>
+                        </div>
+                        <div class="text-muted fs-7 mb-3">@Model.Photos[i].Description</div>
+                        <span class="badge badge-primary badge">@Model.Photos[i].Width x @Model.Photos[i].Height</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

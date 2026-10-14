@@ -1,0 +1,66 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div class="card card-flush mb-10">
+    <div class="card-header">
+        <div class="card-title">
+            @if (Model.StatusID == (int)NewsStatusEnum.Published)
+            {
+                <h2>@_localizer["Published"]</h2>
+            }
+            else if (Model.StatusID == (int)NewsStatusEnum.Unpublished)
+            {
+                <h2>@_localizer["UnPublished"]</h2>
+            }
+            else if (Model.StatusID == (int)NewsStatusEnum.Draft)
+            {
+                <h2>@_localizer["Draft"]</h2>
+            }
+            else if (Model.StatusID == (int)NewsStatusEnum.Scheduled)
+            {
+                <h2>@_localizer["Scheduled"]</h2>
+            }
+        </div>
+        <div class="card-toolbar">
+            @if (Model.StatusID == (int)NewsStatusEnum.Published)
+            {
+                <div class="rounded-circle bg-success w-15px h-15px" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="@_localizer["PublishedText"]"></div>
+            }
+            else if (Model.StatusID == (int)NewsStatusEnum.Unpublished)
+            {
+                <div class="rounded-circle bg-danger w-15px h-15px" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="@_localizer["UnPublishedText"]"></div>
+            }
+            else if (Model.StatusID == (int)NewsStatusEnum.Draft)
+            {
+                @* <div class="rounded-circle bg-primary w-15px h-15px" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="Bu haberin yayında bir versiyonu bulunmamaktadır."></div> *@
+            }
+            else if (Model.StatusID == (int)NewsStatusEnum.Scheduled)
+            {
+                <div class="rounded-circle bg-info w-15px h-15px" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="@_localizer["ScheduledText"]"></div>
+            }
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        @if (Model.StatusID == (int)NewsStatusEnum.Published)
+        {
+            <p>@_localizer["PublishedBy"]: @Model.UpdatedBy</p>
+            <p>@_localizer["PublishDate"]: @Model.PublishDate</p>
+            <div class="mt-5">
+                <a href="/News/Live/@Model.NewsID" class="btn btn-danger btn-sm me-3">@_localizer["GoToLive"]</a>
+            </div>
+        }
+        else if (Model.StatusID == (int)NewsStatusEnum.Unpublished)
+        {
+            <p>@_localizer["UnPublishedBy"]: @Model.UpdatedBy</p>
+            <p>@_localizer["UnPublishedDate"]: @Model.UpdateDate</p>
+        }
+        else if (Model.StatusID == (int)NewsStatusEnum.Draft)
+        {
+            
+        }
+        else if (Model.StatusID == (int)NewsStatusEnum.Scheduled)
+        {
+            <p>@_localizer["ScheduledBy"]: @Model.UpdatedBy</p>
+            <p>@_localizer["ScheduledDate"]: @Model.ScheduledDate</p>
+        }
+    </div>
+</div>

@@ -1,0 +1,1832 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ActiveUser" xml:space="preserve">
+    <value>Aktif Kullanıcı</value>
+  </data>
+  <data name="AdministratorsForNote" xml:space="preserve">
+    <value>Son kullanıcılar tarafından görüntülenmez, sistem yöneticileri tarafından not amaçlı kullanılır.</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Vazgeç</value>
+  </data>
+  <data name="ChangeLanguage" xml:space="preserve">
+    <value>Dil Değiştir</value>
+  </data>
+  <data name="Current_Language_ID" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="DaysAgo" xml:space="preserve">
+    <value>Gün önce</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="Disabled" xml:space="preserve">
+    <value>Pasif</value>
+  </data>
+  <data name="EMail" xml:space="preserve">
+    <value>E-Posta</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Aktif</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>İngilizce</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Çıkış</value>
+  </data>
+  <data name="ExportToExcel" xml:space="preserve">
+    <value>Excel'e Aktar</value>
+  </data>
+  <data name="ForgotPassword" xml:space="preserve">
+    <value>Şifremi Unuttum</value>
+  </data>
+  <data name="FullName" xml:space="preserve">
+    <value>Adı Soyadı</value>
+  </data>
+  <data name="GeneralInformation" xml:space="preserve">
+    <value>Genel Bilgiler</value>
+  </data>
+  <data name="GoodAfternoon" xml:space="preserve">
+    <value>İyi Günler</value>
+  </data>
+  <data name="GoodEvening" xml:space="preserve">
+    <value>İyi Akşamlar</value>
+  </data>
+  <data name="GoodMorning" xml:space="preserve">
+    <value>Günaydın</value>
+  </data>
+  <data name="GoodNight" xml:space="preserve">
+    <value>İyi Geceler</value>
+  </data>
+  <data name="HomePage" xml:space="preserve">
+    <value>Ana Sayfa</value>
+  </data>
+  <data name="HoursAgo" xml:space="preserve">
+    <value> Saat önce</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Bilgi</value>
+  </data>
+  <data name="Informations" xml:space="preserve">
+    <value>Bilgileri</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Yükleniyor...</value>
+  </data>
+  <data name="LoginFailed" xml:space="preserve">
+    <value>Kullanıcı bilgileri hatalı. Lütfen yeniden deneyiniz.</value>
+  </data>
+  <data name="Management" xml:space="preserve">
+    <value>Yönetim</value>
+  </data>
+  <data name="Max10Files" xml:space="preserve">
+    <value>En fazla 10 dosya yükleyebilirsiniz.</value>
+  </data>
+  <data name="MessageSended" xml:space="preserve">
+    <value>Mesajınız gönderildi.</value>
+  </data>
+  <data name="MinAgo" xml:space="preserve">
+    <value> &lt;  1 dakika</value>
+  </data>
+  <data name="MinsAgo" xml:space="preserve">
+    <value> Dakika önce</value>
+  </data>
+  <data name="MyProfile" xml:space="preserve">
+    <value>Profilim</value>
+  </data>
+  <data name="MyUserInformation" xml:space="preserve">
+    <value>Kullanıcı Bilgilerim</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Adı</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>Yeni</value>
+  </data>
+  <data name="Orders" xml:space="preserve">
+    <value>Siparişler</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Cep Telefonu</value>
+  </data>
+  <data name="PhoneNumberIsNotValid" xml:space="preserve">
+    <value>Girdiğiniz telefon numarası hatalıdır. Lütfen kontrol ediniz.</value>
+  </data>
+  <data name="ValidationForPhoneNumberLength" xml:space="preserve">
+    <value>Başında ülke kodu olacak şekilde 12 haneli olarak giriniz.</value>
+  </data>
+  <data name="PhotoCouldNotUploaded" xml:space="preserve">
+    <value>Photo could not uploaded.</value>
+  </data>
+  <data name="Picture" xml:space="preserve">
+    <value>Resim</value>
+  </data>
+  <data name="RecordAdded" xml:space="preserve">
+    <value>Kayıt başarıyla eklendi.</value>
+  </data>
+  <data name="RecordAlreadyExist" xml:space="preserve">
+    <value>Bu kayıt bulunmaktadır.</value>
+  </data>
+  <data name="RecordApproved" xml:space="preserve">
+    <value>Kayıt Onaylandı.</value>
+  </data>
+  <data name="RecordDeleted" xml:space="preserve">
+    <value>Kayıt başarıyla silindi.</value>
+  </data>
+  <data name="RecordNotAdded" xml:space="preserve">
+    <value>Kayıt eklenemedi.</value>
+  </data>
+  <data name="RecordNotFound" xml:space="preserve">
+    <value>Aradığınız kayıt bulunamadı.</value>
+  </data>
+  <data name="RecordRejected" xml:space="preserve">
+    <value>Kayıt onaylanmadı.</value>
+  </data>
+  <data name="RecordsUpdated" xml:space="preserve">
+    <value>Bilgiler başarıyla güncellendi.</value>
+  </data>
+  <data name="RecordUpdated" xml:space="preserve">
+    <value>Kayıt başarıyla güncellendi. </value>
+  </data>
+  <data name="RecordWithNameAlreadyExist" xml:space="preserve">
+    <value>Bu isimde başka bir kayıt bulunmaktadır.</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Raporlar</value>
+  </data>
+  <data name="ResettingYourPassword" xml:space="preserve">
+    <value>Şifrenizi sıfırlayarak ilerlemek için lütfen gerekli bilgileri doldurunuz.</value>
+  </data>
+  <data name="Rights" xml:space="preserve">
+    <value>Hakları</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Rol</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Roller</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="SecureLogin" xml:space="preserve">
+    <value>Güvenli Giriş</value>
+  </data>
+  <data name="SecureLoginDescription" xml:space="preserve">
+    <value>Sisteme erişmek için kullanıcı bilgileriniz ile giriş yapmalısınız.</value>
+  </data>
+  <data name="SelectListItemSELECT" xml:space="preserve">
+    <value>--Seçiniz--</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Gönder</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="SignedOut" xml:space="preserve">
+    <value>Oturum kapatıldı.</value>
+  </data>
+  <data name="SignIn" xml:space="preserve">
+    <value>Giriş Yap</value>
+  </data>
+  <data name="SmsSendedForLogin" xml:space="preserve">
+    <value>Uygulamaya giriş için sms kodu cep telefonunuza gönderilmiştir.</value>
+  </data>
+  <data name="SmsVerificationText" xml:space="preserve">
+    <value>Uygualmaya giriş yapmak için tek kullanımlık şifreniz: </value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Bugün</value>
+  </data>
+  <data name="Turkish" xml:space="preserve">
+    <value>Türkçe</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Düzenle</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Kullanıcı</value>
+  </data>
+  <data name="UserEmailOrMobilePhoneExist" xml:space="preserve">
+    <value>Bu telefon numarası veya email ile kayıtlı kullanıcı bulunmaktadır.</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>Kullanıcı bulunamadı.</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Kullanıcılar</value>
+  </data>
+  <data name="ValidationForCreditCard" xml:space="preserve">
+    <value>Lütfen geçerli bir kredi kartı giriniz.</value>
+  </data>
+  <data name="ValidationForDate" xml:space="preserve">
+    <value>Lütfen geçerli bir tarih giriniz.</value>
+  </data>
+  <data name="ValidationForDigits" xml:space="preserve">
+    <value>Lütfen sadece sayısal karakterler giriniz.</value>
+  </data>
+  <data name="ValidationForEmail" xml:space="preserve">
+    <value>Lütfen geçerli bir e-posta adresi giriniz.</value>
+  </data>
+  <data name="ValidationForMax" xml:space="preserve">
+    <value>Lütfen {0} değerine eşit ya da daha küçük bir değer giriniz.</value>
+  </data>
+  <data name="ValidationForMaxLength" xml:space="preserve">
+    <value>Lütfen en fazla {0} karakter uzunluğunda bir değer giriniz.</value>
+  </data>
+  <data name="ValidationForMin" xml:space="preserve">
+    <value>Lütfen {0} değerine eşit ya da daha büyük bir değer giriniz.</value>
+  </data>
+  <data name="ValidationForMinLength" xml:space="preserve">
+    <value>Lütfen en az {0} karakter uzunluğunda bir değer giriniz.</value>
+  </data>
+  <data name="ValidationForNumber" xml:space="preserve">
+    <value>Lütfen geçerli bir sayı giriniz.</value>
+  </data>
+  <data name="ValidationForPasswordsMustBeSame" xml:space="preserve">
+    <value>Şifreler aynı olmalıdır.</value>
+  </data>
+  <data name="ValidationForPhone" xml:space="preserve">
+    <value>Lütfen geçerli bir telefon numarası giriniz.</value>
+  </data>
+  <data name="ValidationForRangeLength" xml:space="preserve">
+    <value>Lütfen en az {0} ve en fazla {1} uzunluğunda bir değer giriniz.</value>
+  </data>
+  <data name="ValidationForRequired" xml:space="preserve">
+    <value>Bu alan boş olmamalıdır.</value>
+  </data>
+  <data name="ValidationForUrl" xml:space="preserve">
+    <value>Lütfen geçerli bir web adresi (URL) giriniz.</value>
+  </data>
+  <data name="VerificationCodeIsExpired" xml:space="preserve">
+    <value>Doğrulama kodunun süresi geçmiş. Lütfen tekrar deneyiniz.</value>
+  </data>
+  <data name="VerificationCodeIsNotValid" xml:space="preserve">
+    <value>Doğrulama kodu geçerli değil. Lütfen tekrar deneyiniz.</value>
+  </data>
+  <data name="WantToLogin" xml:space="preserve">
+    <value>Giriş yapmak mı istiyorsunuz?</value>
+  </data>
+  <data name="WeeksAgo" xml:space="preserve">
+    <value> Hafta önce</value>
+  </data>
+  <data name="YearAgo" xml:space="preserve">
+    <value> Yıl önce</value>
+  </data>
+  <data name="Customer" xml:space="preserve">
+    <value>Müşteri</value>
+  </data>
+  <data name="Customers" xml:space="preserve">
+    <value>Müşteriler</value>
+  </data>
+  <data name="TransactionError" xml:space="preserve">
+    <value>İşlem sırasında bir hata oluştu.</value>
+  </data>
+  <data name="ProfilePhoto" xml:space="preserve">
+    <value>Profil Fotoğrafı</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Tutar</value>
+  </data>
+  <data name="GiveBonus" xml:space="preserve">
+    <value>Bonus Yükle</value>
+  </data>
+  <data name="UploadImageHelpText" xml:space="preserve">
+    <value>Lütfen png, jpg, jpeg, svg resim formatlarından birini yükleyiniz.</value>
+  </data>
+  <data name="WalletTransactions" xml:space="preserve">
+    <value>Cüzdan Aktiviteleri</value>
+  </data>
+  <data name="PassiveUser" xml:space="preserve">
+    <value>Pasif Kullanıcı</value>
+  </data>
+  <data name="EmailSentForPassword" xml:space="preserve">
+    <value>Mail adresinize yeni şifreniz gönderilmiştir.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Başarılı işlem.</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Dikkat</value>
+  </data>
+  <data name="Balance" xml:space="preserve">
+    <value>Bakiye</value>
+  </data>
+  <data name="BalanceBefore" xml:space="preserve">
+    <value>Önceki Bakiye</value>
+  </data>
+  <data name="Currency" xml:space="preserve">
+    <value>Para Birimi</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Tarih</value>
+  </data>
+  <data name="TransactionType" xml:space="preserve">
+    <value>İşlem Tipi</value>
+  </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>Erişim Engellendi.</value>
+  </data>
+  <data name="ForbiddenPageText" xml:space="preserve">
+    <value>Erişmeye çalıştığınız sayfaya erişim hakkınız bulunmuyor
+&lt;br /&gt;veya yeniden giriş yapmanız gerekiyor.</value>
+  </data>
+  <data name="GoToHome" xml:space="preserve">
+    <value>Ana Sayfaya Git</value>
+  </data>
+  <data name="GoToSignIn" xml:space="preserve">
+    <value>Giriş Sayfasına Git</value>
+  </data>
+  <data name="CustomerDetails" xml:space="preserve">
+    <value>Müşteri Bilgileri</value>
+  </data>
+  <data name="CreatedDate" xml:space="preserve">
+    <value>Eklenme Tarihi</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Tip</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>Bitiş Tarihi</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Başlangıç Tarihi</value>
+  </data>
+  <data name="SelectListItemALL" xml:space="preserve">
+    <value>-- Tümü --</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Şifre</value>
+  </data>
+  <data name="PushNotificationNotSended" xml:space="preserve">
+    <value>Bildirim gönderme sırasında bir hata oluştu.</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>İçerik</value>
+  </data>
+  <data name="Contents" xml:space="preserve">
+    <value>İçerikler</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>Resim</value>
+  </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Bildirimler</value>
+  </data>
+  <data name="PushNotificationSended" xml:space="preserve">
+    <value>Bildirim gönderildi.</value>
+  </data>
+  <data name="SendPushNotification" xml:space="preserve">
+    <value>Push Bildirim Gönder</value>
+  </data>
+  <data name="CardHolderName" xml:space="preserve">
+    <value>Kart Sahibi Adı</value>
+  </data>
+  <data name="CardNo" xml:space="preserve">
+    <value>Kart No</value>
+  </data>
+  <data name="CreditCard" xml:space="preserve">
+    <value>Kredi Kartı</value>
+  </data>
+  <data name="CreditCards" xml:space="preserve">
+    <value>Kredi Kartları</value>
+  </data>
+  <data name="Expiration" xml:space="preserve">
+    <value>Son Kullanım</value>
+  </data>
+  <data name="Deleted" xml:space="preserve">
+    <value>Silindi</value>
+  </data>
+  <data name="Slider" xml:space="preserve">
+    <value>Poster</value>
+  </data>
+  <data name="Sliders" xml:space="preserve">
+    <value>Posterler</value>
+  </data>
+  <data name="Order" xml:space="preserve">
+    <value>Sıra</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Ünvan</value>
+  </data>
+  <data name="Title2" xml:space="preserve">
+    <value>Başlık</value>
+  </data>
+  <data name="UploadSliderImageHelpText" xml:space="preserve">
+    <value>Lütfen ...x... oranlarında bir resim  yükleyiniz.</value>
+  </data>
+  <data name="Announcements" xml:space="preserve">
+    <value>Duyurular</value>
+  </data>
+  <data name="Announcement" xml:space="preserve">
+    <value>Duyuru</value>
+  </data>
+  <data name="StaticSmsCode" xml:space="preserve">
+    <value>Sabit Sms Kodu</value>
+  </data>
+  <data name="SmsCode" xml:space="preserve">
+    <value>Sms Kodu</value>
+  </data>
+  <data name="IsRead" xml:space="preserve">
+    <value>Okundu Mu</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Hayır</value>
+  </data>
+  <data name="Sender" xml:space="preserve">
+    <value>Gönderen</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Evet</value>
+  </data>
+  <data name="OpenInNewWindow" xml:space="preserve">
+    <value>Yeni Pencerede Aç</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Soyadı</value>
+  </data>
+  <data name="EMailPlaceholder" xml:space="preserve">
+    <value>eposta@adresi.com</value>
+  </data>
+  <data name="UserAgreement" xml:space="preserve">
+    <value>Kullanıcı Sözleşmesi</value>
+  </data>
+  <data name="News" xml:space="preserve">
+    <value>Haber</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Kategori</value>
+  </data>
+  <data name="NewsType" xml:space="preserve">
+    <value>Haber Tipi</value>
+  </data>
+  <data name="PublishDate" xml:space="preserve">
+    <value>Yayınlanma Tarihi</value>
+  </data>
+  <data name="Last15Minutes" xml:space="preserve">
+    <value>Son 15 Dakika</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Yazar</value>
+  </data>
+  <data name="Authors" xml:space="preserve">
+    <value>Yazarlar</value>
+  </data>
+  <data name="WebSiteViewersNote" xml:space="preserve">
+    <value>Web sitesinde okuyucular tarafından görüntülenir.</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>İşlemler</value>
+  </data>
+  <data name="NewsMultiple" xml:space="preserve">
+    <value>Haberler</value>
+  </data>
+  <data name="UserIsNotEnabled" xml:space="preserve">
+    <value>Giriş yapmaya çalıştığınız hesap devre dışıdır. Lütfen sistem yöneticisine başvurunuz.</value>
+  </data>
+  <data name="SMSServiceErrorOccurred" xml:space="preserve">
+    <value>SMS servisinde bir hata meydana geldi.</value>
+  </data>
+  <data name="WrongSMSCode" xml:space="preserve">
+    <value>SMS şifresi geçersiz. Lütfen kontrol ederek yeniden deneyiniz.</value>
+  </data>
+  <data name="LoginSuccess" xml:space="preserve">
+    <value>Başarıyla giriş yapıldı.</value>
+  </data>
+  <data name="LogoutSuccess" xml:space="preserve">
+    <value>Başarıyla çıkış yapıldı.</value>
+  </data>
+  <data name="RecordWithKeyAlreadyExists" xml:space="preserve">
+    <value>Bu anahtar kelime ile başka bir bayıt bulunmaktadır.</value>
+  </data>
+  <data name="MinValueCanNotBeGreaterThanMaxValue" xml:space="preserve">
+    <value>Minimum sayısı, maksimum sayısından büyük olamaz.</value>
+  </data>
+  <data name="CaptchaIsNotCompleted" xml:space="preserve">
+    <value>Lütfen Captcha testini tamamlayınız.</value>
+  </data>
+  <data name="Photo" xml:space="preserve">
+    <value>Fotoğraf</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="ViewCount" xml:space="preserve">
+    <value>Görüntülenme Sayısı</value>
+  </data>
+  <data name="Block" xml:space="preserve">
+    <value>Blok</value>
+  </data>
+  <data name="BlockManagement" xml:space="preserve">
+    <value>Blok Yönetimi</value>
+  </data>
+  <data name="Page" xml:space="preserve">
+    <value>Sayfa</value>
+  </data>
+  <data name="BlockPageText" xml:space="preserve">
+    <value>Bu bloğun hangi sayfada gözükeceğini belirler.</value>
+  </data>
+  <data name="BlockNameText" xml:space="preserve">
+    <value>Blok yönetim ekranlarında görüntülenir.</value>
+  </data>
+  <data name="KeyWord" xml:space="preserve">
+    <value>Anahtar Kelime</value>
+  </data>
+  <data name="BlockKeyWordText" xml:space="preserve">
+    <value>Blok yönetimi ekranlarında görüntülenmez, yalnızca frontend geliştirici tarafında içeriğin seçilebilmesi için kullanılır.</value>
+  </data>
+  <data name="NewsCountLimit" xml:space="preserve">
+    <value>Haber Sayısı Limitleri</value>
+  </data>
+  <data name="NewsCountLimitText" xml:space="preserve">
+    <value>Bu blok için en az ve en fazla kaç adet haber seçilebileceğini limitler.</value>
+  </data>
+  <data name="BlockType" xml:space="preserve">
+    <value>Blok Tipi</value>
+  </data>
+  <data name="BlockSliderText" xml:space="preserve">
+    <value>Kendi içerisinde auto-play olarak sürekli dönecek şekilde çalışır.</value>
+  </data>
+  <data name="NewsBlock" xml:space="preserve">
+    <value>Haber Bloğu</value>
+  </data>
+  <data name="NewsBlockText" xml:space="preserve">
+    <value>Haber bloğu şeklinde tüm haberler blok şeklinde görüntülenir.</value>
+  </data>
+  <data name="AutoSlideTime" xml:space="preserve">
+    <value>Otomatik Kayma Süresi</value>
+  </data>
+  <data name="Second" xml:space="preserve">
+    <value>Saniye</value>
+  </data>
+  <data name="AutoSliderTimerText" xml:space="preserve">
+    <value>Blok eğer Auto-Play olacak ise kaç saniye sonra otomatik olarak sonraki habere geçeceğini saniye cinsinden belirler. 0 ayarlanır ise otomatik değişme yapmaz.</value>
+  </data>
+  <data name="BlockUsersText" xml:space="preserve">
+    <value>Bu bloğun hangi kullanıcılar tarafından düzenlenebileceğini belirler.</value>
+  </data>
+  <data name="List" xml:space="preserve">
+    <value>Listesi</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="BlockLayout" xml:space="preserve">
+    <value>Blok Düzeni</value>
+  </data>
+  <data name="BlockLayoutSearch" xml:space="preserve">
+    <value>Başlık veya kategori adında ara</value>
+  </data>
+  <data name="Max" xml:space="preserve">
+    <value>En fazla</value>
+  </data>
+  <data name="Min" xml:space="preserve">
+    <value>En az</value>
+  </data>
+  <data name="BlockLayoutSelected" xml:space="preserve">
+    <value>Seçtiğiniz blokta</value>
+  </data>
+  <data name="BlockLayoutSelected2" xml:space="preserve">
+    <value>haber olabilir.</value>
+  </data>
+  <data name="BlockLayoutWarning" xml:space="preserve">
+    <value>Bloğa haber eklemek için bir sayfa ve blok seçiniz.</value>
+  </data>
+  <data name="BlockLayoutWarning2" xml:space="preserve">
+    <value>Bloğa haber eklemek için listeden sürükleyip bırakınız.</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Sıfırla</value>
+  </data>
+  <data name="Categories" xml:space="preserve">
+    <value>Kategoriler</value>
+  </data>
+  <data name="Error404Title" xml:space="preserve">
+    <value>Sayfa Bulunamadı!</value>
+  </data>
+  <data name="Error404Content" xml:space="preserve">
+    <value>Erişmeye çalıştığınız sayfa bulunamadı.
+                    &lt;br /&gt;&lt;br /&gt;
+                    Bunun bir hata olduğunu düşünüyorsanız lütfen sistem yöneticisi &lt;br /&gt;ile iletişime geçiniz.</value>
+  </data>
+  <data name="Error500Title" xml:space="preserve">
+    <value>Bir Hata Oluştu!</value>
+  </data>
+  <data name="Error500Content" xml:space="preserve">
+    <value>Son yapmaya çalıştığınız işlem esnasında beklenmeyen bir hata oluştu.
+                    &lt;br /&gt;
+                    Lütfen daha sonra tekrar deneyiniz.
+                    &lt;br /&gt;&lt;br /&gt;
+                    Eğer hata tekrar ederse veya bu hatanın olmaması gerektiğini düşünüyorsanız
+                    &lt;br /&gt;
+                    lütfen sistem yöneticisi ile iletişime geçiniz.</value>
+  </data>
+  <data name="UserLogins" xml:space="preserve">
+    <value>Kullanıcı Girişleri</value>
+  </data>
+  <data name="IPAdress" xml:space="preserve">
+    <value>IP Adresi</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Mesaj</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>Dosya</value>
+  </data>
+  <data name="UploadDate" xml:space="preserve">
+    <value>Yükleme Tarihi</value>
+  </data>
+  <data name="UploadedBy" xml:space="preserve">
+    <value>Yükleyen</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>SEÇENEKLER</value>
+  </data>
+  <data name="Folder" xml:space="preserve">
+    <value>Klasör</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Tüm</value>
+  </data>
+  <data name="Files" xml:space="preserve">
+    <value>Dosyalar</value>
+  </data>
+  <data name="MediaGallery" xml:space="preserve">
+    <value>Medya Galeri</value>
+  </data>
+  <data name="Member" xml:space="preserve">
+    <value>Üye</value>
+  </data>
+  <data name="Members" xml:space="preserve">
+    <value>Üyeler</value>
+  </data>
+  <data name="MemberDetails" xml:space="preserve">
+    <value>Üye Detayı</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Detaylar</value>
+  </data>
+  <data name="Menu" xml:space="preserve">
+    <value>Menü</value>
+  </data>
+  <data name="MenuManagement" xml:space="preserve">
+    <value>Menü Yönetimi</value>
+  </data>
+  <data name="Menus" xml:space="preserve">
+    <value>Menüler</value>
+  </data>
+  <data name="Parent" xml:space="preserve">
+    <value>Ana</value>
+  </data>
+  <data name="Child" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="Pages" xml:space="preserve">
+    <value>Sayfalar</value>
+  </data>
+  <data name="PageNameText" xml:space="preserve">
+    <value>Sayfaların hem web sitesinde hem de panelinizde kolay bulunmasını sağlar. Son kullanıcıların da görebileceği bir alan olduğu için anlaşılır bir isim veriniz.
+</value>
+  </data>
+  <data name="PageDescriptionText" xml:space="preserve">
+    <value>Sayfaların yönetilmesini ve takibini kolaylaştırmak için açıklama alanı olarak kullanabilirsiniz. Son kullanıcı tarafından görüntülenmez.
+</value>
+  </data>
+  <data name="PageKeyWordText" xml:space="preserve">
+    <value>Anahtar kelime, Frontend yazılım geliştirici tarafından web sitesinde içeriğin gösterilmesi için kullanılır. Yazılım geliştiriciler ile iletişimde olarak değişiklik yapınız.</value>
+  </data>
+  <data name="AdvancedSearch" xml:space="preserve">
+    <value>Gelişmiş Arama</value>
+  </data>
+  <data name="DeleteFolder" xml:space="preserve">
+    <value>Klasörü Sil</value>
+  </data>
+  <data name="NewsLocked" xml:space="preserve">
+    <value>Haber Kilitli</value>
+  </data>
+  <data name="NewsLockedBy" xml:space="preserve">
+    <value>Bu haber {0} tarafından kilitlenmiştir ve üzerinde değişiklik yapılamaz.</value>
+  </data>
+  <data name="NewsLockedText" xml:space="preserve">
+    <value>Bu haberin kilidi {0} dakika sonra {1}:{2} otomatik olarak açılacaktır.</value>
+  </data>
+  <data name="NewsPerformance" xml:space="preserve">
+    <value>Haber Performansı</value>
+  </data>
+  <data name="Minutely" xml:space="preserve">
+    <value>Anlık</value>
+  </data>
+  <data name="Hourly" xml:space="preserve">
+    <value>Saatlik</value>
+  </data>
+  <data name="Daily" xml:space="preserve">
+    <value>Günlük</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>Geçmiş</value>
+  </data>
+  <data name="NewsHistoryText" xml:space="preserve">
+    <value>Bu haberin {0} adet geçmişi bulunmaktadır.</value>
+  </data>
+  <data name="Photos" xml:space="preserve">
+    <value>Fotoğraflar</value>
+  </data>
+  <data name="Published" xml:space="preserve">
+    <value>Yayında</value>
+  </data>
+  <data name="UnPublished" xml:space="preserve">
+    <value>Yayından Kaldırılmış</value>
+  </data>
+  <data name="Draft" xml:space="preserve">
+    <value>Taslak</value>
+  </data>
+  <data name="Scheduled" xml:space="preserve">
+    <value>Zamanlanmış</value>
+  </data>
+  <data name="PublishedBy" xml:space="preserve">
+    <value>Yayına Alan</value>
+  </data>
+  <data name="PublishedDate2" xml:space="preserve">
+    <value>Yayına Alınan Zaman</value>
+  </data>
+  <data name="PublishedText" xml:space="preserve">
+    <value>Bu haber yayındadır.</value>
+  </data>
+  <data name="UnPublishedText" xml:space="preserve">
+    <value>Bu haber yayından kaldırılmıştır.</value>
+  </data>
+  <data name="ScheduledText" xml:space="preserve">
+    <value>Bu haber otomatik olarak yayına çıkma zamanını beklemektedir.</value>
+  </data>
+  <data name="UnPublishedBy" xml:space="preserve">
+    <value>Yayından Kaldıran</value>
+  </data>
+  <data name="UnPublishedDate" xml:space="preserve">
+    <value>Yayından Kaldırılma Tarihi</value>
+  </data>
+  <data name="ScheduledBy" xml:space="preserve">
+    <value>Yayın Zamanını Oluşturan</value>
+  </data>
+  <data name="ScheduledDate" xml:space="preserve">
+    <value>Yayın Zamanı</value>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>Etiket</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Etiketler</value>
+  </data>
+  <data name="UpdatedBy" xml:space="preserve">
+    <value>Güncellemeyi Yapan</value>
+  </data>
+  <data name="UpdatedDate" xml:space="preserve">
+    <value>Güncelleme Zamanı</value>
+  </data>
+  <data name="NewsAuthorText" xml:space="preserve">
+    <value>Haberi düzenleyecek yazarı seçiniz.</value>
+  </data>
+  <data name="AskToAI" xml:space="preserve">
+    <value>Yapay Zekaya Sor</value>
+  </data>
+  <data name="NewsTitleText" xml:space="preserve">
+    <value>Haberin başlığı haber sayfasında görünür.</value>
+  </data>
+  <data name="Subtitle" xml:space="preserve">
+    <value>Alt Başlık</value>
+  </data>
+  <data name="TitleAI" xml:space="preserve">
+    <value>Ne tür bir başlık istersin?</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Kapat</value>
+  </data>
+  <data name="NewsSpotText" xml:space="preserve">
+    <value>Haberin spotu sadece haberin detay sayfasında görünür.</value>
+  </data>
+  <data name="SubtitleAI" xml:space="preserve">
+    <value>Ne tür bir başlık istersin?</value>
+  </data>
+  <data name="Galleries" xml:space="preserve">
+    <value>Galeriler</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Seç</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Önizleme</value>
+  </data>
+  <data name="NewsStatusText" xml:space="preserve">
+    <value>Haber durumu seçiniz</value>
+  </data>
+  <data name="SelectDateTime" xml:space="preserve">
+    <value>Tarih ve Saat seçiniz.</value>
+  </data>
+  <data name="NewsTagsText" xml:space="preserve">
+    <value>Haber ile ilişkili etiketleri ekleyiniz.</value>
+  </data>
+  <data name="NewsLocked2" xml:space="preserve">
+    <value>Bu haber kilitlidir.</value>
+  </data>
+  <data name="Publish" xml:space="preserve">
+    <value>Yayına Al</value>
+  </data>
+  <data name="UnPublish" xml:space="preserve">
+    <value>Yayından Kaldır</value>
+  </data>
+  <data name="Schedule" xml:space="preserve">
+    <value>Yayına Zamanlı Al</value>
+  </data>
+  <data name="RePublish" xml:space="preserve">
+    <value>Yeniden Yayına Al</value>
+  </data>
+  <data name="ReSchedule" xml:space="preserve">
+    <value>Yayın Zamanını Değiştir</value>
+  </data>
+  <data name="ToDraft" xml:space="preserve">
+    <value>Taslağa Al</value>
+  </data>
+  <data name="Lock" xml:space="preserve">
+    <value>Kilitle</value>
+  </data>
+  <data name="UnLock" xml:space="preserve">
+    <value>Kilidi Kaldır</value>
+  </data>
+  <data name="NewsDetails" xml:space="preserve">
+    <value>Haber Detayları</value>
+  </data>
+  <data name="PhotoType" xml:space="preserve">
+    <value>Fotoğraf Tipi</value>
+  </data>
+  <data name="PhotoTypeNameText" xml:space="preserve">
+    <value>Haber giriş ekranlarında görüntülenir.</value>
+  </data>
+  <data name="PhotoTypeKeyWordText" xml:space="preserve">
+    <value>Haber girişlerinde görüntülenmez, yalnızca frontend geliştirici tarafında yüklenen fotoğrafın tipini belirlemek için kullanılır.
+</value>
+  </data>
+  <data name="Scalings" xml:space="preserve">
+    <value>Ölçüler</value>
+  </data>
+  <data name="Width" xml:space="preserve">
+    <value>Genişlik</value>
+  </data>
+  <data name="Height" xml:space="preserve">
+    <value>Yükseklik</value>
+  </data>
+  <data name="PhotoTypeOrderText" xml:space="preserve">
+    <value>Haber giriş ekranlarında hangi sırada görünmesi gerektiğini belirler.</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>Zorunlu</value>
+  </data>
+  <data name="PhotoTypeRequiredText" xml:space="preserve">
+    <value>Haber girişlerinde bu fotoğraf tipinin zorunlu olarak yüklenip yüklenmeyeceğini belirler.</value>
+  </data>
+  <data name="NewsPhotosSettings" xml:space="preserve">
+    <value>Haber Fotoğrafları Ayarları</value>
+  </data>
+  <data name="TagManagement" xml:space="preserve">
+    <value>Etiket Yönetimi</value>
+  </data>
+  <data name="OpenInWebSite" xml:space="preserve">
+    <value>Sitede Aç</value>
+  </data>
+  <data name="PromptManagement" xml:space="preserve">
+    <value>Komut Yönetimi</value>
+  </data>
+  <data name="SystemSettings" xml:space="preserve">
+    <value>Sistem Ayarları</value>
+  </data>
+  <data name="Prompt" xml:space="preserve">
+    <value>Komut</value>
+  </data>
+  <data name="PromptMessageText" xml:space="preserve">
+    <value>Yapay zekaya gönderilecek komut mesajı.
+</value>
+  </data>
+  <data name="PromptType" xml:space="preserve">
+    <value>Komut Tipi</value>
+  </data>
+  <data name="RequestType" xml:space="preserve">
+    <value>İstek Tipi</value>
+  </data>
+  <data name="GoBack" xml:space="preserve">
+    <value>Geri Dön</value>
+  </data>
+  <data name="successText" xml:space="preserve">
+    <value>Başarılı</value>
+  </data>
+  <data name="failText" xml:space="preserve">
+    <value>Başarısız</value>
+  </data>
+  <data name="LockMessage" xml:space="preserve">
+    <value>Haber kilitlendi.</value>
+  </data>
+  <data name="UnLockMessage" xml:space="preserve">
+    <value>Haberin kilidi açıldı.</value>
+  </data>
+  <data name="ScheduleMessage" xml:space="preserve">
+    <value>Haber belirlenen tarihte yayına alınacak.</value>
+  </data>
+  <data name="UnPublishMessage" xml:space="preserve">
+    <value>Haber yayından kaldırıldı.</value>
+  </data>
+  <data name="PublishMessage" xml:space="preserve">
+    <value>Haber yayına alındı.</value>
+  </data>
+  <data name="UnScheduleMessage" xml:space="preserve">
+    <value>Haber taslağa çekildi.</value>
+  </data>
+  <data name="Template" xml:space="preserve">
+    <value>Şablon</value>
+  </data>
+  <data name="PhotoEditTemplates" xml:space="preserve">
+    <value>Fotoğraf Metin Şablonları</value>
+  </data>
+  <data name="TemplateNameText" xml:space="preserve">
+    <value>Görsellerin düzenlemesi esnasında editörler tarafından görüntülenir ve seçilir.</value>
+  </data>
+  <data name="BackGroundColour" xml:space="preserve">
+    <value>Arkaplan Rengi</value>
+  </data>
+  <data name="BackGroundColourText" xml:space="preserve">
+    <value>Metinlerin arkaplan rengini belirler. Hex kodu ile uygulanır, şeffaf bırakmak için boş geçiniz.</value>
+  </data>
+  <data name="BackGroundOpacity" xml:space="preserve">
+    <value>Arkaplan Saydamlık</value>
+  </data>
+  <data name="BackGroundOpacityText" xml:space="preserve">
+    <value>Metinlerin arkaplan rengininin opacity ayarını belirler. Şeffaf bırakmak için 0 yazınız.</value>
+  </data>
+  <data name="TextSize" xml:space="preserve">
+    <value>Metin Boyutu</value>
+  </data>
+  <data name="TextSizeText" xml:space="preserve">
+    <value>Metinlerin boyutunu belirler.</value>
+  </data>
+  <data name="TextColour" xml:space="preserve">
+    <value>Metin Rengi</value>
+  </data>
+  <data name="TextColourText" xml:space="preserve">
+    <value>Metinlerin rengini belirler. Hex kodu ile uygulanır.</value>
+  </data>
+  <data name="PhotoEditPreview" xml:space="preserve">
+    <value>Fotoğraf Düzenleme Önizleme</value>
+  </data>
+  <data name="Templates" xml:space="preserve">
+    <value>Şablonlar</value>
+  </data>
+  <data name="CreatedBy" xml:space="preserve">
+    <value>Ekleyen Kişi</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Durum</value>
+  </data>
+  <data name="Merge" xml:space="preserve">
+    <value>Birleştir</value>
+  </data>
+  <data name="Target" xml:space="preserve">
+    <value>Hedef</value>
+  </data>
+  <data name="TargetTagText" xml:space="preserve">
+    <value>Kalıcı olan etiketi seçiniz.</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Kaynak</value>
+  </data>
+  <data name="SourceTagText" xml:space="preserve">
+    <value>Silinecek olan etiketi seçiniz.</value>
+  </data>
+  <data name="Compare" xml:space="preserve">
+    <value>Karşılaştır</value>
+  </data>
+  <data name="ApplyVersion" xml:space="preserve">
+    <value>Bu Versiyonu Uygula</value>
+  </data>
+  <data name="CopiedToClipboard" xml:space="preserve">
+    <value>Panoya kopyalandı.</value>
+  </data>
+  <data name="CategoryAlreadyMain" xml:space="preserve">
+    <value>Bir kategori aynı anda hem alt hem ana kategori olamaz.</value>
+  </data>
+  <data name="Error_PhotoSize" xml:space="preserve">
+    <value>Lütfen Geçerli Boyutlarda Fotoğraf Giriniz.</value>
+  </data>
+  <data name="NewsMainCategoryText" xml:space="preserve">
+    <value>Haberin yayınlanacağı ana kategoriyi seçiniz.</value>
+  </data>
+  <data name="NewsSubCategoryText" xml:space="preserve">
+    <value>Haberin yayınlanacağı alt kategoriyi seçiniz.</value>
+  </data>
+  <data name="UserAgreementText" xml:space="preserve">
+    <value>Uygulamaya giriş yapabilmek için &lt;a href="#" target="_blank" class="ms-1 link-primary"&gt;kullanıcı sözleşmesini&lt;/a&gt; kabul ediyorum.</value>
+  </data>
+  <data name="DataTypes" xml:space="preserve">
+    <value>Data Tipleri</value>
+  </data>
+  <data name="DataType" xml:space="preserve">
+    <value>Data Tipi</value>
+  </data>
+  <data name="Issue" xml:space="preserve">
+    <value>Problem</value>
+  </data>
+  <data name="Solved" xml:space="preserve">
+    <value>Çözülmüş</value>
+  </data>
+  <data name="UnSolved" xml:space="preserve">
+    <value>Çözülmemiş</value>
+  </data>
+  <data name="Anomaly" xml:space="preserve">
+    <value>Anomali</value>
+  </data>
+  <data name="Anomalies" xml:space="preserve">
+    <value>Anomaliler</value>
+  </data>
+  <data name="ShowOnlyUnsolved" xml:space="preserve">
+    <value>Sadece Çözülmemişleri Göster</value>
+  </data>
+  <data name="MarkAsSolved" xml:space="preserve">
+    <value>Çözüldü Olarak İşaretle</value>
+  </data>
+  <data name="RelatedNews" xml:space="preserve">
+    <value>İlişkili Haberler</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="EnteredNews" xml:space="preserve">
+    <value>Girilen Haberler</value>
+  </data>
+  <data name="UserCount" xml:space="preserve">
+    <value>Kullanıcı Sayısı</value>
+  </data>
+  <data name="PageViews" xml:space="preserve">
+    <value>Sayfa Gösterimi</value>
+  </data>
+  <data name="MostReadNewsToday" xml:space="preserve">
+    <value>Bugün En Çok Okunan Haberler</value>
+  </data>
+  <data name="CurrentLanguage" xml:space="preserve">
+    <value>Türkçe</value>
+  </data>
+  <data name="MaxRelatedNewsCount" xml:space="preserve">
+    <value>Maksimum ilişkili haber sayısına ulaştınız.Daha fazla ilişkili haber ekleyemezsiniz.</value>
+  </data>
+  <data name="CurrentLanguageWithFlags" xml:space="preserve">
+    <value>Türkçe &lt;img class="w-15px h-15px rounded-1 ms-2" src="{0}/assets/media/flags/turkey.svg" alt=""&gt;</value>
+  </data>
+  <data name="CurrentLanguageWithFlagsSignIn" xml:space="preserve">
+    <value>&lt;img data-kt-element="current-lang-flag" class="w-20px h-20px rounded me-3" src="{0}/assets/media/flags/turkey.svg" alt=""&gt;
+                        &lt;span data-kt-element="current-lang-name" class="me-1"&gt;Türkçe&lt;/span&gt;</value>
+  </data>
+  <data name="UserNewsCategoriesHintText" xml:space="preserve">
+    <value>Haber girişi yapacak kullanıcıların hangi kategorilere erişimi olacağını belirler.</value>
+  </data>
+  <data name="Live" xml:space="preserve">
+    <value>Canlı</value>
+  </data>
+  <data name="Current" xml:space="preserve">
+    <value>Güncel</value>
+  </data>
+  <data name="ReturnToDetails" xml:space="preserve">
+    <value>Detaylara Geri Dön</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Versiyon</value>
+  </data>
+  <data name="DraftToLive" xml:space="preserve">
+    <value>Taslağı Canlıya Al</value>
+  </data>
+  <data name="GoToDraft" xml:space="preserve">
+    <value>Taslak Haline Git</value>
+  </data>
+  <data name="GoToLive" xml:space="preserve">
+    <value>Canlı Halini Görüntüle</value>
+  </data>
+  <data name="AlertLiveText" xml:space="preserve">
+    <value>Bu haberin canlı yayında olmayan taslak bir versiyonu bulunmaktadır.</value>
+  </data>
+  <data name="AlertDraftText" xml:space="preserve">
+    <value>Bu haberin canlı yayında bir versiyonu bulunmaktadır ve taslak halini yayına alana dek kimse güncel halini göremeyecektir.</value>
+  </data>
+  <data name="ChangeOrder" xml:space="preserve">
+    <value>Sıralamayı Değiştir</value>
+  </data>
+  <data name="DailyViewCount" xml:space="preserve">
+    <value>Günlük Görüntülenme Sayısı</value>
+  </data>
+  <data name="PressNo" xml:space="preserve">
+    <value>Basın No</value>
+  </data>
+  <data name="ViewRange" xml:space="preserve">
+    <value>Görüntülenme Aralığı</value>
+  </data>
+  <data name="ColumnArticle" xml:space="preserve">
+    <value>Köşe Yazısı</value>
+  </data>
+  <data name="PhotoGallery" xml:space="preserve">
+    <value>Foto Galeri</value>
+  </data>
+  <data name="VideoNews" xml:space="preserve">
+    <value>Video Haber</value>
+  </data>
+  <data name="UserContract" xml:space="preserve">
+    <value>Kullanıcı Sözleşmesi</value>
+  </data>
+  <data name="UserContracts" xml:space="preserve">
+    <value>Kullanıcı Sözleşmeleri</value>
+  </data>
+  <data name="UserContractManagement" xml:space="preserve">
+    <value>Kullanıcı Sözleşmesi Yönetimi</value>
+  </data>
+  <data name="BlockManageNewsUsed" xml:space="preserve">
+    <value>Bu Haber Aşağıdaki Bloklarda Kullanılmaktadır</value>
+  </data>
+  <data name="AllowAdsText" xml:space="preserve">
+    <value>Bu haberde reklamlar görüntülenecektir</value>
+  </data>
+  <data name="DontAllowAdsText" xml:space="preserve">
+    <value>Bu haberde reklamlar görüntülenmeyecektir</value>
+  </data>
+  <data name="AllowAdsDescription" xml:space="preserve">
+    <value>Bu haberde reklam olmasını istiyorsanız açık tutunuz.</value>
+  </data>
+  <data name="AdsSetting" xml:space="preserve">
+    <value>Reklam İzni</value>
+  </data>
+  <data name="UnPublishDescription" xml:space="preserve">
+    <value>Yayından Kaldırılma Nedeni</value>
+  </data>
+  <data name="GovernmentAnnouncement" xml:space="preserve">
+    <value>Resmi İlan</value>
+  </data>
+  <data name="PublishedNews" xml:space="preserve">
+    <value>Yayınlanan Haberler</value>
+  </data>
+  <data name="NewsWithTags" xml:space="preserve">
+    <value>Etiketi Olan Haberler</value>
+  </data>
+  <data name="NewsWithRelatedNews" xml:space="preserve">
+    <value>İlişkili Haberleri Olan Haberler</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Toplam</value>
+  </data>
+  <data name="NonAuth" xml:space="preserve">
+    <value>Bu işlem için yetkiniz bulunmamaktadır</value>
+  </data>
+  <data name="SeoTitle" xml:space="preserve">
+    <value>SEO Başlığı</value>
+  </data>
+  <data name="SeoDescription" xml:space="preserve">
+    <value>SEO Açıklaması</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Hakkında</value>
+  </data>
+  <data name="ColumnName" xml:space="preserve">
+    <value>Köşe Adı</value>
+  </data>
+  <data name="UrlDesc" xml:space="preserve">
+    <value>URL girerken lütfen sadece küçük harf, rakam ve kesme işareti (-) işareti kullanınız.</value>
+  </data>
+  <data name="SocialMedias" xml:space="preserve">
+    <value>Sosyal Medyalar</value>
+  </data>
+  <data name="ShowInHome" xml:space="preserve">
+    <value>Anasayfada Göster</value>
+  </data>
+  <data name="Sources" xml:space="preserve">
+    <value>Kaynaklar</value>
+  </data>
+  <data name="NewsSourceManagement" xml:space="preserve">
+    <value>Haber Kaynak Yönetimi</value>
+  </data>
+  <data name="NewsSource" xml:space="preserve">
+    <value>Haber Kaynağı</value>
+  </data>
+  <data name="SystemLogs" xml:space="preserve">
+    <value>Sistem Logları</value>
+  </data>
+  <data name="SystemLog" xml:space="preserve">
+    <value>Sistem Log</value>
+  </data>
+  <data name="Credential" xml:space="preserve">
+    <value>İletişim Bilgisi</value>
+  </data>
+  <data name="Shuffle" xml:space="preserve">
+    <value>Karıştır</value>
+  </data>
+  <data name="ClichePhoto" xml:space="preserve">
+    <value>Klişe Fotoğraf</value>
+  </data>
+  <data name="SocialMediaTitle" xml:space="preserve">
+    <value>Sosyal Medya Başlığı</value>
+  </data>
+  <data name="Gallery" xml:space="preserve">
+    <value>Galeri</value>
+  </data>
+  <data name="Favourites" xml:space="preserve">
+    <value>Favoriler</value>
+  </data>
+  <data name="Archive" xml:space="preserve">
+    <value>Arşiv</value>
+  </data>
+  <data name="Entertainment" xml:space="preserve">
+    <value>Eğlence</value>
+  </data>
+  <data name="Business" xml:space="preserve">
+    <value>İş</value>
+  </data>
+  <data name="ScienceAndTech" xml:space="preserve">
+    <value>Bilim ve Teknoloji</value>
+  </data>
+  <data name="Health" xml:space="preserve">
+    <value>Sağlık</value>
+  </data>
+  <data name="Sports" xml:space="preserve">
+    <value>Spor</value>
+  </data>
+  <data name="TopStories" xml:space="preserve">
+    <value>En İyi Hikayeler</value>
+  </data>
+  <data name="GoogleTrendsNews" xml:space="preserve">
+    <value>Google Trends Haberleri</value>
+  </data>
+  <data name="MainCategory" xml:space="preserve">
+    <value>Ana Kategori</value>
+  </data>
+  <data name="SecondaryCategories" xml:space="preserve">
+    <value>İkincil Kategoriler</value>
+  </data>
+  <data name="LastUpdated" xml:space="preserve">
+    <value>Son Güncellenme Zamanı</value>
+  </data>
+  <data name="Survey" xml:space="preserve">
+    <value>Anket</value>
+  </data>
+  <data name="Surveys" xml:space="preserve">
+    <value>Anketler</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>Soru</value>
+  </data>
+  <data name="Option" xml:space="preserve">
+    <value>Seçenek</value>
+  </data>
+  <data name="Answers" xml:space="preserve">
+    <value>Cevaplar</value>
+  </data>
+  <data name="UpdateData" xml:space="preserve">
+    <value>Verileri Güncelle</value>
+  </data>
+  <data name="Enable" xml:space="preserve">
+    <value>Aktif Et</value>
+  </data>
+  <data name="TotalAnswers" xml:space="preserve">
+    <value>Toplam Cevaplar</value>
+  </data>
+  <data name="URLRedirection" xml:space="preserve">
+    <value>Link Yönlendirme</value>
+  </data>
+  <data name="TotalParticipants" xml:space="preserve">
+    <value>Toplam Katılımcılar</value>
+  </data>
+  <data name="Headline" xml:space="preserve">
+    <value>Manşet Başlığı</value>
+  </data>
+  <data name="HeadlineText" xml:space="preserve">
+    <value>Manşet başlığı tüm sayfalarda görünür.</value>
+  </data>
+  <data name="Caricaturist" xml:space="preserve">
+    <value>Çizer</value>
+  </data>
+  <data name="Caricaturists" xml:space="preserve">
+    <value>Çizerler</value>
+  </data>
+  <data name="CaricaturistNews" xml:space="preserve">
+    <value>Çizer Haberi</value>
+  </data>
+  <data name="NewsHeadlineText" xml:space="preserve">
+    <value>Ana sayfada görünecek haberin başlığı.</value>
+  </data>
+  <data name="PhotoGalleryItems" xml:space="preserve">
+    <value>Foto Galeriler</value>
+  </data>
+  <data name="ZodiacSign" xml:space="preserve">
+    <value>Burç</value>
+  </data>
+  <data name="Astrologer" xml:space="preserve">
+    <value>Astrolog</value>
+  </data>
+  <data name="Astrologers" xml:space="preserve">
+    <value>Astrologlar</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Yenile</value>
+  </data>
+  <data name="Blocks" xml:space="preserve">
+    <value>Bloklar</value>
+  </data>
+  <data name="Cache" xml:space="preserve">
+    <value>Önbellek</value>
+  </data>
+  <data name="NewsUrlHint" xml:space="preserve">
+    <value>URL girerken lütfen sadece küçük harf, rakam ve kesme işareti (-) işareti kullanınız.</value>
+  </data>
+  <data name="RecordAlreadyExists" xml:space="preserve">
+    <value>Bu kayıt zaten mevcut.</value>
+  </data>
+  <data name="BookDetails" xml:space="preserve">
+    <value>Kitap Detayı</value>
+  </data>
+  <data name="BookInformation" xml:space="preserve">
+    <value>Kitap Bilgileri</value>
+  </data>
+  <data name="BookName" xml:space="preserve">
+    <value>Kitap Adı</value>
+  </data>
+  <data name="BookPhoto" xml:space="preserve">
+    <value>Kitap Fotoğrafı</value>
+  </data>
+  <data name="Books" xml:space="preserve">
+    <value>Kitaplar</value>
+  </data>
+  <data name="NewBooks" xml:space="preserve">
+    <value>Yeni Kitaplar</value>
+  </data>
+  <data name="UpdateBook" xml:space="preserve">
+    <value>Kitapları Güncelle</value>
+  </data>
+  <data name="BaseURL" xml:space="preserve">
+    <value>BaseURL</value>
+  </data>
+  <data name="Slug" xml:space="preserve">
+    <value>Slug</value>
+  </data>
+  <data name="ImageUploadRequired" xml:space="preserve">
+    <value>Görsel yükleme zorunludur.</value>
+  </data>
+  <data name="SeoSettings" xml:space="preserve">
+    <value>SEO Ayarları</value>
+  </data>
+  <data name="AllowGoogleIndexDescription" xml:space="preserve">
+    <value>Haberlerin Google Index'e eklenmesi, arama motorlarında hızlı indekslemeyi sağlar.</value>
+  </data>
+  <data name="AllowToSendGoogleSideMapDescription" xml:space="preserve">
+    <value>Haberlerin Sitemap'e eklenmesi, arama motorlarının içeriği daha etkili taramasını sağlar.</value>
+  </data>
+  <data name="AllowToSendRssDescription" xml:space="preserve">
+    <value>Haberlerin RSS'e eklenmesi, içeriklerin diğer platformlara kolayca taşınmasını sağlar.</value>
+  </data>
+  <data name="ExcludeFromGoogleAiFeedSetting" xml:space="preserve">
+    <value>Google AI Feed'den Hariç Tut</value>
+  </data>
+  <data name="ExcludeFromGoogleAiFeedDescription" xml:space="preserve">
+    <value>İşaretlenirse içerik Google AI Pilot RSS feed'ine gönderilmez. Normal RSS etkilenmez.</value>
+  </data>
+  <data name="Error_GoogleAiPhotoSize" xml:space="preserve">
+    <value>Google AI görseli minimum 1600x1200, maksimum 3200x3200 olmalıdır.</value>
+  </data>
+  <data name="GoogleIndexSetting" xml:space="preserve">
+    <value>Google İndeks'e Gönder</value>
+  </data>
+  <data name="GooglePermissions" xml:space="preserve">
+    <value>Google İzinleri</value>
+  </data>
+  <data name="GoogleSideMapSetting" xml:space="preserve">
+    <value>Google Sitemap'e Gönder</value>
+  </data>
+  <data name="Permissions" xml:space="preserve">
+    <value>İzinler</value>
+  </data>
+  <data name="RssSetting" xml:space="preserve">
+    <value>RSS İzni</value>
+  </data>
+  <data name="BoxCount" xml:space="preserve">
+    <value>Kutu Sayısı</value>
+  </data>
+  <data name="AllNews" xml:space="preserve">
+    <value>Tüm Haberler</value>
+  </data>
+  <data name="By" xml:space="preserve">
+    <value>Tarafından</value>
+  </data>
+  <data name="CategoryBasedNewsChart" xml:space="preserve">
+    <value>Kategori Bazlı Haber Grafiği</value>
+  </data>
+  <data name="DailyNewsData" xml:space="preserve">
+    <value>Günlük Haber Verileri</value>
+  </data>
+  <data name="GoToNewsListToContinue" xml:space="preserve">
+    <value>Devam Etmek İçin Haber Listesine Gidiniz.</value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>Adet</value>
+  </data>
+  <data name="LastPublishedNews" xml:space="preserve">
+    <value>Son Yayınlanan Haberler</value>
+  </data>
+  <data name="LatestActions" xml:space="preserve">
+    <value>Son Hareketler</value>
+  </data>
+  <data name="NewAstrologer" xml:space="preserve">
+    <value>Yeni Astrolog</value>
+  </data>
+  <data name="NewAuthor" xml:space="preserve">
+    <value>Yeni Yazar</value>
+  </data>
+  <data name="NewBook" xml:space="preserve">
+    <value>Yeni Kitap</value>
+  </data>
+  <data name="NewMember" xml:space="preserve">
+    <value>Yeni Üye</value>
+  </data>
+  <data name="NewNews" xml:space="preserve">
+    <value>Yeni Haber</value>
+  </data>
+  <data name="NewPhotoGalleryNews" xml:space="preserve">
+    <value>Yeni Foto Galeri Haberi</value>
+  </data>
+  <data name="NewsAddedInTheLastMonth" xml:space="preserve">
+    <value>Son 1 Ayda Girilen Haberler</value>
+  </data>
+  <data name="NewsAvailable" xml:space="preserve">
+    <value>Haber Bulunmaktadır</value>
+  </data>
+  <data name="NewsChart" xml:space="preserve">
+    <value>Haber Grafiği</value>
+  </data>
+  <data name="NewsEntryChart" xml:space="preserve">
+    <value>Haber Giriş Grafiği</value>
+  </data>
+  <data name="NewsList" xml:space="preserve">
+    <value>Haber Listesi</value>
+  </data>
+  <data name="NewsOfTheDay" xml:space="preserve">
+    <value>Günün Haberi</value>
+  </data>
+  <data name="NewsTypes" xml:space="preserve">
+    <value>Haber Tipleri</value>
+  </data>
+  <data name="NewUser" xml:space="preserve">
+    <value>Yeni Kullanıcı</value>
+  </data>
+  <data name="NotPublished" xml:space="preserve">
+    <value>Yayına Alınmamış</value>
+  </data>
+  <data name="QuickMenu" xml:space="preserve">
+    <value>Hızlı Menü</value>
+  </data>
+  <data name="TagCount" xml:space="preserve">
+    <value>Etiket Sayısı</value>
+  </data>
+  <data name="TaggedNews" xml:space="preserve">
+    <value>Etiketli Haberler</value>
+  </data>
+  <data name="UnrelatedNews" xml:space="preserve">
+    <value>İlişkisiz Haberler</value>
+  </data>
+  <data name="UntaggedNews" xml:space="preserve">
+    <value>Etiketsiz Haberler</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>Görüntüle</value>
+  </data>
+  <data name="Views" xml:space="preserve">
+    <value>Görüntülenme</value>
+  </data>
+  <data name="CoverPhoto" xml:space="preserve">
+    <value>Kapak Fotoğrafı</value>
+  </data>
+  <data name="Spot" xml:space="preserve">
+    <value>Spot</value>
+  </data>
+  <data name="ShowTodaysColumnArticles" xml:space="preserve">
+    <value>Günün Köşe Yazılarını Göster</value>
+  </data>
+  <data name="FileName" xml:space="preserve">
+    <value>Dosya Adı</value>
+  </data>
+  <data name="NewsUpHeadlineText" xml:space="preserve">
+    <value>Haberin üstmanşet başlığı, kırmızı bantda görünür.</value>
+  </data>
+  <data name="NewsUpSubHeadingText" xml:space="preserve">
+    <value>Haberin sürmanşet başlığı, haber sayfasında görünür.</value>
+  </data>
+  <data name="ShowHeadline" xml:space="preserve">
+    <value>Manşet başlığı haberde göster.</value>
+  </data>
+  <data name="ShowNewsUpSubHeading" xml:space="preserve">
+    <value>Sürmanşet başlığı haberde göster.</value>
+  </data>
+  <data name="ShowSubHeading" xml:space="preserve">
+    <value>Sürmanşeti haberde göster.</value>
+  </data>
+  <data name="ShowUpHeadline" xml:space="preserve">
+    <value>Manşet üst başlığı kırmızı bantta gösterilsin.</value>
+  </data>
+  <data name="SubHeading" xml:space="preserve">
+    <value>Sürmanşet Başlık</value>
+  </data>
+  <data name="UpHeadline" xml:space="preserve">
+    <value>Manşet Üst Başlık</value>
+  </data>
+  <data name="UpSubHeading" xml:space="preserve">
+    <value>Sürmanşet Üst Başlık</value>
+  </data>
+  <data name="RedirectLink" xml:space="preserve">
+    <value>Yönlendirme Linki</value>
+  </data>
+  <data name="Option1" xml:space="preserve">
+    <value>1. Seçenek</value>
+  </data>
+  <data name="Option2" xml:space="preserve">
+    <value>2. Seçenek</value>
+  </data>
+  <data name="Option3" xml:space="preserve">
+    <value>3. Seçenek</value>
+  </data>
+  <data name="Option4" xml:space="preserve">
+    <value>4. Seçenek</value>
+  </data>
+  <data name="SurveyCreator" xml:space="preserve">
+    <value>Anketi Oluşturan Kişi</value>
+  </data>
+  <data name="SurveyPhoto" xml:space="preserve">
+    <value>Anket Fotoğrafı</value>
+  </data>
+  <data name="SurveyQuestion" xml:space="preserve">
+    <value>Anket Sorusu</value>
+  </data>
+  <data name="NewsPublishTime" xml:space="preserve">
+    <value>Haberin Yayınlanacağı Zaman</value>
+  </data>
+  <data name="PublishNow" xml:space="preserve">
+    <value>Hemen Yayınla</value>
+  </data>
+  <data name="Show" xml:space="preserve">
+    <value>Göster</value>
+  </data>
+  <data name="DontSendDate" xml:space="preserve">
+    <value>Başlangıç Tarihi Gönderme</value>
+  </data>
+  <data name="NewsPublishEndDate" xml:space="preserve">
+    <value>Haber Yayın Bitiş Tarihi</value>
+  </data>
+  <data name="NewsPublishStartDate" xml:space="preserve">
+    <value>Haber Yayın Başlangıç Tarihi</value>
+  </data>
+  <data name="PublishEndDate" xml:space="preserve">
+    <value>Yayından Kaldırılma Tarihi</value>
+  </data>
+  <data name="BlendAndSave" xml:space="preserve">
+    <value>Karıştır ve Kaydet</value>
+  </data>
+  <data name="PhotoGalleryItem_Content" xml:space="preserve">
+    <value>İçerik</value>
+  </data>
+  <data name="UpSpot" xml:space="preserve">
+    <value>Manşet Spot</value>
+  </data>
+  <data name="BackgroundPhoto" xml:space="preserve">
+    <value>Arka Plan Fotoğrafı</value>
+  </data>
+  <data name="PaymentManagements" xml:space="preserve">
+    <value>Ödeme Yönetimi</value>
+  </data>
+  <data name="Products" xml:space="preserve">
+    <value>Ürünler</value>
+  </data>
+  <data name="Subscriptions" xml:space="preserve">
+    <value>Abonelikler</value>
+  </data>
+  <data name="Plans" xml:space="preserve">
+    <value>Ödeme Planları</value>
+  </data>
+  <data name="PaymentPlanName" xml:space="preserve">
+    <value>Ödeme Planı Adı</value>
+  </data>
+  <data name="PaymentProduct" xml:space="preserve">
+    <value>Ödeme Ürünü</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Fiyat</value>
+  </data>
+  <data name="PaymentInterval" xml:space="preserve">
+    <value>Ödeme Aralığı</value>
+  </data>
+  <data name="PlanPaymentType" xml:space="preserve">
+    <value>Ödeme Tipi</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Ürün Adı</value>
+  </data>
+  <data name="ProductInformation" xml:space="preserve">
+    <value>Ürün Bilgileri</value>
+  </data>
+  <data name="PaymentPlanInformation" xml:space="preserve">
+    <value>Ödeme Planı Bilgileri</value>
+  </data>
+  <data name="PlanReferenceCode" xml:space="preserve">
+    <value>Ödeme Planı Referans Kodu</value>
+  </data>
+  <data name="ProductReferenceCode" xml:space="preserve">
+    <value>Ürün Referans Kodu</value>
+  </data>
+  <data name="PaymentPlan" xml:space="preserve">
+    <value>Ödeme Planı</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>Ürün</value>
+  </data>
+  <data name="SubscriptionReferenceCode" xml:space="preserve">
+    <value>Abonelik Referans Numarası</value>
+  </data>
+  <data name="SubscriptionStartDate" xml:space="preserve">
+    <value>Abonelik Başlangıç Tarihi</value>
+  </data>
+  <data name="SubscriptionEndDate" xml:space="preserve">
+    <value>Abonelik Bitiş Tarihi</value>
+  </data>
+  <data name="SubscriptionPlanReferenceCode" xml:space="preserve">
+    <value>Abone Planı Referans Kodu</value>
+  </data>
+  <data name="PaymentIntervalCount" xml:space="preserve">
+    <value>Ödeme Aralığı Sayısı</value>
+  </data>
+  <data name="PaymentIntervalDisplayName" xml:space="preserve">
+    <value>Ödeme Aralığı Görünen İsim</value>
+  </data>
+  <data name="NewsAddedToRss" xml:space="preserve">
+    <value>Haber RSS beslemesine eklendi.</value>
+  </data>
+  <data name="NewsRemovedFromRss" xml:space="preserve">
+    <value>Haber RSS beslemesinden kaldırıldı.</value>
+  </data>
+  <data name="NewsAddedToSitemap" xml:space="preserve">
+    <value>Haber Google Site Haritasına eklendi.</value>
+  </data>
+  <data name="NewsRemovedFromSitemap" xml:space="preserve">
+    <value>Haber Google Site Haritasından kaldırıldı.</value>
+  </data>
+  <data name="SendWebNotification" xml:space="preserve">
+    <value>Web Bildirim Gönder</value>
+  </data>
+  <data name="UpdatedPublish" xml:space="preserve">
+    <value>Güncellemeyi Yayına Al</value>
+  </data>
+  <data name="SendNotification" xml:space="preserve">
+    <value>Bildirim Gönder</value>
+  </data>
+  <data name="CloudflareCacheUpdate" xml:space="preserve">
+    <value>Cloudflare Cache Güncelle</value>
+  </data>
+  <data name="Popular News" xml:space="preserve">
+    <value>En Çok Okunan Haberler</value>
+  </data>
+  <data name="NewsSubHeadingText" xml:space="preserve">
+    <value>Haberin sürmanşeti haber sayfasında görünür.</value>
+  </data>
+  <data name="AgencyNews" xml:space="preserve">
+    <value>Ajans Haberleri</value>
+  </data>
+  <data name="WasItReported" xml:space="preserve">
+    <value>Haberleştirildi mi ?</value>
+  </data>
+  <data name="Agency" xml:space="preserve">
+    <value>Ajans</value>
+  </data>
+  <data name="Source_SourceText" xml:space="preserve">
+    <value>Aktaracağınız kaynağı seçiniz.</value>
+  </data>
+  <data name="Source_TargetText" xml:space="preserve">
+    <value>Hedef kaynağı seçiniz. Aktaracağınız kaynak ile hedef kaynak yer değiştirecektir.</value>
+  </data>
+  <data name="NewsIntegration" xml:space="preserve">
+    <value>Gazete Haber Merkezi</value>
+  </data>
+</root>

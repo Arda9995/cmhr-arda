@@ -1,0 +1,61 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="card card-flush mb-10">
+    <div class="card-header">
+        <div class="card-title required">
+            <h2>@_localizer["Permissions"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        <div class="row">
+            <div class="col-lg-12 fv-row">
+                <label class="required form-label">@_localizer["AdsSetting"]</label>
+                <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                  
+                    <input asp-for="AllowAds" class="form-check-input" type="checkbox" />
+                </div>
+                <div class="text-muted fs-7 mt-5">@_localizer["AllowAdsDescription"]</div>
+            </div>
+        </div>
+        <div class="separator border-2 my-10"></div>
+        <div class="row">
+            <div class="col-lg-12 fv-row">
+                <label class="required form-label">@_localizer["RssSetting"]</label>
+                <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                    <input asp-for="AllowToSendRSS" class="form-check-input" type="checkbox" />
+                </div>
+                <div class="text-muted fs-7 mt-5">@_localizer["AllowToSendRssDescription"]</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="card card-flush mb-10">
+    <div class="card-header">
+        <div class="card-title required">
+            <h2>@_localizer["GooglePermissions"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0">      
+        <div class="row">
+            <div class="col-lg-12 fv-row">
+                <label class="required form-label">@_localizer["GoogleIndexSetting"]</label>
+                <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                    <input asp-for="AllowGoogleIndex" class="form-check-input" type="checkbox" />
+                </div>
+                <div class="text-muted fs-7 mt-5">@_localizer["AllowGoogleIndexDescription"]</div>
+            </div>
+        </div>
+        <div class="separator border-2 my-10"></div>
+        <div class="row">
+            <div class="col-lg-12 fv-row">
+                <label class="required form-label">@_localizer["GoogleSideMapSetting"]</label>
+                <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                    <input asp-for="AllowToSendGoogleSideMap" class="form-check-input" type="checkbox" />
+                </div>
+                <div class="text-muted fs-7 mt-5">@_localizer["AllowToSendGoogleSideMapDescription"]</div>
+            </div>
+        </div>       
+    </div>
+</div>

@@ -1,0 +1,1041 @@
+﻿@using Quark.Business.Caching.Models.Responses.NewsCachingResponses
+@using Quark.Data.Models
+@model MainPageResponse
+
+@{
+    var economy1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "AnaSayfa-EkonomiHaberleri").Take(1).FirstOrDefault();
+    var economy4 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "AnaSayfa-EkonomiHaberleri").Skip(1).Take(5).ToList();
+
+    var sustainabilty2 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "AnaSayfa-SurdurulebilirliHaberleri").Take(2).ToList();
+    var sustainabilty1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "AnaSayfa-SurdurulebilirliHaberleri").Skip(2).Take(3).FirstOrDefault();
+
+    var world1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "AnaSayfa-DunyaHaberleri").Take(1).FirstOrDefault();
+    var world3 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "AnaSayfa-DunyaHaberleri").Skip(1).Take(4).ToList();
+
+    var spor4 = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-SporHaberleri").ToList();
+
+    var lifeSlider = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-YasamHaberleriSlider").ToList();
+
+    var life2 = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-YasamHaberleri").ToList();
+
+    var gurme4 = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-GurmeHaberleri").ToList();
+
+    var scienceAndTech1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-BilimTeknolojiHaberleri").Take(1).FirstOrDefault();
+    var scienceAndTech3 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-BilimTeknolojiHaberleri").Skip(1).Take(4).ToList();
+
+    var automotive1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-OtomotivHaberleri").Take(1).FirstOrDefault();
+    var automotive3 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-OtomotivHaberleri").Skip(1).Take(4).ToList();
+
+    var bookad1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-KitapEkiHaberleri").Take(1).FirstOrDefault();
+    var bookad3 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-KitapEkiHaberleri").Skip(1).Take(4).ToList();
+
+    var culture1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-KulturSanatHaberleri").Take(1).FirstOrDefault();
+    var culture3 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-KulturSanatHaberleri").Skip(1).Take(4).ToList();
+
+    var fashion1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-ModaHaberleri").Take(1).FirstOrDefault();
+    var fashion3 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-ModaHaberleri").Skip(1).Take(4).ToList();
+
+    var mostSearced1 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-EnCokArananlarTab1").Take(6).ToList();
+    var mostSearced2 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-EnCokArananlarTab2").Take(6).ToList();
+    var mostSearced3 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-EnCokArananlarTab3").Take(6).ToList();
+    var mostSearced4 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+    "Anasayfa-EnCokArananlarTab4").Take(6).ToList();
+}
+<div class="px-5 space-y-5">
+    <!-- Social Start -->
+    <div class="mt-8">
+        <!-- Title Start -->
+        <div class="text-slate-900 font-semibold"> Bizi Sosyal Medyada Takip Edin </div> <!-- Title End -->
+        <!-- Flex Start -->
+        <div class="flex items-center mt-6">
+            <a href="@_appSettings.Social_Instagram" class="flex-1 text-center">
+                <svg class="mx-auto" width="30" height="30" viewBox="0 0 30 30" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_2605_3264)">
+                        <path
+                            d="M24.7807 6.98542C24.7807 5.98963 23.9736 5.18555 22.9815 5.18555C21.9894 5.18555 21.1816 5.98963 21.1816 6.98542C21.1816 7.97755 21.9894 8.7816 22.9815 8.7816C23.9736 8.7816 24.7807 7.97755 24.7807 6.98542Z"
+                            fill="url(#paint0_linear_2605_3264)"></path>
+                        <path
+                            d="M27.1742 21.0342C27.1076 22.4951 26.8633 23.2887 26.6604 23.8159C26.3879 24.5148 26.0629 25.0146 25.5358 25.5387C25.0146 26.0629 24.5148 26.3872 23.8158 26.6567C23.2887 26.8626 22.4921 27.1076 21.0313 27.1772C19.4521 27.2468 18.9842 27.2617 14.9794 27.2617C10.9784 27.2617 10.5067 27.2468 8.92753 27.1772C7.4668 27.1076 6.67382 26.8626 6.14663 26.6567C5.44403 26.3872 4.94799 26.0629 4.4238 25.5387C3.89589 25.0146 3.57088 24.5148 3.30212 23.8159C3.09922 23.2887 2.85123 22.4951 2.78826 21.0342C2.7113 19.455 2.6972 18.9797 2.6972 14.9831C2.6972 10.9784 2.7113 10.5068 2.78826 8.92749C2.85123 7.46676 3.09922 6.67384 3.30212 6.14221C3.57088 5.44403 3.89589 4.94722 4.4238 4.42303C4.94799 3.89962 5.44403 3.57455 6.14663 3.30213C6.67382 3.09556 7.4668 2.85418 8.92753 2.7846C10.5067 2.71496 10.9784 2.69719 14.9794 2.69719C18.9842 2.69719 19.4521 2.71496 21.0313 2.7846C22.4921 2.85418 23.2887 3.09556 23.8158 3.30213C24.5148 3.57455 25.0146 3.89962 25.5358 4.42303C26.0629 4.94722 26.3879 5.44403 26.6604 6.14221C26.8633 6.67384 27.1076 7.46676 27.1742 8.92749C27.2475 10.5068 27.2653 10.9784 27.2653 14.9831C27.2653 18.9797 27.2475 19.455 27.1742 21.0342ZM29.8715 8.80463C29.7982 7.20833 29.5464 6.11777 29.1725 5.16788C28.792 4.18242 28.2819 3.34727 27.4467 2.51212C26.6153 1.68069 25.7801 1.17055 24.7947 0.785565C23.8411 0.415356 22.7542 0.160645 21.1571 0.0910681C19.5601 0.0140496 19.0501 0 14.9794 0C10.9125 0 10.3987 0.0140496 8.80169 0.0910681C7.20837 0.160645 6.12219 0.415356 5.16417 0.785565C4.18242 1.17055 3.34727 1.68069 2.51584 2.51212C1.68069 3.34727 1.17054 4.18242 0.786287 5.16788C0.416076 6.11777 0.164365 7.20833 0.0873466 8.80463C0.0177692 10.4016 0 10.9125 0 14.9831C0 19.0501 0.0177692 19.5601 0.0873466 21.1572C0.164365 22.7505 0.416076 23.8403 0.786287 24.7947C1.17054 25.7764 1.68069 26.6153 2.51584 27.4467C3.34727 28.2782 4.18242 28.792 5.16417 29.1763C6.12219 29.5464 7.20837 29.7982 8.80169 29.8715C10.3987 29.9448 10.9125 29.9625 14.9794 29.9625C19.0501 29.9625 19.5601 29.9448 21.1571 29.8715C22.7542 29.7982 23.8411 29.5464 24.7947 29.1763C25.7801 28.792 26.6153 28.2782 27.4467 27.4467C28.2819 26.6153 28.792 25.7764 29.1725 24.7947C29.5464 23.8403 29.7982 22.7505 29.8715 21.1572C29.9448 19.5601 29.9625 19.0501 29.9625 14.9831C29.9625 10.9125 29.9448 10.4016 29.8715 8.80463Z"
+                            fill="url(#paint1_linear_2605_3264)"></path>
+                        <path
+                            d="M14.9814 19.9714C12.2249 19.9714 9.98821 17.7383 9.98821 14.9819C9.98821 12.221 12.2249 9.98508 14.9814 9.98508C17.7386 9.98508 19.9782 12.221 19.9782 14.9819C19.9782 17.7383 17.7386 19.9714 14.9814 19.9714ZM14.9814 7.28418C10.7323 7.28418 7.29102 10.7328 7.29102 14.9819C7.29102 19.2273 10.7323 22.6723 14.9814 22.6723C19.2304 22.6723 22.6754 19.2273 22.6754 14.9819C22.6754 10.7328 19.2304 7.28418 14.9814 7.28418Z"
+                            fill="url(#paint2_linear_2605_3264)"></path>
+                    </g>
+                    <defs>
+                        <linearGradient id="paint0_linear_2605_3264" x1="0.274013" y1="29.6534" x2="27.4707"
+                            y2="2.45676" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#FFD521"></stop>
+                            <stop offset="0.05" stop-color="#FFD521"></stop>
+                            <stop offset="0.501119" stop-color="#F50000"></stop>
+                            <stop offset="0.95" stop-color="#B900B4"></stop>
+                            <stop offset="0.950079" stop-color="#B900B4"></stop>
+                            <stop offset="1" stop-color="#B900B4"></stop>
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_2605_3264" x1="0.270258" y1="29.6901" x2="27.4893"
+                            y2="2.47103" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#FFD521"></stop>
+                            <stop offset="0.05" stop-color="#FFD521"></stop>
+                            <stop offset="0.501119" stop-color="#F50000"></stop>
+                            <stop offset="0.95" stop-color="#B900B4"></stop>
+                            <stop offset="0.950079" stop-color="#B900B4"></stop>
+                            <stop offset="1" stop-color="#B900B4"></stop>
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_2605_3264" x1="0.279253" y1="29.6896" x2="27.4917"
+                            y2="2.47709" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#FFD521"></stop>
+                            <stop offset="0.05" stop-color="#FFD521"></stop>
+                            <stop offset="0.501119" stop-color="#F50000"></stop>
+                            <stop offset="0.95" stop-color="#B900B4"></stop>
+                            <stop offset="0.950079" stop-color="#B900B4"></stop>
+                            <stop offset="1" stop-color="#B900B4"></stop>
+                        </linearGradient>
+                        <clipPath id="clip0_2605_3264">
+                            <rect width="30" height="30" fill="white"></rect>
+                        </clipPath>
+                    </defs>
+                </svg>
+            </a> <a href="@_appSettings.Social_Twitter" class="flex-1">
+                <svg class="mx-auto" width="30" height="28" viewBox="0 0 30 28" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_2605_3269)">
+                        <path
+                            d="M23.6145 0.498047H28.1928L18.1928 11.958L30 27.498H20.7229L13.494 18.078L5.18072 27.498H0.60241L11.3253 15.258L0 0.498047H9.51807L16.0843 9.13805L23.6145 0.498047ZM21.988 24.738H24.5181L8.13253 3.07805H5.36145L21.988 24.738Z"
+                            fill="black"></path>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_2605_3269">
+                            <rect width="30" height="27" fill="white" transform="translate(0 0.5)"></rect>
+                        </clipPath>
+                    </defs>
+                </svg>
+            </a> <a href="@_appSettings.Social_Facebook" class="flex-1 text-center">
+                <svg class="mx-auto" width="30" height="30" viewBox="0 0 30 30" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_2605_3272)">
+                        <path
+                            d="M30 14.9996C30 6.71533 23.2843 -0.000392914 15 -0.000392914C6.71572 -0.000392914 0 6.71533 0 14.9996C0 22.4865 5.48528 28.6921 12.6562 29.8174V19.3355H8.84766V14.9996H12.6562V11.6949C12.6562 7.93554 14.8956 5.85898 18.322 5.85898C19.9631 5.85898 21.6797 6.15195 21.6797 6.15195V9.84336H19.7882C17.9249 9.84336 17.3438 10.9996 17.3438 12.1858V14.9996H21.5039L20.8389 19.3355H17.3438V29.8174C24.5147 28.6921 30 22.4865 30 14.9996Z"
+                            fill="#1877F2"></path>
+                        <path
+                            d="M20.8389 19.3359L21.5039 15H17.3438V12.1862C17.3438 11 17.9249 9.84375 19.7882 9.84375H21.6797V6.15234C21.6797 6.15234 19.9631 5.85938 18.322 5.85938C14.8956 5.85938 12.6563 7.93594 12.6563 11.6953V15H8.84766V19.3359H12.6563V29.8178C13.4199 29.9376 14.2027 30 15 30C15.7973 30 16.5801 29.9376 17.3438 29.8178V19.3359H20.8389Z"
+                            fill="white"></path>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_2605_3272">
+                            <rect width="30" height="30" fill="white"></rect>
+                        </clipPath>
+                    </defs>
+                </svg>
+            </a> <a href="@_appSettings.Social_Youtube" class="flex-1 text-center">
+                <svg class="mx-auto" width="30" height="22" viewBox="0 0 30 22" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M29.3731 3.75758C29.0281 2.46284 28.0116 1.44328 26.7208 1.09725C24.3813 0.468395 15 0.468395 15 0.468395C15 0.468395 5.61874 0.468395 3.27919 1.09725C1.98845 1.44328 0.971857 2.46284 0.626886 3.75758C0 6.10421 0 11.0003 0 11.0003C0 11.0003 0 15.8963 0.626886 18.2432C0.971857 19.5378 1.98845 20.5573 3.27919 20.9035C5.61874 21.5322 15 21.5322 15 21.5322C15 21.5322 24.3813 21.5322 26.7208 20.9035C28.0116 20.5573 29.0281 19.5378 29.3731 18.2432C30 15.8963 30 11.0003 30 11.0003C30 11.0003 30 6.10421 29.3731 3.75758Z"
+                        fill="#ED1D24"></path>
+                    <path d="M11.9316 15.4453L19.7726 11.0002L11.9316 6.55476V15.4453Z" fill="white"></path>
+                </svg>
+            </a>
+            <a href="https://open.spotify.com/show/49IhEntlSpEdKzEM4pTV6R?si=KPNI87ZyTw-r92Bbdox-ZQ" class="flex-1 text-center">
+                <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+                  <path fill="#1ED760" fill-rule="evenodd" d="M19.0983701,10.6382791 C15.230178,8.34118115 8.85003755,8.12986439 5.15729493,9.25058527 C4.56433588,9.43062856 3.93727638,9.09580812 3.75758647,8.50284907 C3.57789655,7.90953664 3.91236362,7.28283051 4.50585273,7.10261054 C8.74455585,5.81598127 15.7909802,6.06440214 20.2440037,8.70780512 C20.7774195,9.02442687 20.9525156,9.71332656 20.6362472,10.2456822 C20.3198021,10.779098 19.6305491,10.9549008 19.0983701,10.6382791 M18.971686,14.0407262 C18.7004726,14.4810283 18.1246521,14.6190203 17.6848801,14.3486903 C14.4600027,12.3664473 9.54264764,11.792217 5.72728477,12.9503953 C5.23256328,13.0998719 4.70992535,12.8208843 4.55974204,12.3270462 C4.41061884,11.8323247 4.68978312,11.3107469 5.18362118,11.1602103 C9.5419409,9.83771368 14.9600247,10.4782013 18.6638986,12.7544503 C19.1036707,13.0253103 19.242016,13.6013075 18.971686,14.0407262 M17.5034233,17.308185 C17.2876894,17.6617342 16.827245,17.7725165 16.4749326,17.5571359 C13.6571403,15.8347984 10.1101639,15.4459119 5.93312425,16.4000177 C5.53063298,16.4922479 5.12937851,16.2399399 5.03767834,15.8376253 C4.94544812,15.4351341 5.19669597,15.0338796 5.60024736,14.9420027 C10.1712973,13.8970803 14.0923186,14.3467468 17.2551791,16.2796943 C17.6078449,16.4948982 17.7189805,16.9556959 17.5034233,17.308185 M12,0 C5.37267547,0 0,5.37249879 0,11.9998233 C0,18.6278546 5.37267547,24 12,24 C18.6275012,24 24,18.6278546 24,11.9998233 C24,5.37249879 18.6275012,0 12,0"/>
+                </svg> 
+            </a>
+        </div> <!-- Flex End -->
+    </div> <!-- Social End --> <!-- Items Start -->
+    <div class="space-y-4">
+        <!-- Title Start -->
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">@economy1.BlockCategoryName Haberleri</h2> <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0">
+            </span>
+            <a href="@economy1.BlockCategorySlug" class="text-gray-700 font-bold lg:italic text-xs lg:text-base"> Tümü
+            </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End --> <!-- Items Start -->
+        <div class="grid grid-cols-2 gap-5">
+            <!-- Item Start -->
+            <a href="@economy1.NewsSlug" target="_blank" class="col-span-2 space-y-1 relative">
+                <!-- Favorite Button Start -->
+                <button class="absolute top-3 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End --> <!-- Thumbnail Start -->
+                <div class="aspect-[16/9]">
+                    <img src="@economy1.NewsPhoto" alt="" class="w-full h-full object-cover" loading="lazy">
+                </div> <!-- Thumbnail End --> <!-- Title Start -->
+                <div class="text-md font-semibold line-clamp-2 text-slate-900"> @economy1.NewsHeadline </div>
+                <!-- Title End --> <!-- Description Start -->
+                <p class="line-clamp-2 text-gray-700 text-sm"> @economy1.NewsUpSubtitle </p> <!-- Description End -->
+            </a> <!-- Item End -->
+            @foreach (var news in economy4)
+            {
+                <div class="space-y-1 relative">
+                    <!-- Favorite Button Start -->
+                    <button class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                fill="#FF0101"></path>
+                        </svg>
+                    </button> <!-- Favorite Button End --> <!-- Thumbnail Start -->
+                    <a href="@news.NewsSlug">
+                        <div class="aspect-[16/9]">
+                            <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsSlug"
+                                loading="lazy">
+                        </div>
+                    </a> <!-- Thumbnail End --> <!-- Title Start -->
+                    <a href="@news.NewsSlug" target="_blank" class="font-semibold line-clamp-2 text-sm">
+                        @news.NewsUpSubtitle </a> <!-- Title End -->
+                </div>
+            }
+        </div> <!-- Items End -->
+    </div> <!-- Items End --> <!-- New Boxes Start -->
+    <div class="relative">
+        <!-- Head Image Start -->
+        <div class="relative">
+            <!-- Title Start -->
+            <div class="absolute top-1/2 left-0 right-0 -translate-y-1/2 text-center text-white text-2xl font-semibold">
+                @sustainabilty1.BlockCategoryName </div> <!-- Title End -->
+            <div class="aspect-[16/9] h-[86px] w-full"> <img src="@sustainabilty1.BlockCategoryBackgroundPhotoUrl"
+                    class="w-full h-full object-cover rounded-t-2xl" alt="" loading="lazy"> </div>
+        </div> <!-- Head Image End --> <!-- Items Start -->
+        <div class="grid grid-cols-2 gap-x-5 gap-y-3 -mt-5 relative px-8">
+            <!-- Item Start -->
+            @foreach (var news in sustainabilty2)
+            {
+                <a target="_blank" href="@news.NewsSlug" class="space-y-1 relative">
+                    <!-- Favorite Button Start -->
+                    <button class="absolute top-2.5 right-2.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                fill="#FF0101"></path>
+                        </svg>
+                    </button> <!-- Favorite Button End --> <!-- Thumbnail Start -->
+                    <div class="aspect-[16/9]">
+                        <img src="@news.NewsPhoto" class="w-full h-full object-cover border-2 border-white"
+                            alt="@news.NewsHeadline" loading="lazy">
+                    </div> <!-- Thumbnail End --> <!-- Title Start -->
+                    <div class="text-green-950 text-xs font-semibold line-clamp-2"> @news.NewsUpSubtitle </div>
+                    <!-- Title End -->
+                </a>
+            }
+            <!-- Item End --> <!-- Item Start -->
+
+            <a target="_blank" href="@sustainabilty1.NewsSlug" class="space-y-1 col-span-2 relative">
+                <!-- Favorite Button Start -->
+                <button class="absolute top-3 right-2.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End --> <!-- Thumbnail Start -->
+                <div class="aspect-[16/9]">
+                    <img src="@sustainabilty1.NewsPhoto" class="w-full h-full object-cover border-2 border-white"
+                        alt="@sustainabilty1.NewsHeadline" loading="lazy">
+                </div> <!-- Thumbnail End --> <!-- Title Start -->
+                <div class="text-green-950 text-sm font-semibold line-clamp-2"> @sustainabilty1.NewsHeadline</div>
+                <!-- Title End -->
+            </a> <!-- Item End -->
+
+        </div> <!-- Item End -->
+    </div> <!-- New Boxes End --> <!-- News Start -->
+
+    <div class="space-y-4">
+        <!-- Title Start -->
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">@world1.BlockCategoryName Haberleri
+            </h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@world1.BlockCategorySlug" class="text-gray-700 font-bold lg:italic text-xs lg:text-base"> Tümü
+            </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End --> <!-- Items Start -->
+        <div class="space-y-4">
+            <!-- Item Start -->
+            <div class="space-y-1 relative">
+                <!-- Favorite Button Start --> <button
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End -->
+                <a href="@world1.NewsSlug" target="_blank">
+                    <!-- Thumbnail Start -->
+                    <div class="aspect-[16/9]"> <img src="@world1.NewsPhoto" alt="" class="w-full h-full object-cover"
+                            loading="lazy"> </div> <!-- Thumbnail End --> <!-- Title Start -->
+                    <div class="text-md font-semibold line-clamp-2 text-slate-900 mt-2"> @world1.NewsHeadline </div>
+                    <!-- Title End --> <!-- Description Start -->
+                    <p class="line-clamp-2 text-gray-700 text-sm"> @world1.NewsUpSubtitle </p> <!-- Description End -->
+                </a>
+            </div> <!-- Item End -->
+            <div class="col-span-2 *:py-4 divide-y divide-[#E5E5EA]">
+                @foreach (var news in world3)
+                {
+                    <div class="col-span-2 gap-3 flex items-center">
+                        <!-- Thumbnail Start -->
+                        <div class="relative w-[38%] shrink-0">
+                            <!-- Favorite Button Start --> <button
+                                class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                        fill="#FF0101"></path>
+                                </svg>
+                            </button> <!-- Favorite Button End -->
+                            <a target="_blank" href="@news.NewsSlug">
+                                <div class="aspect-[16/9]">
+                                    <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                                        loading="lazy">
+                                </div>
+                            </a>
+                        </div> <!-- Thumbnail End --> <!-- Content Start -->
+                        <div class="space-y-1">
+                            <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold line-clamp-2">
+                                @news.NewsHeadline </a>
+                            <a href="@news.NewsSlug" target="_blank" class="line-clamp-2 text-xs font-medium">
+                                @news.NewsUpSubtitle </a>
+                        </div> <!-- Content End -->
+                    </div>
+                }
+                @if (Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup ==
+                                (int)GovernmentOrderGroupEnum.UnderEkonomi).Any())
+                {
+                    var governmentModel = new GovernmentFilledBlock
+                    {
+                        GovernmentAnnouncementItems = Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup ==
+                        (int)GovernmentOrderGroupEnum.UnderEkonomi).ToList(),
+                        FillerBlockNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+                        "AnaSayfa-BlokDoldurucu").ToList(),
+                    };
+                    @await Html.PartialAsync("MobileBlockContainers/_MobileGovernmentAnnouncementsBlock", governmentModel)
+
+                }
+            </div>
+        </div> <!-- Items End -->
+    </div> <!-- News End --> <!-- New Boxes Start -->
+    <div>
+        <!-- Title Start -->
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">
+                @spor4.FirstOrDefault().BlockCategoryName Haberleri</h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@spor4.FirstOrDefault().BlockCategorySlug Haberleri"
+                class="text-gray-700 font-bold lg:italic text-xs lg:text-base"> Tümü </a> <span
+                class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End --> <!-- Items Start -->
+        <div class="grid grid-cols-2 gap-5">
+            <!-- Item Start -->
+            @foreach (var news in spor4)
+            {
+                <div class="space-y-1 relative">
+                    <!-- Favorite Button Start --> <button
+                        class="absolute top-2.5 right-2.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                fill="#FF0101"></path>
+                        </svg>
+                    </button> <!-- Favorite Button End -->
+                    <a href="@news.NewsSlug" target="_blank">
+                        <!-- Thumbnail Start -->
+                        <div class="aspect-[16/9] block">
+                            <img src="@news.NewsPhoto" class="w-full h-full object-cover border-2 border-white"
+                                alt="@news.NewsHeadline" loading="lazy">
+                        </div> <!-- Thumbnail End --> <!-- Title Start -->
+                        <div class="font-semibold line-clamp-2 text-sm text-slate-900"> @news.NewsHeadline </div>
+                        <!-- Title End -->
+                    </a>
+                </div>
+            }
+
+        </div> <!-- Items End -->
+    </div> <!-- New Boxes End  --> <!-- Slider Start -->
+    <div>
+        <!-- Title Start -->
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">
+                @lifeSlider.FirstOrDefault().BlockCategoryName Haberleri</h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@lifeSlider.FirstOrDefault().BlockCategorySlug"
+                class="text-gray-700 font-bold lg:italic text-xs lg:text-base"> Tümü </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End -->
+        <div class="splide mobile-second-slider mt-5" role="group">
+            <div class="splide__track">
+                <ul class="splide__list">
+                    @foreach (var news in lifeSlider)
+                    {
+                        <li class="splide__slide aspect-[16/9] relative">
+                            <a href="@news.NewsSlug" target="_blank" class="relative">
+                                <div class="absolute inset-0 manset-gradient"></div>
+                                <img class="w-full h-full object-cover" src="@news.NewsPhoto" alt="@news.NewsHeadline"
+                                    loading="lazy">
+                                <div class="absolute bottom-0 left-0 right-0 p-4 pt-6">
+                                    <div class="font-semibold text-white">@news.NewsHeadline</div>
+                                </div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-5 mt-5">
+            <!-- Item Start -->
+            @foreach (var news in life2)
+            {
+                <div class="space-y-1 relative">
+                    <!-- Favorite Button Start --> <button
+                        class="absolute top-2.5 right-2.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                fill="#FF0101"></path>
+                        </svg>
+                    </button> <!-- Favorite Button End -->
+                    <a href="@news.NewsSlug" target="_blank">
+                        <!-- Thumbnail Start -->
+                        <div class="aspect-[16/9] block">
+                            <img src="@news.NewsPhoto" class="w-full h-full object-cover border-2 border-white"
+                                alt="@news.NewsHeadline" loading="lazy">
+                        </div> <!-- Thumbnail End --> <!-- Title Start -->
+                        <div class="font-semibold line-clamp-2 text-sm text-slate-900"> @news.NewsHeadline </div>
+                        <!-- Title End -->
+                    </a>
+                </div>
+            }
+            <!-- Item End --> <!-- Item Start -->
+            @if (Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup ==
+                        (int)GovernmentOrderGroupEnum.UnderDunya).Any())
+            {
+                var governmentModel = new GovernmentFilledBlock
+                {
+                    GovernmentAnnouncementItems = Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup ==
+                    (int)GovernmentOrderGroupEnum.UnderDunya).ToList(),
+                    FillerBlockNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+                    "AnaSayfa-BlokDoldurucu").ToList(),
+                };
+                @await Html.PartialAsync("MobileBlockContainers/_MobileGovernmentAnnouncementsBlock", governmentModel)
+
+            }
+        </div>
+    </div> <!-- Slider End --> <!-- Horoscope Start -->
+    <div class="p-3 bg-neutral-50">
+        <!-- Title Start -->
+        <div class="text-slate-900 text-sm font-semibold text-center"> Günlük Burç Yorumları </div> <!-- Title End -->
+        <!-- Head Start -->
+        <div class="flex items-center mt-3 mb-5">
+            <!-- Author Start -->
+            <a href="/astroloji" class="flex items-center gap-3">
+                <!-- Avatar Start --> <img src="@Model.AstrologerImageURL" alt="" class="w-9 h-9 rounded-full"
+                    loading="lazy"> <!-- Avatar End --> <!-- Content Start -->
+                <div>
+                    <!-- Toptitle Start -->
+                    <div class="text-gray-700 text-xs font-medium">Astrolog</div> <!-- Toptitle End -->
+                    <!-- Name Start -->
+                    <div class="text-slate-900 text-sm font-bold">@Model.AstrologerName</div> <!-- Name End -->
+                </div> <!-- Content End -->
+            </a> <!-- Author End --> <!-- Date Start -->
+
+            <div class="text-gray-700 text-sm ml-auto italic font-helvetica">@Model.AstrologieDateStr</div>
+            <!-- Date End -->
+        </div> <!-- Head End --> <!-- List Start -->
+        <nav class="grid grid-cols-3 gap-x-4 gap-y-8">
+
+            @foreach (var news in Model.ZodiacSignItems)
+            {
+                <a href="@news.Slug" class="flex items-center gap-2">
+                    @switch (news.ZodiacSignType)
+                    {
+                        case ZodiacSignEnum.Koc:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M1.39357 1.53936C0.0800905 2.10482 -0.304896 3.56559 0.238614 5.80387C0.714186 7.68874 1.43887 8.70186 2.88823 9.4558L3.99789 10.0448V8.93747C3.99789 7.99503 3.90731 7.75942 3.49968 7.57094C2.82029 7.26465 2.11825 5.70963 2.09561 4.50803C2.07296 3.6834 2.1409 3.56559 2.63912 3.49491C2.97881 3.42423 3.99789 3.84832 5.28873 4.53159L7.39483 5.63895L7.44013 12.1417L7.50807 18.6445H8.52715H9.54623L9.61417 12.1653L9.65946 5.66251L11.7656 4.53159C14.0528 3.30643 14.936 3.18862 15.0493 4.10749C15.1852 5.02637 14.4152 6.95835 13.7131 7.50025C13.1696 7.92435 13.0564 8.18352 13.0564 9.03171V10.0448L14.0302 9.55005C16.0684 8.48981 16.9742 6.81699 16.9969 4.10749C17.0195 2.95301 16.9289 2.67028 16.4307 2.15194C15.2984 0.973902 12.762 1.20951 10.3615 2.74096C8.98007 3.63628 8.07422 3.63628 6.71545 2.76453C4.85845 1.58648 2.54853 1.04458 1.39357 1.53936Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Koç</span>
+                            break;
+                        case ZodiacSignEnum.Boga:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M0.892091 1.00811C1.12877 2.45251 2.28587 4.52372 3.33777 5.47756L4.23189 6.29514L3.15369 7.358C1.54953 8.99316 0.918389 10.4376 0.918389 12.536C0.918389 17.823 6.54609 21.6384 10.8852 19.2947C15.6977 16.6784 16.6707 10.8191 12.8575 7.27624L11.8582 6.3224L12.8838 5.28679C14.0935 4.06042 15.2243 1.8802 15.2243 0.762838C15.2243 0.0542679 15.1717 -0.000238419 14.0672 -0.000238419C12.989 -0.000238419 12.9101 0.0542679 12.7523 0.844597C12.5157 2.12547 11.5952 3.48811 10.4644 4.27844C9.28104 5.09602 7.36131 5.20503 6.09903 4.55097C4.96823 3.92415 3.73224 2.37075 3.36407 1.08987C3.0485 0.0270138 3.0222 -0.000238419 1.8651 -0.000238419H0.708008L0.892091 1.00811ZM10.5433 8.42086C11.8845 9.3202 12.8575 11.0371 12.8575 12.5905C12.8575 14.6617 11.1219 16.8147 8.93917 17.4415C7.07204 17.9593 4.73155 16.6512 3.62705 14.4165C3.0222 13.1628 2.9959 12.2907 3.52186 10.9554C4.81044 7.8213 7.91356 6.70393 10.5433 8.42086Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Boğa</span>
+                            break;
+                        case ZodiacSignEnum.Ikizler:
+                            <svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M-0.000976562 1.21622V2.43243H1.60149H3.20395L3.15054 9.91892L3.07042 17.4324L1.54807 17.5135L-0.000976562 17.5946V18.7838V20H8.81258H17.6261V18.7838V17.5946L16.1038 17.5135L14.5548 17.4324L14.4746 9.91892L14.4212 2.43243H16.0237H17.6261V1.21622V0H8.81258H-0.000976562V1.21622ZM12.0175 10V17.5676H8.81258H5.60765V10V2.43243H8.81258H12.0175V10Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">İkizler</span>
+                            break;
+                        case ZodiacSignEnum.Yengec:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.13468 1.4384C2.72693 1.73344 0.770222 3.07449 0.1986 5.59568C-0.285081 7.66091 0.704266 10.0212 2.4631 11.0672C3.65032 11.7646 4.59569 11.7914 5.651 11.1208C7.7616 9.77979 8.70698 6.99038 7.78359 4.81787C7.32189 3.74502 7.62969 3.53045 9.4325 3.7182C12.2466 4.04006 13.9175 4.71059 15.5445 6.18575L16.27 6.85628L16.204 5.54204C16.1381 4.33509 16.0721 4.20098 15.0608 3.36953C13.0381 1.73344 10.224 1.11655 6.13468 1.4384ZM5.56306 5.22019C6.48645 6.53442 6.17865 8.09005 4.88151 8.92151C4.11201 9.40429 3.49642 9.27018 2.81487 8.43873C1.49574 6.82946 2.28722 4.38873 4.134 4.38873C4.83753 4.38873 5.10136 4.54966 5.56306 5.22019Z"
+                                    fill="#393952"></path>
+                                <path
+                                    d="M10.576 8.97525C8.46541 10.2627 7.67394 13.1594 8.75123 15.6001C9.01505 16.1901 8.99306 16.1901 7.14629 16.1901C4.90377 16.1901 2.90309 15.4928 1.29815 14.1786C0.66057 13.669 0.110933 13.2398 0.0449768 13.2398C0.00100587 13.2398 -0.0209796 13.7494 0.0229913 14.3663C0.0889478 15.3319 0.220861 15.6269 1.01234 16.3511C2.96904 18.1749 6.13495 18.9259 10.1363 18.5504C14.2256 18.1749 16.2483 16.4852 16.2483 13.4812C16.2483 9.83353 13.1483 7.36598 10.576 8.97525ZM13.632 11.6037C14.4455 12.5961 14.4674 13.7226 13.7199 14.7954C13.0604 15.761 12.3129 15.9756 11.4554 15.466C10.1143 14.6613 9.8505 12.757 10.9498 11.5769C11.8732 10.5577 12.7746 10.5845 13.632 11.6037Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Yengeç</span>
+                            break;
+                        case ZodiacSignEnum.Aslan:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.40343 0.239677C5.05832 0.740517 4.49785 1.21859 3.82529 2.35686C2.92855 3.9049 2.97339 5.63507 3.93739 7.66118L4.65478 9.14093L3.60111 9.25476C2.27841 9.41411 1.7852 9.6873 0.888456 10.7117C-0.703265 12.5785 -0.0979624 15.1055 2.25599 16.2892C3.48901 16.9039 4.38576 16.8356 5.55152 16.0161C6.94148 15.0599 7.23292 14.4453 7.2105 12.3736C7.2105 10.6662 7.12083 10.302 6.13441 8.00266C5.23766 5.86272 5.08073 5.33912 5.17041 4.40574C5.2825 3.06258 5.97748 2.26579 7.23292 1.96984C8.35385 1.71943 11.3131 2.03814 12.2323 2.51621C13.2187 3.03982 13.6895 4.20085 13.5774 5.72613C13.4653 7.02375 13.129 7.79777 11.4028 10.8483C9.51962 14.1721 8.95915 16.7446 9.76622 18.3381C10.3491 19.4992 11.1338 20 12.434 20C13.6446 20 14.7431 19.5447 15.7071 18.6341C16.4245 17.9284 16.447 17.9056 15.8417 17.1316L15.3709 16.5397L14.5862 17.2226C13.4877 18.2015 12.8151 18.4292 12.0978 18.0877C11.627 17.8601 11.47 17.6096 11.4252 16.9039C11.3131 15.4242 11.7839 14.0582 13.2635 11.5313C14.9898 8.61733 15.4157 7.388 15.4157 5.29359C15.3933 2.69834 14.4965 1.21859 12.5013 0.490097C11.0665 -0.0335064 7.45711 -0.170097 6.40343 0.239677ZM5.08073 11.5541C5.97748 12.4647 5.9999 13.3298 5.12557 14.3087C4.63236 14.8778 4.3185 15.0372 3.64594 15.0372C2.97339 15.0372 2.65953 14.8778 2.16632 14.3087C1.47134 13.5119 1.35925 12.8517 1.83004 12.0094C2.52501 10.7117 4.04948 10.5069 5.08073 11.5541Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Aslan</span>
+                            break;
+                        case ZodiacSignEnum.Basak:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M2.33287 0.224762C1.38711 0.588863 0.725072 1.33982 0.323121 2.45488C0.0157468 3.34238 -0.0315415 4.66224 0.0157468 10.1238L0.0866793 16.7003L1.10338 16.7686L2.09643 16.8369V10.2603C2.09643 6.07313 2.19101 3.4334 2.35652 2.95552C2.66389 2.09078 3.58601 1.77219 4.17712 2.3411C4.53178 2.68244 4.60271 3.5927 4.69729 9.71415L4.81551 16.7003L5.83221 16.7686L6.82526 16.8369V10.0555C6.82526 2.81898 6.91984 2.20456 7.98383 2.06802C8.83502 1.95424 9.42612 2.63693 9.42612 3.70648C9.42612 4.77602 9.99358 9.28178 10.3482 11.0113C10.4665 11.6257 10.8448 12.9683 11.1758 13.9696L11.7669 15.7673L11.2231 16.7003C10.9157 17.201 10.3719 17.8609 10.0409 18.1567L9.42612 18.7256L10.0645 19.3628C10.4192 19.7042 10.8211 20 10.9866 20C11.1521 20 11.625 19.5449 12.0506 18.976C12.4762 18.4071 12.8782 17.9519 12.9491 17.9519C13.02 17.9519 13.422 18.4298 13.8003 18.976C14.2022 19.5449 14.6278 20 14.7697 20C14.8879 20 15.2899 19.7042 15.6445 19.3628C16.2829 18.7256 16.2829 18.7029 15.81 18.2933C15.55 18.0657 15.0298 17.4058 14.6515 16.8369L13.9422 15.7901L14.6042 13.8558C15.4554 11.4436 16.0465 8.30325 16.212 5.29942C16.3302 3.20584 16.3066 2.88725 15.81 1.90873C15.1953 0.679888 14.5333 0.202005 13.2328 0.0427113C12.5235 -0.048315 12.0743 0.0427113 11.4359 0.406813L10.5847 0.884695L9.70985 0.429569C8.62222 -0.139339 7.62917 -0.139339 6.65976 0.406813C5.92679 0.839182 5.90314 0.839182 5.02831 0.406813C4.03525 -0.0710697 3.255 -0.116583 2.33287 0.224762ZM13.8239 2.59142C14.155 3.09206 14.2022 3.54718 14.0604 5.5725C13.9185 7.7571 13.422 10.9657 13.0437 12.1491C12.9255 12.5359 12.8782 12.5132 12.689 11.9215C11.8615 9.07697 11.4122 3.0693 12.0033 2.40937C12.4762 1.84046 13.3747 1.93149 13.8239 2.59142Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Başak</span>
+                            break;
+                        case ZodiacSignEnum.Terazi:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.48551 3.24405C6.1337 3.5035 5.64996 3.98998 5.40809 4.28186C4.88038 4.96292 4.17676 7.0061 4.17676 7.88175C4.17676 8.49795 4.04483 8.53038 2.08789 8.53038H-0.000976562V9.9898V11.4492H2.96742H5.93581V10.152C5.93581 6.35747 7.93672 4.31429 9.47589 6.55206C10.0476 7.39528 10.1135 7.7196 10.1135 9.4709V11.4492H13.1919H16.2702V9.9898V8.53038H14.1813C12.2244 8.53038 12.0925 8.49795 12.0925 7.88175C12.0925 7.0061 11.3889 4.96292 10.8611 4.28186C9.62981 2.69272 7.76082 2.23868 6.48551 3.24405Z"
+                                    fill="#393952"></path>
+                                <path
+                                    d="M-0.000976562 15.9898V17.2871H8.13462H16.2702V15.9898V14.6926H8.13462H-0.000976562V15.9898Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Terazi</span>
+                            break;
+                        case ZodiacSignEnum.Akrep:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M2.06102 0.164898C1.45356 0.458593 0.498983 1.54301 0.238644 2.28854C0.0867797 2.6952 0 5.4966 0 9.81167V16.7022L0.932881 16.6344L1.84407 16.5667L1.95254 9.63093C2.03932 3.44073 2.10441 2.65001 2.42983 2.28854C2.9939 1.72374 3.97017 2.1304 4.14373 3.01149C4.23051 3.39555 4.29559 6.6262 4.31729 10.1957L4.33898 16.7022L5.27186 16.6344L6.18305 16.5667L6.29153 9.65352C6.4 2.28854 6.44339 1.99485 7.48475 1.99485C8.5261 1.99485 8.56949 2.24336 8.67797 10.1054C8.78644 18.1255 8.82983 18.3062 10.1098 19.3681C11.9756 20.9043 14.4054 19.5036 14.8393 16.6344C14.9695 15.7759 14.9912 15.7759 15.4468 16.1148C16.1627 16.6118 16.2712 16.5441 16.2712 15.5952C16.2712 14.8045 16.1627 14.6463 15.0997 13.8782L13.9064 13.0423L12.7132 13.833C11.5634 14.6012 11.4983 14.6915 11.4983 15.55C11.4983 16.5893 11.4983 16.5893 12.4095 16.0922C13.0386 15.7534 13.0603 15.7534 12.9302 16.1148C12.8651 16.3182 12.8 16.6796 12.8 16.9055C12.8 17.4026 12.2359 18.0351 11.802 18.0351C11.6285 18.0351 11.3031 17.8318 11.0644 17.5833C10.6522 17.1541 10.6305 16.8378 10.6305 10.2861C10.6305 4.70588 10.5654 3.23741 10.3051 2.4015C9.52407 0.0745296 7.44136 -0.693596 5.59729 0.684513C5.29356 0.910433 5.1417 0.887842 4.79458 0.548962C4.29559 0.0745296 2.71186 -0.128798 2.06102 0.164898Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Akrep</span>
+                            break;
+                        case ZodiacSignEnum.Yay:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M11.1225 3.50954V4.30824H12.0644H13.0263L10.6215 6.70434L8.21661 9.10044H6.57329H4.90992V9.99897V10.8975H5.65142H6.41296L3.20648 14.0923L0 17.2871H1.20243H2.40486L5.61134 14.0923L8.79778 10.9175L10.5213 10.8576L12.2247 10.7977V9.99897C12.2247 9.22024 12.2047 9.20027 11.4431 9.14037L10.6616 9.08047L12.2448 7.48307C13.1065 6.62447 13.8881 5.90564 13.9682 5.90564C14.0684 5.90564 14.1286 6.30499 14.1286 6.80417V7.70271H15.0304H15.9322V5.20677V2.71084H13.5273H11.1225V3.50954Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Yay</span>
+                            break;
+                        case ZodiacSignEnum.Oglak:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M10.9764 3.4353C10.371 3.68581 9.59745 4.55425 9.4461 5.10538C9.39565 5.30579 9.37883 5.80682 9.41247 6.22434C9.4461 6.67527 9.37883 7.02598 9.2443 7.12619C9.12658 7.20969 8.40346 8.77958 7.62989 10.6C6.85631 12.4037 6.20046 13.9234 6.16683 13.9735C6.09956 14.0404 5.42689 12.22 3.91338 7.87773C3.59386 6.90908 3.25752 6.02393 3.17344 5.90703C3.08935 5.75672 2.76983 5.70662 2.28215 5.74002L1.52539 5.79012L2.85392 9.46431C3.59386 11.4851 4.46833 13.8733 4.78785 14.7752L5.39325 16.4119L6.15001 16.3618L6.92358 16.3117L8.60526 12.4204C10.0179 9.1303 10.3374 8.54576 10.6233 8.54576C11.0941 8.54576 12.3218 9.74823 12.9272 10.8004C13.5158 11.8024 13.5998 13.1218 13.129 13.9067C12.759 14.5247 11.3632 15.2261 10.5224 15.2261H9.88334V15.9944V16.7793L10.7746 16.6791C12.759 16.4453 14.1044 15.6436 14.7434 14.341C15.4329 12.9214 15.0629 10.9674 13.768 9.2806L13.1122 8.42886L13.583 8.14494C15.2143 7.19299 15.1134 4.40395 13.4149 3.5355C12.6581 3.15138 11.7164 3.11798 10.9764 3.4353ZM12.8263 5.12208C13.6335 5.90703 13.1458 7.04269 12.0023 7.04269C10.926 7.04269 10.4887 5.72332 11.3296 5.05528C11.9182 4.60436 12.3218 4.62106 12.8263 5.12208Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Oğlak</span>
+                            break;
+                        case ZodiacSignEnum.Kova:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M1.36326 4.69041C0.0659643 6.57524 0 6.73231 0 8.20876V9.74805L1.27531 7.95745C1.97893 6.98362 2.63857 6.16686 2.74851 6.16686C2.85845 6.16686 3.51809 6.98362 4.22171 7.95745L5.49702 9.74805L6.81631 7.89463L8.13559 6.0412L9.45488 7.89463L10.7742 9.74805L12.0495 7.95745C12.7531 6.98362 13.4127 6.16686 13.5227 6.16686C13.6326 6.16686 14.2923 6.98362 14.9959 7.95745L16.2712 9.74805V8.20876C16.2712 6.73231 16.2052 6.57524 14.9079 4.69041L13.5447 2.71133L12.1594 4.65899L10.7742 6.60665L9.45488 4.75323L8.13559 2.89981L6.81631 4.75323L5.49702 6.60665L4.11177 4.65899L2.72652 2.71133L1.36326 4.69041Z"
+                                    fill="#393952"></path>
+                                <path
+                                    d="M1.25332 12.3885C0.0659643 14.0848 0 14.2733 0 15.7498V17.2891L1.27531 15.4985C1.97893 14.5246 2.63857 13.7079 2.74851 13.7079C2.85845 13.7079 3.51809 14.5246 4.22171 15.4985L5.49702 17.2891L6.81631 15.4356L8.13559 13.5822L9.45488 15.4356L10.7742 17.2891L12.0495 15.4985C12.7531 14.5246 13.4127 13.7079 13.5227 13.7079C13.6326 13.7079 14.2923 14.5246 14.9959 15.4985L16.2712 17.2891V15.7498C16.2712 14.2733 16.2052 14.0848 15.0179 12.3885C14.3142 11.3832 13.6546 10.5665 13.5447 10.5665C13.4127 10.5665 12.7531 11.3832 12.0495 12.3571L10.7742 14.1477L9.45488 12.2943L8.13559 10.4408L6.81631 12.2943L5.49702 14.1477L4.22171 12.3571C3.51809 11.3832 2.85845 10.5665 2.72652 10.5665C2.61658 10.5665 1.95694 11.3832 1.25332 12.3885Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Kova</span>
+                            break;
+                        case ZodiacSignEnum.Balik:
+                            <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M1.37401 2.63524C2.84444 4.07987 3.92919 6.06919 4.12203 7.63223L4.24256 8.69793H2.38644H0.554426V9.88205V11.0662H2.38644H4.24256L4.09793 12.2503C3.88098 14.0501 3.13371 15.4237 1.49454 17.1289L0 18.6445H1.25348C2.36234 18.6445 2.60339 18.5498 3.5435 17.6972C4.98983 16.3947 6.12279 14.2159 6.26742 12.4634L6.41205 11.0662H8.02712H9.66629L9.81092 12.3213C10.052 14.0975 10.9439 15.8263 12.3902 17.342C13.6196 18.6208 13.6678 18.6445 14.9695 18.6445H16.2712L14.9213 17.342C13.4508 15.9211 12.7036 14.6896 12.2215 12.8423C11.7153 11.0188 11.667 11.0662 13.8365 11.0662H15.765L15.6927 9.92942L15.6203 8.81634L13.7401 8.7453L11.8599 8.67425L12.0286 7.798C12.3902 5.80868 13.1375 4.41142 14.632 2.89575L16.1024 1.3564H14.9454C13.5232 1.3564 12.7518 1.83004 11.5465 3.46413C10.4377 4.93243 9.83503 6.5902 9.73861 8.39006C9.7145 8.6032 9.20829 8.69793 8.02712 8.69793H6.33974V7.75064C6.33974 6.1876 5.47194 4.31669 4.00151 2.77734C2.69981 1.38008 2.6516 1.3564 1.37401 1.3564H0.0723164L1.37401 2.63524Z"
+                                    fill="#393952"></path>
+                            </svg> <span class="font-semibold">Balık</span>
+                            break;
+                        default:
+                            break;
+                    }
+                </a>
+            }
+        </nav> <!-- List End -->
+    </div> <!-- Horoscope End --> <!-- Big Slider Area Start -->
+
+
+
+
+    <div>
+        <!-- Title Start -->
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">
+                @gurme4.FirstOrDefault().BlockCategoryName Haberleri</h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@gurme4.FirstOrDefault().BlockCategorySlug"
+                class="text-gray-700 font-bold lg:italic text-xs lg:text-base"> Tümü </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End -->
+        <div class="splide mobile-big-slider mt-5 -mx-5" role="group">
+            <div class="splide__track">
+                <ul class="splide__list">
+                    @foreach (var news in gurme4)
+                    {
+                        <li class="splide__slide">
+                            <!-- Item Start -->
+                            <a target="_blank" href="@news.NewsSlug"
+                                class="block rounded-b-3xl relative overflow-hidden group">
+                                <!-- Thumbnail Start -->
+                                <div class="aspect-[16/9]">
+                                    <img class="w-full h-full object-cover min-h-96" src="@news.NewsPhoto" alt=""
+                                        loading="lazy">
+                                </div> <!-- Thumbnail End --> <!-- Content Start -->
+                                <div
+                                    class="absolute bottom-0 left-0 right-0 p-2 pb-4 bg-gradient-to-b from-transparent to-black text-white text-xl font-semibold">
+                                    @news.NewsHeadline</div> <!-- Content End -->
+                            </a> <!-- Item End -->
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div> <!-- Big Slider Area End --> <!-- News Start -->
+    <iframe name="BIKADV" src="https://medya.ilan.gov.tr/widgets/2303ada6-9b5d-4ea8-b08a-08715b5f3036.html" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
+    @if (Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup == (int)GovernmentOrderGroupEnum.Remaining).Any())
+    {
+        var governmentModel = new GovernmentFilledBlock
+        {
+            GovernmentAnnouncementItems = Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup ==
+            (int)GovernmentOrderGroupEnum.Remaining).ToList(),
+            FillerBlockNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-BlokDoldurucu").ToList(),
+        };
+
+        <partial name="~/Views/Shared/MobileBlockContainers/_MobileRemainingGovernmentAnnouncements.cshtml"
+            model="governmentModel" />
+    }
+    <div>
+
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">@scienceAndTech1.BlockCategoryName
+                Haberleri</h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@scienceAndTech1.BlockCategorySlug" class="text-gray-700 font-bold lg:italic text-xs lg:text-base">
+                Tümü </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End --> <!-- Items Start -->
+        <div class="space-y-4">
+            <!-- Item Start -->
+            <div class="space-y-1 relative">
+                <!-- Favorite Button Start --> <button
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End -->
+                <a href="@scienceAndTech1.NewsSlug" target="_blank">
+                    <!-- Thumbnail Start -->
+                    <div class="aspect-[16/9]"> <img src="@scienceAndTech1.NewsPhoto" alt=""
+                            class="w-full h-full object-cover" loading="lazy"> </div> <!-- Thumbnail End -->
+                    <!-- Title Start -->
+                    <div class="text-md font-semibold line-clamp-2 text-slate-900 mt-2"> @scienceAndTech1.NewsHeadline
+                    </div> <!-- Title End --> <!-- Description Start -->
+                    <p class="line-clamp-2 text-gray-700 text-sm"> @scienceAndTech1.NewsUpSubtitle </p>
+                    <!-- Description End -->
+                </a>
+            </div> <!-- Item End -->
+            <div class="col-span-2 *:py-4 divide-y divide-[#E5E5EA]">
+                @foreach (var news in scienceAndTech3)
+                {
+                    <div class="col-span-2 gap-3 flex items-center">
+                        <!-- Thumbnail Start -->
+                        <div class="relative w-[38%] shrink-0">
+                            <!-- Favorite Button Start --> <button
+                                class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                        fill="#FF0101"></path>
+                                </svg>
+                            </button> <!-- Favorite Button End -->
+                            <a target="_blank" href="@news.NewsSlug">
+                                <div class="aspect-[16/9]">
+                                    <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                                        loading="lazy">
+                                </div>
+                            </a>
+                        </div> <!-- Thumbnail End --> <!-- Content Start -->
+                        <div class="space-y-1">
+                            <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold line-clamp-2">
+                                @news.NewsHeadline </a>
+                            <a href="@news.NewsSlug" target="_blank" class="line-clamp-2 text-xs font-medium">
+                                @news.NewsUpSubtitle </a>
+                        </div> <!-- Content End -->
+                    </div>
+                }
+            </div>
+        </div> <!-- Items End -->
+    </div> <!-- NEws End --> <!-- News Start -->
+   
+    <div>
+        <!-- Title Start -->
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">@automotive1.BlockCategoryName
+                Haberleri</h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@automotive1.BlockCategorySlug" class="text-gray-700 font-bold lg:italic text-xs lg:text-base">
+                Tümü </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End --> <!-- Items Start -->
+        <div class="space-y-4">
+            <!-- Item Start -->
+            <div class="space-y-1 relative">
+                <!-- Favorite Button Start --> <button
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End -->
+                <a href="@automotive1.NewsSlug" target="_blank">
+                    <!-- Thumbnail Start -->
+                    <div class="aspect-[16/9]"> <img src="@automotive1.NewsPhoto" alt=""
+                            class="w-full h-full object-cover" loading="lazy"> </div> <!-- Thumbnail End -->
+                    <!-- Title Start -->
+                    <div class="text-md font-semibold line-clamp-2 text-slate-900 mt-2"> @automotive1.NewsHeadline
+                    </div> <!-- Title End --> <!-- Description Start -->
+                    <p class="line-clamp-2 text-gray-700 text-sm"> @automotive1.NewsUpSubtitle </p>
+                    <!-- Description End -->
+                </a>
+            </div> <!-- Item End -->
+            <div class="col-span-2 *:py-4 divide-y divide-[#E5E5EA]">
+                @foreach (var news in automotive3)
+                {
+                    <div class="col-span-2 gap-3 flex items-center">
+                        <!-- Thumbnail Start -->
+                        <div class="relative w-[38%] shrink-0">
+                            <!-- Favorite Button Start --> <button
+                                class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                        fill="#FF0101"></path>
+                                </svg>
+                            </button> <!-- Favorite Button End -->
+                            <a target="_blank" href="@news.NewsSlug">
+                                <div class="aspect-[16/9]">
+                                    <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                                        loading="lazy">
+                                </div>
+                            </a>
+                        </div> <!-- Thumbnail End --> <!-- Content Start -->
+                        <div class="space-y-1">
+                            <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold line-clamp-2">
+                                @news.NewsHeadline </a>
+                            <a href="@news.NewsSlug" target="_blank" class="line-clamp-2 text-xs font-medium">
+                                @news.NewsUpSubtitle </a>
+                        </div> <!-- Content End -->
+                    </div>
+                }
+            </div>
+        </div> <!-- Items End -->
+    </div> <!-- News End --> 
+    <div>
+        <!-- Title Start -->
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">@fashion1.BlockCategoryName
+                Haberleri</h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@fashion1.BlockCategorySlug" class="text-gray-700 font-bold lg:italic text-xs lg:text-base">
+                Tümü </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End --> <!-- Items Start -->
+        <div class="space-y-4">
+            <!-- Item Start -->
+            <div class="space-y-1 relative">
+                <!-- Favorite Button Start --> <button
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End -->
+                <a href="@fashion1.NewsSlug" target="_blank">
+                    <!-- Thumbnail Start -->
+                    <div class="aspect-[16/9]"> <img src="@fashion1.NewsPhoto" alt=""
+                            class="w-full h-full object-cover" loading="lazy"> </div> <!-- Thumbnail End -->
+                    <!-- Title Start -->
+                    <div class="text-md font-semibold line-clamp-2 text-slate-900 mt-2"> @fashion1.NewsHeadline
+                    </div> <!-- Title End --> <!-- Description Start -->
+                    <p class="line-clamp-2 text-gray-700 text-sm"> @fashion1.NewsUpSubtitle </p>
+                    <!-- Description End -->
+                </a>
+            </div> <!-- Item End -->
+            <div class="col-span-2 *:py-4 divide-y divide-[#E5E5EA]">
+                @foreach (var news in fashion3)
+                {
+                    <div class="col-span-2 gap-3 flex items-center">
+                        <!-- Thumbnail Start -->
+                        <div class="relative w-[38%] shrink-0">
+                            <!-- Favorite Button Start --> <button
+                                class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                        fill="#FF0101"></path>
+                                </svg>
+                            </button> <!-- Favorite Button End -->
+                            <a target="_blank" href="@news.NewsSlug">
+                                <div class="aspect-[16/9]">
+                                    <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                                        loading="lazy">
+                                </div>
+                            </a>
+                        </div> <!-- Thumbnail End --> <!-- Content Start -->
+                        <div class="space-y-1">
+                            <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold line-clamp-2">
+                                @news.NewsHeadline </a>
+                            <a href="@news.NewsSlug" target="_blank" class="line-clamp-2 text-xs font-medium">
+                                @news.NewsUpSubtitle </a>
+                        </div> <!-- Content End -->
+                    </div>
+                }
+            </div>
+        </div> <!-- Items End -->
+    </div> <!-- News End --> <!-- Books Start -->
+    <div class="flex flex-col">
+        <!-- Head Start -->
+        <div>
+            <div class="flex justify-between items-center mb-1">
+                <!-- Title Start -->
+                <div class="text-slate-900 font-semibold"> Edebiyatın ve Kültürün Nabzı </div> <!-- Title End -->
+                <!-- Button Start --> <a href="#"
+                    class="px-4 py-1 bg-gray-700 rounded-lg text-white font-medium ml-auto"> Kitaplar </a>
+                <!-- Button End -->
+            </div> <!-- Description Start -->
+            <p class="text-sm">Kitap dünyasına açılan kapınızı aralayın! En sevdiğiniz kitapları indirimli fiyatlarla keşfedin ve hayal gücünüzü genişletin. </p>
+            <!-- Description End -->
+        </div> <!-- Head End --> <!-- List Start -->
+        <div class="splide books mt-6 rounded-b-2xl overflow-hidden -mx-5" role="group">
+            <div class="splide__track">
+                <ul class="splide__list">
+
+                    @foreach (var book in Model.BookCachingResponses)
+                    {
+                        <li class="splide__slide px-2 space-y-1">
+                            <img class="w-full h-24 object-cover" src="@book.ImageURL" alt="" loading="lazy">
+                            <a href="@book.Slug" class="bg-[#F2F2F7] text-xs font-semibold py-1 text-center block ">Satın
+                                Al</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div> <!-- List End -->
+    </div> <!-- Books End --> <!-- News Start -->
+    <div>
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">@bookad1.BlockCategoryName
+                Haberleri</h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@bookad1.BlockCategorySlug" class="text-gray-700 font-bold lg:italic text-xs lg:text-base"> Tümü
+            </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End --> <!-- Items Start -->
+        <div class="space-y-4">
+            <!-- Item Start -->
+            <div class="space-y-1 relative">
+                <!-- Favorite Button Start --> <button
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End -->
+                <a href="@bookad1.NewsSlug" target="_blank">
+                    <!-- Thumbnail Start -->
+                    <div class="aspect-[16/9]"> <img src="@bookad1.NewsPhoto" alt="" class="w-full h-full object-cover"
+                            loading="lazy"> </div> <!-- Thumbnail End --> <!-- Title Start -->
+                    <div class="text-md font-semibold line-clamp-2 text-slate-900 mt-2"> @bookad1.NewsHeadline </div>
+                    <!-- Title End --> <!-- Description Start -->
+                    <p class="line-clamp-2 text-gray-700 text-sm"> @bookad1.NewsUpSubtitle </p> <!-- Description End -->
+                </a>
+            </div> <!-- Item End -->
+            <div class="col-span-2 *:py-4 divide-y divide-[#E5E5EA]">
+                @foreach (var news in bookad3)
+                {
+                    <div class="col-span-2 gap-3 flex items-center">
+                        <!-- Thumbnail Start -->
+                        <div class="relative w-[38%] shrink-0">
+                            <!-- Favorite Button Start --> <button
+                                class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                        fill="#FF0101"></path>
+                                </svg>
+                            </button> <!-- Favorite Button End -->
+                            <a target="_blank" href="@news.NewsSlug">
+                                <div class="aspect-[16/9]">
+                                    <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                                        loading="lazy">
+                                </div>
+                            </a>
+                        </div> <!-- Thumbnail End --> <!-- Content Start -->
+                        <div class="space-y-1">
+                            <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold line-clamp-2">
+                                @news.NewsHeadline </a>
+                            <a href="@news.NewsSlug" target="_blank" class="line-clamp-2 text-xs font-medium">
+                                @news.NewsUpSubtitle </a>
+                        </div> <!-- Content End -->
+                    </div>
+                }
+            </div>
+        </div> <!-- Items End -->
+    </div> <!-- News End -->
+
+    <div>
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h2 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">@culture1.BlockCategoryName
+                Haberleri</h2>
+            <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            <a href="@culture1.BlockCategorySlug" class="text-gray-700 font-bold lg:italic text-xs lg:text-base"> Tümü
+            </a>
+            <span class="w-3 h-1 rounded-full bg-[#FF0101] hidden md:block"></span>
+        </div> <!-- Title End --> <!-- Items Start -->
+        <div class="space-y-4">
+            <!-- Item Start -->
+            <div class="space-y-1 relative">
+                <!-- Favorite Button Start --> <button
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End -->
+                <a href="@culture1.NewsSlug" target="_blank">
+                    <!-- Thumbnail Start -->
+                    <div class="aspect-[16/9]"> <img src="@culture1.NewsPhoto" alt="" class="w-full h-full object-cover"
+                            loading="lazy"> </div> <!-- Thumbnail End --> <!-- Title Start -->
+                    <div class="text-md font-semibold line-clamp-2 text-slate-900 mt-2"> @culture1.NewsHeadline </div>
+                    <!-- Title End --> <!-- Description Start -->
+                    <p class="line-clamp-2 text-gray-700 text-sm"> @culture1.NewsUpSubtitle </p> <!-- Description End -->
+                </a>
+            </div> <!-- Item End -->
+            <div class="col-span-2 *:py-4 divide-y divide-[#E5E5EA]">
+                @foreach (var news in culture3)
+                {
+                    <div class="col-span-2 gap-3 flex items-center">
+                        <!-- Thumbnail Start -->
+                        <div class="relative w-[38%] shrink-0">
+                            <!-- Favorite Button Start --> <button
+                                class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                        fill="#FF0101"></path>
+                                </svg>
+                            </button> <!-- Favorite Button End -->
+                            <a target="_blank" href="@news.NewsSlug">
+                                <div class="aspect-[16/9]">
+                                    <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                                        loading="lazy">
+                                </div>
+                            </a>
+                        </div> <!-- Thumbnail End --> <!-- Content Start -->
+                        <div class="space-y-1">
+                            <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold line-clamp-2">
+                                @news.NewsHeadline </a>
+                            <a href="@news.NewsSlug" target="_blank" class="line-clamp-2 text-xs font-medium">
+                                @news.NewsUpSubtitle </a>
+                        </div> <!-- Content End -->
+                    </div>
+                }
+            </div>
+        </div> <!-- Items End -->
+    </div> <!-- News End --> <!-- Youtube Box Start -->
+
+    <a href="https://www.youtube.com/CumhuriyetTVtr" class="flex yt-gradient relative overflow-hidden p-4">
+        <div class="w-60 h-60 rotate-[60deg] bg-white/5 absolute top-0 left-0"></div> <!-- Left Start -->
+        <div class="space-y-2.5 w-1/2">
+            <!-- Logo Start -->
+            <div class="flex items-center gap-2">
+                <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_2605_3659)">
+                        <path
+                            d="M23.4985 2.81076C23.2225 1.70434 22.4093 0.83308 21.3766 0.537388C19.505 0 12 0 12 0C12 0 4.495 0 2.62335 0.537388C1.59076 0.83308 0.777485 1.70434 0.501509 2.81076C0 4.81606 0 9 0 9C0 9 0 13.1839 0.501509 15.1894C0.777485 16.2957 1.59076 17.1669 2.62335 17.4627C4.495 18 12 18 12 18C12 18 19.505 18 21.3766 17.4627C22.4093 17.1669 23.2225 16.2957 23.4985 15.1894C24 13.1839 24 9 24 9C24 9 24 4.81606 23.4985 2.81076Z"
+                            fill="white"></path>
+                        <path d="M9.54541 12.7988L15.8181 9.00032L9.54541 5.20145V12.7988Z" fill="#ED1D24"></path>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_2605_3659">
+                            <rect width="24" height="18" fill="white"></rect>
+                        </clipPath>
+                    </defs>
+                </svg>
+                <div class="text-red-600 text-sm font-semibold">Cumhuriyet TV</div>
+            </div> <!-- Logo End --> <!-- Description Start -->
+            <div class="text-white font-semibold">En güncel haberleri kaçırma!</div> <!-- Description End -->
+        </div> <!-- Left End -->
+        <div class="text-white font-semibold ml-auto">Abone Ol</div>
+    </a> <!-- Youtube Box End --> <!-- Whatsapp Start -->
+    <a href="https://api.whatsapp.com/send/?phone=905354587854&text&type=phone_number&app_absent=0" class="p-4 pb-0 flex relative bg-wa">
+        <div class="space-y-2.5">
+            <!-- Title Start -->
+            <div class="text-slate-900 text-sm font-semibold"> İhbarlarınızı Bize WhatsApp Üzerinden İletin </div>
+            <!-- Title End --> <!-- Phone Start -->
+            <div class="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_2605_3707)">
+                        <path
+                            d="M16 11.9397C16 12.0274 15.9973 12.2164 15.9918 12.3644C15.9781 12.7233 15.9507 13.1863 15.9068 13.3973C15.8411 13.7151 15.7452 14.0137 15.6164 14.263C15.4658 14.5589 15.274 14.8219 15.0438 15.0493C14.8164 15.2767 14.5534 15.4685 14.2575 15.6192C14.0082 15.7479 13.7068 15.8438 13.3863 15.9096C13.1781 15.9507 12.7178 15.9808 12.3616 15.9918C12.2137 15.9973 12.0247 16 11.937 16H4.05753C3.96986 16 3.78082 15.9973 3.63288 15.9918C3.27397 15.9781 2.81096 15.9507 2.6 15.9068C2.28219 15.8411 1.98356 15.7452 1.73425 15.6164C1.43836 15.4658 1.17534 15.274 0.947945 15.0438C0.720548 14.8164 0.528767 14.5534 0.378082 14.2575C0.249315 14.0082 0.153425 13.7068 0.0876712 13.3863C0.0465753 13.1781 0.0164384 12.7178 0.00547945 12.3616C0.00273973 12.2164 0 12.0274 0 11.9397V4.06027C0 3.9726 0.00273973 3.78356 0.00821918 3.63562C0.0219178 3.27671 0.0493151 2.8137 0.0931507 2.60274C0.158904 2.28493 0.254795 1.9863 0.383562 1.73699C0.534247 1.4411 0.726027 1.17808 0.953425 0.950685C1.18082 0.723288 1.44384 0.531507 1.73973 0.380822C1.98904 0.252055 2.29041 0.156164 2.61096 0.090411C2.81918 0.0493151 3.27945 0.0191781 3.63562 0.00821918C3.78356 0.00273973 3.9726 0 4.06027 0H11.9397C12.0274 0 12.2164 0.00273973 12.3644 0.00821918C12.7233 0.0219178 13.1863 0.0493151 13.3973 0.0931507C13.7151 0.158904 14.0137 0.254795 14.263 0.383562C14.5589 0.534247 14.8219 0.726027 15.0493 0.956164C15.2767 1.18356 15.4685 1.44658 15.6192 1.74247C15.7479 1.99178 15.8438 2.29315 15.9096 2.6137C15.9507 2.82192 15.9808 3.28219 15.9918 3.63836C15.9973 3.7863 16 3.97534 16 4.06301V11.9397Z"
+                            fill="url(#paint0_linear_2605_3707)"></path>
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M11.62 4.04778C10.6618 3.08961 9.38671 2.56055 8.02869 2.56055C5.22976 2.56055 2.95502 4.83773 2.95258 7.63422C2.95258 8.529 3.18664 9.40184 3.63037 10.1698L2.91113 12.8005L5.60279 12.0959C6.34397 12.5007 7.1778 12.7128 8.02869 12.7128H8.03113C10.8276 12.7128 13.1048 10.4356 13.1072 7.6391C13.1072 6.28108 12.5782 5.00596 11.62 4.04778ZM8.03113 11.8546C7.27288 11.8546 6.52927 11.6498 5.88317 11.267L5.72957 11.1768L4.13262 11.5961L4.55929 10.0406L4.45932 9.88215C4.03753 9.21167 3.81323 8.43392 3.81323 7.63666C3.81323 5.31072 5.70763 3.41876 8.03357 3.41876C9.15997 3.41876 10.2205 3.85761 11.0154 4.65487C11.8126 5.45213 12.2515 6.5127 12.249 7.6391C12.2466 9.9626 10.3546 11.8546 8.03113 11.8546ZM10.3449 8.69723C10.2181 8.63384 9.59395 8.32664 9.47936 8.28519C9.36233 8.24375 9.27944 8.2218 9.1941 8.34859C9.10877 8.47537 8.8674 8.76062 8.79182 8.84596C8.71868 8.93129 8.64309 8.94104 8.51631 8.87765C8.38953 8.81426 7.97993 8.68017 7.49719 8.24862C7.11929 7.91217 6.86572 7.49769 6.79258 7.37091C6.71944 7.24413 6.78527 7.17586 6.84866 7.11247C6.90473 7.05639 6.97544 6.96375 7.03883 6.8906C7.10222 6.81746 7.12416 6.76382 7.16561 6.67849C7.20706 6.59316 7.18755 6.52001 7.15586 6.45662C7.12416 6.39323 6.8706 5.76908 6.76576 5.51552C6.66336 5.26927 6.55852 5.30097 6.4805 5.29853C6.40736 5.29365 6.32203 5.29365 6.23669 5.29365C6.15136 5.29365 6.01483 5.32535 5.8978 5.45213C5.78077 5.57891 5.45407 5.88611 5.45407 6.51026C5.45407 7.13441 5.90755 7.73662 5.97094 7.82196C6.03433 7.90729 6.86572 9.18729 8.13841 9.73586C8.44073 9.86752 8.67723 9.94554 8.86252 10.0041C9.16728 10.1016 9.44279 10.0869 9.66222 10.0553C9.90603 10.0187 10.4132 9.74805 10.518 9.45304C10.6228 9.15803 10.6228 8.90203 10.5911 8.85083C10.5546 8.79232 10.4717 8.76062 10.3449 8.69723Z"
+                            fill="white"></path>
+                    </g>
+                    <defs>
+                        <linearGradient id="paint0_linear_2605_3707" x1="8.00061" y1="16.0012" x2="8.00061" y2="0"
+                            gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#25CF43"></stop>
+                            <stop offset="1" stop-color="#61FD7D"></stop>
+                        </linearGradient>
+                        <clipPath id="clip0_2605_3707">
+                            <rect width="16" height="16" rx="8" fill="white"></rect>
+                        </clipPath>
+                    </defs>
+                </svg>
+                <div class="text-slate-900 text-sm"> <span class="text-gray-500 text-xs font-medium">(+90)</span> 535 458 78 54 </div>
+            </div> <!-- Phone End -->
+        </div> <img src="./assets/img/wa-phone.png" class="w-28" alt="" loading="lazy">
+    </a> <!-- Whatsapp End --> <!-- Tab Area Start -->
+</div>

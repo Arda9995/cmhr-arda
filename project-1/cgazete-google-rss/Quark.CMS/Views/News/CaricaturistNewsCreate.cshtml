@@ -1,0 +1,84 @@
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataNames.Title] = _localizer["New"] +" " + _localizer["CaricaturistNews"];
+    ViewData[ViewDataNames.AsideMenu] = "News";
+    ViewData[ViewDataNames.AsideSubMenu] = "CaricaturistNews";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Haberler", "/News/List")
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+@section Styles{
+    <link href="https://metronic.b-cdn.net/8.1.5/assets/plugins/custom/jstree/jstree.bundle.css" rel="stylesheet" type="text/css"/>
+}
+
+@section Scripts
+{
+    <partial name="_CKEditorScripts"/>
+    <script src="/Scripts/News/Create.js" asp-append-version="true"></script>
+    <partial name="_NewsEditScriptFiles"/>
+    <script src="/Scripts/News/Category.js" asp-append-version="true"></script>
+
+}
+
+<form method="post" class="form row g-10" enctype="multipart/form-data" id="newsFormCreate">
+    
+    <input asp-for="@Model.NewsTypeID" type="hidden"/>
+    <input id="url-prefix" type="hidden" value="@_appSettings.News_URLSchema"/>
+    
+    <div class="row justify-content-between mt-5">
+        <div class="col-auto">
+            <a onclick="history.back()" class="btn btn-sm btn-secondary">
+                <i class="ki-outline ki-left"></i> @_localizer["GoBack"]
+            </a>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">@_localizer["Save"]</button>
+            <a href="/News/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </div>
+    
+    <!--begin::Content-->
+    <div class="col-12">
+        <partial name="_Edit/_Category" />
+        <div class="card card-flush mb-10">
+            <div class="card-header">
+                <div class="card-title d-block mt-5 mb-5">
+                    <h2>@_localizer["NewsType"] : @Model.NewsTypeName</h2>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div class="mb-10 fv-row">
+                    <label class="form-label required">@_localizer["Caricaturist"]</label>
+                    <div class="input-group">
+                        <select asp-items="@Model.CaricaturistIDs" asp-for="@Model.CaricaturistID" class="form-select mb-2" data-control="select2"></select>
+                    </div>
+                    <span asp-validation-for="@Model.CaricaturistID" class="fv-plugins-message-container invalid-feedback CaricaturistValidationMessage"></span>
+                    <div class="text-muted fs-7 mb-7">@_localizer["NewsAuthorText"]</div>
+                </div>
+                <partial name="_Edit/_Title" model="Model" />
+                <partial name="_Edit/_UpHeadline" model="Model" />
+                <partial name="_Edit/_Headline" model="Model" />
+                <partial name="_Edit/_UpSubHeading" model="Model" />
+                <partial name="_Edit/_SubHeading" model="Model" />
+                <partial name="_Edit/_Url" model="Model"/>
+                <partial name="_Edit/_PublishDate" model="Model" />
+                <partial name="_Edit/_Content" model="Model" />
+                <partial name="_Edit/_ManuelUpdatedDate" model="Model" />
+
+            </div>
+        </div>
+        <partial name="_Edit/_PhotoUpload"/>
+    </div>
+
+    <!--end::Content-->
+
+
+</form>
+<partial name="_Edit/_PhotoEditModal"/>
+<partial name="_Edit/_MediaGallery"/>
+<partial name="_Edit/_MainCategoryJsTree"/>
+<partial name="_Edit/_SecondaryCategoryJsTree"/>

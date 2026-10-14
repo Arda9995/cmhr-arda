@@ -1,0 +1,84 @@
+﻿# Hangfire ve Elasticsearch Sorun Giderme Notları
+
+## 1. `Quark.Hangfire` – SQL `Login failed for user 'News-Migration-User'`
+
+**Belirti:** `Quark.Hangfire` açılışta, `Program.cs` içindeki `recurringJob.AddOrUpdate<ICurrencyService>(...)` satırında `Microsoft.Data.SqlClient.SqlException` (Error 18456) hatası veriyor.
+
+**Neden:** `AddOrUpdate`, Hangfire'ın SQL Server depolamasına ilk yazan çağrıdır. Kod doğru. SQL Server, bağlantı cümlesindeki kullanıcının girişini reddediyor.
+
+**Olası sebepler:**
+- Bağlantı cümlesindeki kullanıcı adı veya şifre yanlış.
+- `News-Migration-User` login'i hedef SQL Server'da yok, ya da bağlantı cümlesi farklı bir sunucuyu gösteriyor.
+- Login'in hedef veritabanında karşılık gelen bir kullanıcısı yok, veya `Initial Catalog` hatalı.
+- Sunucuda SQL Server Authentication (mixed mode) kapalı.
+- Login devre dışı bırakılmış, kilitlenmiş veya şifresinin süresi dolmuş.
+
+**Teşhis:** SQL Server hata günlüğündeki *State* koduna bakın:
+
+| State | Anlamı |
+|-------|--------|
+| 8 | Şifre yanlış |
+| 5 | Login yok |
+| 38 / 4064 | Veritabanı açılamıyor |
+| 58 | SQL Authentication kapalı |
+
+**Not:** Bu bir çalışma zamanı (runtime) hatasıdır. Projeyi yeniden derlemek çözmez. `appsettings` dosyasını düzelttikten sonra uygulamayı yeniden başlatmak yeterlidir.
+
+## 2. Hangfire nedir?
+
+Hangfire, .NET'te arka plan işleri çalıştırmak için kullanılan bir NuGet kütüphanesidir. İşler SQL Server'da saklanır. Ayrıca derlenmesi gerekmez, `Quark.Hangfire` projesiyle birlikte derlenir ve uygulamanın içinde çalışır.
+
+- **Fire-and-forget:** `BackgroundJob.Enqueue(...)` ile iş hemen bir kez çalışır.
+- **Gecikmeli:** `BackgroundJob.Schedule(..., TimeSpan)` ile iş belirli bir süre sonra çalışır.
+- **Tekrarlayan:** `RecurringJob.AddOrUpdate(..., cron)` ile iş CRON zamanlamasına göre çalışır.
+- **Devam (continuation):** `BackgroundJob.ContinueJobWith(...)` ile iş başka bir işten sonra çalışır.
+- Başarısız işler otomatik olarak yeniden denenir. `/hangfire` adresinde dashboard vardır ve `HangfireCustomBasicAuthenticationFilter` ile korunur.
+
+## 3. `Quark.Hangfire` ile `Quark.Hangfire.Api` ilişkisi
+
+```
+Quark.Hangfire        ──┐
+(zamanlı, otomatik)     ├──► Quark.Hangfire.Business (ortak iş mantığı) ──► Quark.Data / SQL Server
+Quark.Hangfire.Api    ──┘
+(HTTP ile, elle)
+```
+
+- **`Quark.Hangfire`:** Hangfire kütüphanesini gerçekten kullanan projedir. Görevleri CRON zamanlamasıyla çalıştırır (ör. "Döviz - Döviz Kuru Güncelle") ve dashboard sunar.
+- **`Quark.Hangfire.Api`:** İçinde Hangfire kurulumu yoktur, normal bir ASP.NET Core Web API'dir. Aşağıdaki işlemleri elle (anlık) tetiklemek için kullanılır:
+  - `GET /Index/GetAANews` çağrıldığında `IAgencyHangfireService.GetAANews()` çalışır.
+  - `GET /Index/GetRssItems` çağrıldığında `IAgencyHangfireService.GetRssItemsAsync()` çalışır.
+- İki proje ayrı uygulamalardır, ayrı çalıştırılır ve ayrı yayınlanır. Bağlantı cümleleri de farklı olabilir.
+
+## 4. `Quark.Web` – "Google AI live feed could not be updated in Elasticsearch"
+
+**Belirti:** `/feeds/google-ai.xml` isteğinde `XmlFeedCachingService.RefreshGoogleAiRSS` bu hatayı yazıyor, çünkü `ElasticSearchService.UpdateDocumentAsync` `false` döndürüyor.
+
+**Kök neden:** `Quark.Web\appsettings.Development.json` dosyasında Elasticsearch adresi `http://192.168.35.34:9200` olarak tanımlıydı. Sunucu yalnızca **HTTPS** kabul ettiği için `http` ile gelen bağlantıları kapatıyordu. `Quark.API` ve `Quark.Hangfire` projeleri zaten `https://` kullanıyordu.
+
+**Düzeltme:** `ElasticSearchOptions:Uri` değeri `https://192.168.35.34:9200` olarak değiştirildi. `Quark.Business.ElasticSearch\DependencyInjection\Registration.cs` sertifika doğrulamasını zaten atladığı için kodda değişiklik gerekmedi.
+
+**Doğrulama:** `https` ile sunucuya (Elasticsearch 8.18.0) ve `dev_google_ai_rss` indeksine erişildiği doğrulandı. Değişiklikten sonra `/feeds/google-ai.xml` adresi henüz test edilmedi.
+
+**Yapılacaklar:**
+- `Quark.Web`'i yeniden başlatın ve `/feeds/google-ai.xml` adresini çağırarak hatanın gidip gitmediğini kontrol edin.
+- Yayınlanmış `Quark.Web\bin\Release\...\publish\appsettings.Development.json` hâlâ `http` adresini içeriyor. O paket kullanılıyorsa yeniden yayınlayın.
+- `Quark.Web` dışındaki projelerin Elasticsearch ayarlarında değişiklik gerekmez.
+
+## 5. `google-ai.xml` – Yayından kaldırma / değişiklik sonrası eski haberlerin görünmesi
+
+**Belirti:** CMS'te haber yayından kaldırılınca veya güncellenip yeniden yayınlanınca `/feeds/google-ai.xml` eski içeriği göstermeye devam ediyor.
+
+**Önbellek yapısı:** Feed Redis'te değil, **Elasticsearch**'te (`{env}_google_ai_rss` indeksi, doküman ID `2`) saklanır. `Quark.Web` output cache'i bu adres için kapalıdır ve Cloudflare purge da kullanılmaz.
+
+**Yenileme akışı:**
+- `NewsService.PublishNowOrScheduled` → `HandlePublishCacheOperations` → `RefreshGoogleAiRSS`
+- `NewsService.UnPublish` → `HandleUnPublishCacheOperations` → `RefreshGoogleAiRSS`
+
+**Kök neden:** `Quark.CMS\appsettings.Production.json` dosyasında Elasticsearch adresi `http://` idi. Sunucu yalnızca HTTPS kabul ettiği için CMS'ten yapılan güncelleme isteği başarısız oluyordu. `GetOrRefreshXmlAsync`, Elasticsearch'te kayıtlı **eski** dokümanı döndürmeye devam ediyordu.
+
+**Düzeltme:** `Quark.CMS\appsettings.Production.json` dosyasındaki `ElasticSearchOptions:Uri` değeri `https://192.168.35.34:9200` yapıldı.
+
+**Yapılacaklar:**
+- `Quark.CMS` yeniden yayınlanmalı. Değişiklik sadece ayar dosyasında olduğu için diğer uygulamaların yeniden yayınlanması gerekmez.
+- Canlıda bir haberi yayından kaldırıp `/feeds/google-ai.xml` adresinden çıktığını kontrol edin.
+- Yayındaki bir haberi düzenlemek haberi taslağa (`Draft`) çeker. Feed, `NewsPublished` tablosundan üretildiği için değişiklikler ancak haber **yeniden yayınlanınca** feed'e yansır.

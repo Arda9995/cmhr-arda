@@ -1,0 +1,9 @@
+﻿@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div class="mb-10 fv-row">
+    <label class="form-label">@_localizer["UpHeadline"]</label>
+    <div class="input-group">
+        <input asp-for="@Model.UpHeadline" type="text" class="form-control" readonly />
+    </div>
+    <div class="text-muted fs-7">@_localizer["NewsUpHeadlineText"]</div>
+</div>

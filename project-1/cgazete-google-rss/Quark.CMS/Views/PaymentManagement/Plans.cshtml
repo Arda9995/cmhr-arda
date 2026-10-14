@@ -1,0 +1,87 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["Plans"];
+    ViewData[ViewDataNames.AsideMenu] = "PaymentManagements";
+    ViewData[ViewDataNames.AsideSubMenu] = "Plans";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["PaymentManagements"], string.Empty),
+        new BreadcrumbItem(_localizer["Plans"], "/PaymentManagement/Plans"),
+    };
+}
+
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <partial name="Icons/Search" />
+                <input type="text" data-kt-filter="datatable-search" id="search-value" class="form-control form-control-solid w-250px ps-14" placeholder="@_localizer["Search"]">
+            </div>
+        </div>
+        <div class="card-toolbar">
+            <div class="d-flex justify-content-end">
+                <a href="/PaymentManagement/CreatePlan" class="btn btn-primary">
+                    <partial name="Icons/Add" />
+                    @_localizer["New"] @_localizer["PaymentPlan"]
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <table id="paymentPlanDatatable">
+            <thead>
+                <tr>
+                    <th>@_localizer["Name"]</th>
+                    <th>Aktif Abonelik Sayısı</th>
+                    <th>@_localizer["Price"]</th>
+                    <th>@_localizer["PaymentInterval"]</th>
+                    <th>@_localizer["PlanReferenceCode"]</th>
+                    <th>@_localizer["ProductReferenceCode"]</th>
+                    <th>@_localizer["Statu"]</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <div style="display:none">
+                    <div id="Col1">
+                        {1}
+                    </div>
+                    <div id="Col99">
+                        {1}
+                    </div>
+                    <div id="Col2">
+                        {1}
+                    </div>
+                    <div id="Col3">
+                        {1}
+                    </div>
+                    <div id="Col4">
+                        {1}
+                    </div>
+                    <div id="Col5">
+                        {1}
+                    </div>
+                    <div id="Col6">
+                        <span class="badge fw-bolder badge-{0}">
+                            {1}
+                        </span>
+                        <span class="badge fw-bolder badge-{2}">
+                            {3}
+                        </span>
+                    </div>
+                    <div id="Col7">
+                        <a href="/PaymentManagement/SubscriptionsUpgrade/{0}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="@_localizer["Update"]">
+                            <i class="bi bi-wallet"></i>
+                        </a>
+                        <a href="/PaymentManagement/UpdatePlan/{0}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="@_localizer["Update"]">
+                            <partial name="Icons/Edit" />
+                        </a>
+                    </div>
+                </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/Scripts/PaymentManagement/Plans.js" asp-append-version="true"></script>
+}

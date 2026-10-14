@@ -1,0 +1,980 @@
+[
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "CancelPremiumMembershipRenewal",
+    "RelativePath": "Account/CancelPremiumMembershipRenewal",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "ChangePassword",
+    "RelativePath": "Account/ChangePassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Requests.AccountRequests.ChangePasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "EmailLogin",
+    "RelativePath": "Account/EmailLogin",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Requests.AccountRequests.EmailLoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "ForgotPassword",
+    "RelativePath": "Account/ForgotPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Requests.AccountRequests.ForgotPasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "GetAccountInformation",
+    "RelativePath": "Account/GetAccountInformation",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "GetAnonymousToken",
+    "RelativePath": "Account/GetAnonymousToken",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Requests.AccountRequests.GetAnonymousTokenRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "Login",
+    "RelativePath": "Account/Login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Requests.AccountRequests.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "Register",
+    "RelativePath": "Account/Register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Requests.AccountRequests.RegistrationRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "ResetPassword",
+    "RelativePath": "Account/ResetPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Requests.AccountRequests.ResetPasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "UpdateAccountInformation",
+    "RelativePath": "Account/UpdateAccountInformation",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Responses.AccountResponses.AccountMainPageResponse",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AccountController",
+    "Method": "VerifySmsCode",
+    "RelativePath": "Account/VerifySmsCode",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Quark.API.Business.Models.Requests.AccountRequests.SmsVerificationRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AddressController",
+    "Method": "CitiesByCountryId",
+    "RelativePath": "Address/CitiesByCountryId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AddressController",
+    "Method": "CitiesOfTurkey",
+    "RelativePath": "Address/CitiesOfTurkey",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AddressController",
+    "Method": "Countries",
+    "RelativePath": "Address/Countries",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AddressController",
+    "Method": "DistrictsByCityId",
+    "RelativePath": "Address/DistrictsByCityId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AddressController",
+    "Method": "NeighbourhoodsByDistrictId",
+    "RelativePath": "Address/NeighbourhoodsByDistrictId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AppSettingsController",
+    "Method": "AppVersions",
+    "RelativePath": "AppSettings/AppVersions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AuthorController",
+    "Method": "AuthorDetails",
+    "RelativePath": "Author/AuthorDetails",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "slug",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AuthorController",
+    "Method": "Authors",
+    "RelativePath": "Author/Authors",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AuthorController",
+    "Method": "GetAuthorTodayNewsList",
+    "RelativePath": "Author/GetAuthorTodayNewsList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.AuthorController",
+    "Method": "GetFilteredArticles",
+    "RelativePath": "Author/GetFilteredArticles",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "authorId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "dateRange",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.BookController",
+    "Method": "GetAllBooks",
+    "RelativePath": "Book/GetAllBooks",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.BookController",
+    "Method": "GetById",
+    "RelativePath": "Book/GetById",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.BookController",
+    "Method": "GetByName",
+    "RelativePath": "Book/GetByName",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "name",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CategoryController",
+    "Method": "CategoryPageLoadMoreNews",
+    "RelativePath": "Category/CategoryPageLoadMoreNews",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "categoryId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CategoryController",
+    "Method": "DeleteCategoryNewsListInCache",
+    "RelativePath": "Category/DeleteCategoryNewsListInCache",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CategoryController",
+    "Method": "GetCategoryNewsList",
+    "RelativePath": "Category/GetCategoryNewsList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "slug",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CategoryController",
+    "Method": "GetMobileCategoryNewsList",
+    "RelativePath": "Category/GetMobileCategoryNewsList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "slug",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "Currency",
+    "RelativePath": "Common/Currency",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "count",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "currency",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "GetCurrencyList",
+    "RelativePath": "Common/GetCurrencyList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "GetTodayCurrencyData",
+    "RelativePath": "Common/GetTodayCurrencyData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "GetTodayWeatherData",
+    "RelativePath": "Common/GetTodayWeatherData",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "Index",
+    "RelativePath": "Common/Index",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "PrayerTimes",
+    "RelativePath": "Common/PrayerTimes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "city",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "ReadList",
+    "RelativePath": "Common/ReadList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "Weather",
+    "RelativePath": "Common/Weather",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.CommonController",
+    "Method": "WeatherDetail",
+    "RelativePath": "Common/WeatherDetail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "city",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.PageController",
+    "Method": "GetPageBlocks",
+    "RelativePath": "Content/Pages",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Quark.Business.Caching.Models.Requests.PageCachingRequests.PageCachingRequest",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.HomeController",
+    "Method": "Error404",
+    "RelativePath": "Home/Error404",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.HomeController",
+    "Method": "GetMainPage",
+    "RelativePath": "Home/GetMainPage",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.HomeController",
+    "Method": "IndexMobile",
+    "RelativePath": "Home/IndexMobile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MemberController",
+    "Method": "Create",
+    "RelativePath": "Member/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Quark.API.Business.Models.Requests.MemberRequests.CreateMemberRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MemberController",
+    "Method": "CreateSubscription",
+    "RelativePath": "Member/CreateSubscription",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createSubsRequest",
+        "Type": "Quark.Business.Common.PaymentServices.Models.Requests.CreateCumhuriyetSubscriptionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MemberController",
+    "Method": "Delete",
+    "RelativePath": "Member/Delete",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MemberController",
+    "Method": "Notifications",
+    "RelativePath": "Member/Notifications",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MemberController",
+    "Method": "RetrySubscriptionPayment",
+    "RelativePath": "Member/RetrySubscriptionPayment",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "referenceCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MemberController",
+    "Method": "SearchSubscriptionDetail",
+    "RelativePath": "Member/SearchSubscriptionDetail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "referenceCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MemberController",
+    "Method": "UpdateProfile",
+    "RelativePath": "Member/UpdateProfile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Quark.API.Business.Models.Requests.MemberRequests.UpdateMemberRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MemberController",
+    "Method": "UserInfo",
+    "RelativePath": "Member/UserInfo",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "mobileDevicePushID",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MenuController",
+    "Method": "List",
+    "RelativePath": "Menu/List",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.MenuController",
+    "Method": "ListByKey",
+    "RelativePath": "Menu/ListByKey",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "key",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "CreateElasticDetail",
+    "RelativePath": "News/CreateElasticDetail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "Details",
+    "RelativePath": "News/Details",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "GetMostSearchedNewsPage",
+    "RelativePath": "News/GetMostSearchedNewsPage",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "Index",
+    "RelativePath": "News/Index",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "NewsSearch",
+    "RelativePath": "News/NewsSearch",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Quark.API.Business.Models.Requests.NewsRequests.LiveSearchRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "SearchedNewsPage",
+    "RelativePath": "News/SearchedNewsPage",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "SearchPageLoadMore",
+    "RelativePath": "News/SearchPageLoadMore",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "dateRange",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "TestMetod",
+    "RelativePath": "News/TestMetod",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsController",
+    "Method": "VoteSurvey",
+    "RelativePath": "News/VoteSurvey",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "surveyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "optionId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsIntegrationController",
+    "Method": "PageCategories",
+    "RelativePath": "NewsIntegration/PageCategories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsIntegrationController",
+    "Method": "Stories",
+    "RelativePath": "NewsIntegration/Stories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Nullable\u00601[[System.Int64, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.NewsIntegrationController",
+    "Method": "Story",
+    "RelativePath": "NewsIntegration/Story",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int64",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.SourceController",
+    "Method": "LoadMoreNews",
+    "RelativePath": "Source/LoadMoreNews",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "slug",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.SourceController",
+    "Method": "NewsList",
+    "RelativePath": "Source/NewsList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "slug",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.TagController",
+    "Method": "GetTagePageLoadMoreNews",
+    "RelativePath": "Tag/GetTagePageLoadMoreNews",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "slug",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.API.Controllers.TagController",
+    "Method": "GetTagNewsList",
+    "RelativePath": "Tag/GetTagNewsList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "slug",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

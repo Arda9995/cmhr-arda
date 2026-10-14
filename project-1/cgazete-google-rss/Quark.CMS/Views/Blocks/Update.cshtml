@@ -1,0 +1,202 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["Block"] + " " + _localizer["Update"];
+    ViewData[ViewDataNames.AsideMenu] = "Management";
+    ViewData[ViewDataNames.AsideSubMenu] = "BlockManagement";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Management"], string.Empty),
+        new BreadcrumbItem(_localizer["BlockManagement"], "/Blocks/List")
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.BlockRequests.CreateUpdateRequest
+
+@section Scripts
+{
+    <script>let blockTypeID = '@Model.BlockTypeID';</script>
+    <script src="/Scripts/Blocks/Update.js" asp-append-version="true"></script>
+    <script src="/Scripts/Blocks/Validation.js" asp-append-version="true"></script>
+}
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Block"] @_localizer["Informations"]</h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data" id="blockForm">
+        <input asp-for="@Model.ID" type="hidden"/>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Page"]</label>
+                <div class="col-lg-9">
+                    <select asp-items="@Model.Pages" asp-for="SelectedPageID" class="form-select form-select-lg form-select-solid" data-control="select2"></select>
+                    <span asp-validation-for="@Model.SelectedPageID" class="fv-plugins-message-container invalid-feedback"></span>
+                    <div class="form-text">
+                        @_localizer["BlockPageText"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Name"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Name" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Name" class="fv-plugins-message-container invalid-feedback"></span>
+                    <div class="form-text">
+                        @_localizer["BlockNameText"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["KeyWord"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Key" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Key" class="fv-plugins-message-container invalid-feedback"></span>
+                    <div class="form-text">
+                        @_localizer["BlockKeyWordText"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["Title2"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Title" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Title" class="fv-plugins-message-container invalid-feedback"></span>
+                    <div class="form-text">
+                        @_localizer["WebSiteViewersNote"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["NewsCountLimit"]</label>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-lg-6 fv-row">
+                            <div class="position-relative" data-kt-dialer="true" data-kt-dialer-min="1" data-kt-dialer-max="20" data-kt-dialer-step="1" data-kt-dialer-decimals="0">
+                                <button type="button" class="btn btn-icon btn-active-color-gray-700 position-absolute translate-middle-y top-50 start-0" data-kt-dialer-control="decrease">
+                                    <i class="ki-duotone ki-minus-square fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                </button>
+                                <input asp-for="MinNewsCount" type="text" class="form-control form-control-solid border-0 ps-12" data-kt-dialer-control="input" readonly />
+                                <button type="button" class="btn btn-icon btn-active-color-gray-700 position-absolute translate-middle-y top-50 end-0" data-kt-dialer-control="increase">
+                                    <i class="ki-duotone ki-plus-square fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                </button>
+                            </div>
+                            <span class="fv-plugins-message-container invalid-feedback minCountMessage"></span>
+                            <div class="form-text">@_localizer["Min"]</div>
+                        </div>
+                        <div class="col-lg-6 fv-row">
+                            <div class="position-relative" data-kt-dialer="true" data-kt-dialer-min="1" data-kt-dialer-max="50" data-kt-dialer-step="1" data-kt-dialer-decimals="0">
+                                <button type="button" class="btn btn-icon btn-active-color-gray-700 position-absolute translate-middle-y top-50 start-0" data-kt-dialer-control="decrease">
+                                    <i class="ki-duotone ki-minus-square fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                </button>
+                                <input asp-for="MaxNewsCount" type="text" class="form-control form-control-solid border-0 ps-12" data-kt-dialer-control="input" readonly />
+                                <button type="button" class="btn btn-icon btn-active-color-gray-700 position-absolute translate-middle-y top-50 end-0" data-kt-dialer-control="increase">
+                                    <i class="ki-duotone ki-plus-square fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                </button>
+                            </div>
+                            <span class="fv-plugins-message-container invalid-feedback maxCountMessage"></span>
+                            <div class="form-text">@_localizer["Max"]</div>
+                        </div>
+                    </div>
+                    <div class="form-text">@_localizer["NewsCountLimitText"]</div>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["BlockType"]</label>
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <input type="radio" class="btn-check block_type" name="BlockTypeID" value="@Model.BlockTypes[0].Value" id="block_slider"/>
+                            <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-7 d-flex align-items-center mb-10" for="block_slider">
+                                <partial name="Icons/Slider2"/>
+                                <span class="d-block fw-semibold text-start">
+                                    <span class="text-gray-900 fw-bold d-block fs-4 mb-2">Slider</span>
+                                    <span class="text-muted fw-semibold fs-6">@_localizer["BlockSliderText"]</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="col-lg-6">
+                            <input type="radio" class="btn-check block_type" name="BlockTypeID" value="@Model.BlockTypes[1].Value" id="block_catalog"/>
+                            <label class="btn btn-outline btn-outline-dashed btn-active-light-primary p-7 d-flex align-items-center" for="block_catalog">
+                                <partial name="Icons/Block"/>
+                                <span class="d-block fw-semibold text-start">
+                                    <span class="text-gray-900 fw-bold d-block fs-4 mb-2">@_localizer["NewsBlock"]</span>
+                                    <span class="text-muted fw-semibold fs-6">@_localizer["NewsBlockText"]</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="autoplayDelay" class="row mb-10">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["AutoSlideTime"]</label>
+                <div class="col-lg-6">
+                    <div class="d-flex flex-column text-center mt-5 rounded border p-10 mb-3">
+                        <div class="d-flex flex-row align-items-start justify-content-center mb-7">
+                            <span class="fw-bold fs-3x" id="lblAutoSlideDelay">1</span>
+                            <span class="fw-bold fs-4 mt-1 ms-2">@_localizer["Second"]</span>
+                            <input asp-for="AutoSliderDelay" type="hidden" id="txtAutoSlideDelay"/><!-- Model'i bu input içine bind edip buradan okuyacağız -->
+                        </div>
+                        <div id="slider" class=" flex-row noUi-lg mb-5"></div>
+                    </div>
+                    <div class="form-text">
+                        @_localizer["AutoSliderTimerText"]
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Users"]</label>
+                <div class="col-lg-9">
+                    <select asp-items="@Model.Users" asp-for="SelectedUserIDs" class="form-select form-select-lg form-select-solid" data-control="select2" multiple="multiple" data-close-on-select="false"></select>
+                    <span asp-validation-for="@Model.SelectedUserIDs" class="fv-plugins-message-container invalid-feedback"></span>
+                    <div class="form-text">
+                        @_localizer["BlockUsersText"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Categories"]</label>
+                <div class="col-lg-9">
+                    <select asp-items="@Model.Categories" asp-for="SelectedCategoryID" class="form-select form-select-lg form-select-solid" data-control="select2" data-close-on-select="false"></select>
+                    <span asp-validation-for="@Model.SelectedCategoryID" class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["Order"]</label>
+                <div class="col-lg-9 fv-row">
+                    <div class="position-relative" data-kt-dialer="true" data-kt-dialer-min="1" data-kt-dialer-max="20" data-kt-dialer-step="1" data-kt-dialer-decimals="0">
+                        <button type="button" class="btn btn-icon btn-active-color-gray-700 position-absolute translate-middle-y top-50 start-0" data-kt-dialer-control="decrease">
+                            <i class="ki-duotone ki-minus-square fs-2"><span class="path1"></span><span class="path2"></span></i>
+                        </button>
+                        <input asp-for="Order" type="text" class="form-control form-control-solid border-0 ps-12" data-kt-dialer-control="input" readonly />
+                        <button type="button" class="btn btn-icon btn-active-color-gray-700 position-absolute translate-middle-y top-50 end-0" data-kt-dialer-control="increase">
+                            <i class="ki-duotone ki-plus-square fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                        </button>
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["Status"]</label>
+                <div class="col-lg-9 fv-row">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <input asp-for="IsEnabled" class="form-check-input" type="checkbox" checked/>
+                        <span class="form-check-label text-muted">@_localizer["Enabled"]</span>
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/Blocks/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

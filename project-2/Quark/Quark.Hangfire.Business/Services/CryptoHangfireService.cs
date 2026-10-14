@@ -1,0 +1,149 @@
+using AvvaMobile.Core;
+using AvvaMobile.Core.Caching;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
+using Quark.Business.Common.BaseServices;
+using Quark.Data;
+using Quark.Data.Models;
+using Quark.Data.Models.SystemLog;
+using Quark.Hangfire.Business.Interfaces;
+using Quark.Hangfire.Business.Models.Responses.CryptoResponses;
+using Quark.Hangfire.Business.Models.Responses.CurrenciesResponses;
+using Quark.Resources;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+
+namespace Quark.Hangfire.Business.Services;
+
+public class CryptoHangfireService(
+    IHttpContextAccessor httpContext,
+    QuarkDataContext context,
+    IStringLocalizer<CommonResource> localizer,
+    AppSettingsKeys appSettingsKeys,
+    ICacheManager cache)
+    : BaseService(httpContext, context, localizer, appSettingsKeys, cache), ICryptoHangfireService
+{
+    
+    private string _coinMarketUrlTemplate = "{0}?convert={1}";
+
+    public void GetAllDailyCryptoData()
+    {
+        var baseUrl = _appSettingsKeys.CoinMarketAPIURL;
+        var convertCurrency = _appSettingsKeys.CoinMarket_ConvertCurrency;
+        
+        var networkManager = new NetworkManager();
+        networkManager.AddHeader("X-CMC_PRO_API_KEY",_appSettingsKeys.CoinMarketAPI_Token);
+        
+        var hangfireLog = new HangfireLog()
+        {
+            CreatedDate = DateTime.Now,
+            Method = (nameof(GetAllDailyCryptoData)),
+            Message = "Crypto data retrieval started."
+        };
+        _context.HangfireLogs.Add(hangfireLog);
+        _context.SaveChanges();
+
+        try
+        {
+            var serviceUrl = string.Format(_coinMarketUrlTemplate, baseUrl, convertCurrency);
+            var networkResponse = networkManager.GetAsync<CoinMarketCryptoResponse>(serviceUrl).Result;
+
+            if (!networkResponse.IsSuccess)
+            {
+                var hangfireErrorLog = new HangfireLog()
+                {
+                    CreatedDate = DateTime.Now,
+                    Method = (nameof(GetAllDailyCryptoData)),
+                    Message = networkResponse.Message
+                };
+                _context.HangfireLogs.Add(hangfireErrorLog);
+                _context.SaveChanges();
+                return;
+            }
+            
+            if (networkResponse.Data.data.Count == 0)
+            {
+                var hangfireNotDataLog = new HangfireLog()
+                {
+                    CreatedDate = DateTime.Now,
+                    Method = (nameof(GetAllDailyCryptoData)),
+                    Message = "No Crypto data found in the response."
+                };
+                _context.HangfireLogs.Add(hangfireNotDataLog);
+                _context.SaveChanges();
+                return;
+            }
+
+            var allCurrencies = _context.Currencies.ToList();
+
+            foreach (var currency in allCurrencies)
+            {
+                var getCrypto = networkResponse.Data.data.FirstOrDefault(x => x.symbol == currency.Name);
+
+                if (getCrypto == null)
+                {
+                    var hangfireNotCryptoDataLog = new HangfireLog()
+                    {
+                        CreatedDate = DateTime.Now,
+                        Method = (nameof(GetAllDailyCryptoData)),
+                        Message = $"No Crypto data found for currency: {currency.Name}"
+                    };
+                    _context.HangfireLogs.Add(hangfireNotCryptoDataLog);
+                    _context.SaveChanges();
+                    continue;
+                }
+
+                var todayCrypto = _context.CurrencyDailyValues.FirstOrDefault(x => x.Date.Date == DateTime.Now.Date
+                    && x.CurrencyID == currency.ID);
+
+                var lastDayCrypto = _context.CurrencyDailyValues.FirstOrDefault(x =>
+                    x.Date.Date == DateTime.Now.AddDays(-1).Date
+                    && x.CurrencyID == currency.ID);
+
+                if (todayCrypto == null)
+                {
+                    todayCrypto = new CurrencyDailyValue();
+                    todayCrypto.CurrencyID = currency.ID;
+                    todayCrypto.Date = DateTime.Now;
+                    todayCrypto.BuyingValue = Math.Round(Convert.ToDecimal(getCrypto.quote.TRY.price), 2);
+                    todayCrypto.SellingValue = Math.Round(Convert.ToDecimal(getCrypto.quote.TRY.price), 2);
+                    todayCrypto.StateID = lastDayCrypto?.SellingValue == Math.Round(Convert.ToDecimal(getCrypto.quote.TRY.price), 2)
+                        ? (int)CurrencyStateEnum.Equal
+                        : (lastDayCrypto?.SellingValue < Math.Round(Convert.ToDecimal(getCrypto.quote.TRY.price), 2)
+                            ? (int)CurrencyStateEnum.Increased
+                            : (int)CurrencyStateEnum.Decreased);
+
+                    _context.CurrencyDailyValues.Add(todayCrypto);
+                }
+                else
+                {
+                    todayCrypto.BuyingValue = Math.Round(Convert.ToDecimal(getCrypto.quote.TRY.price), 2);
+                    todayCrypto.SellingValue = Math.Round(Convert.ToDecimal(getCrypto.quote.TRY.price), 2);
+                    todayCrypto.Date = DateTime.Now;
+
+                    _context.CurrencyDailyValues.Update(todayCrypto);
+                }
+            }
+
+            _context.SaveChanges();
+        }
+        catch (Exception e)
+        {
+            var hangfireExceptionLog = new HangfireLog()
+            {
+                CreatedDate = DateTime.Now,
+                Method = (nameof(GetAllDailyCryptoData)),
+                Message = $"An error occurred while retrieving crypto data: {e.Message}"
+            };
+            _context.HangfireLogs.Add(hangfireExceptionLog);
+            _context.SaveChanges();
+        }
+        finally
+        {
+            hangfireLog.Message = "Crypto data retrieval completed.";
+            _context.HangfireLogs.Update(hangfireLog);
+            _context.SaveChanges();
+        }
+
+        // TODO : Cachede Sadece bugün tutulsun. Bu aşamada cache güncellenmeli.
+    }
+}

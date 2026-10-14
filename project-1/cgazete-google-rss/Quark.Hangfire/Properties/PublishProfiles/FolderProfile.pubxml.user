@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://go.microsoft.com/fwlink/?LinkID=208121. -->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>E:\GitHub\cgazete-google-rss\Quark.Hangfire\bin\Release\net8.0\publish\</_PublishTargetUrl>
+    <History>True|2026-10-12T12:58:07.1139032Z||;True|2026-10-09T20:14:12.2508746+03:00||;True|2026-10-09T14:55:49.3726840+03:00||;True|2026-10-09T13:36:05.6996316+03:00||;True|2026-10-09T09:03:05.9645953+03:00||;True|2026-10-08T18:26:51.0878138+03:00||;True|2026-10-08T13:23:47.5400644+03:00||;True|2026-10-08T12:16:19.9842752+03:00||;True|2026-10-07T16:19:35.1473385+03:00||;True|2026-10-06T13:31:07.6215277+03:00||;True|2026-09-19T10:52:54.1543060+03:00||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,100 @@
+﻿
+@using Quark.CMS.Business.Constants
+@using System.Security.Claims
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+@{
+    var hasRole = Context.User.Identities.First()
+        .FindAll(ClaimTypes.Role)
+        .FirstOrDefault(r => r.Value == SecurityClaimKeys.NEWS_PERMISSIONS) != null;
+}
+
+@if (hasRole)
+{
+    <div class="card card-flush mb-10">
+        <div class="card-header">
+            <div class="card-title">
+                <h2>@_localizer["Permissions"]</h2>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="row">
+                <div class="col-lg-6 fv-row mb-5">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <div class="col-lg-6">
+                            <span class="required" style="margin-right:10px;">@_localizer["AdsSetting"]</span>
+                        </div>
+                        <div class="col-lg-6">
+                            <input asp-for="AllowAds" class="form-check-input" type="checkbox" />
+                        </div>
+                    </div>
+                    <div class="text-muted fs-7 mt-5">@_localizer["AllowAdsDescription"]</div>
+                   
+                </div>
+             
+                <div class="col-lg-6 fv-row mb-5">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <div class="col-lg-6">
+                            <span class="required" style="margin-right:10px;">@_localizer["RssSetting"]</span>
+                        </div>
+                        <div class="col-lg-6">
+                            <input asp-for="AllowToSendRSS" class="form-check-input" type="checkbox" />
+                        </div>
+                    </div>
+                    <div class="text-muted fs-7 mt-5">@_localizer["AllowToSendRssDescription"]</div>
+                </div>
+            </div>
+            <div class="separator border-2 my-5"></div>
+            <div class="row">
+                <div class="col-lg-6 fv-row mb-5">
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <div class="col-lg-6">
+                            <span class="required" style="margin-right:10px;">@_localizer["GoogleIndexSetting"]</span>
+                        </div>
+                        <div class="col-lg-6">
+                            <input asp-for="AllowGoogleIndex" class="form-check-input" type="checkbox" />
+                        </div>
+                    </div>
+                    <div class="text-muted fs-7 mt-5">@_localizer["AllowGoogleIndexDescription"]</div>
+                </div>
+
+                <div class="col-lg-6 fv-row mb-5">
+
+                    <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                        <div class="col-lg-6">
+                            <span class="required" style="margin-right:10px;">@_localizer["GoogleSideMapSetting"]</span>
+                        </div>
+                        <div class="col-lg-6">
+                            <input asp-for="AllowToSendGoogleSideMap" class="form-check-input" type="checkbox" />
+                        </div>
+                    </div>
+                    <div class="text-muted fs-7 mt-5">@_localizer["AllowToSendGoogleSideMapDescription"]</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+
+<div class="card card-flush mb-10">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>@_localizer["AllowGoogleAiFeedSetting"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        <div class="row">
+            <div class="col-lg-6 fv-row mb-5">
+                <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                    <div class="col-lg-6">
+                        <span style="margin-right:10px;">@_localizer["AllowGoogleAiFeedSetting"]</span>
+                    </div>
+                    <div class="col-lg-6">
+                        <input asp-for="AllowGoogleAiFeed" class="form-check-input cursor-pointer" type="checkbox" />
+                    </div>
+                </div>
+                <div class="text-muted fs-7 mt-5">@_localizer["AllowGoogleAiFeedDescription"]</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+﻿@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="row mb-6">
+    <div class="col-1w">
+        <label class="required form-label">@_localizer["SurveyQuestion"]</label>
+        <div class="input-group">
+            <textarea asp-for="@Model.SurveyItemRequest.Question" class="form-control maxlength" maxlength="200" autocomplete="off" style="height: 17px;"></textarea>
+        </div>
+        <span asp-validation-for="@Model.SurveyItemRequest.Question" class="fv-plugins-message-container invalid-feedback"></span>
+    </div>
+</div>
+<partial name="_Edit/_SurveyOptions" model="Model"/>
+<div class="d-flex flex-wrap gap-10 mb-6">
+    <div class="fv-row w-100 flex-md-root">
+        <label class="form-label required">@_localizer["StartDate"]</label>
+        <div id="startDateWrapper">
+            <input asp-for="@Model.SurveyItemRequest.StartDate" class="form-control datetimepicker flatpickr-input active"
+                   id="startDatePicker" type="text" readonly="readonly"
+                   value="@Model.SurveyItemRequest.StartDate.ToString(" dd.MM.yyyy HH:mm:ss")"
+                   placeholder="@_localizer["SelectDate"]">
+        </div>
+    </div>
+    <div class="fv-row w-100 flex-md-root">
+        <label class="form-label required">@_localizer["EndDate"]</label>
+        <div id="endDateWrapper">
+            <input asp-for="@Model.SurveyItemRequest.EndDate" class="form-control datetimepicker flatpickr-input active"
+                   id="endDatePicker" type="text" readonly="readonly"
+                   value="@Model.SurveyItemRequest.EndDate.ToString("dd.MM.yyyy HH:mm:ss")"
+                   placeholder="@_localizer["SelectDate"]">
+        </div>
+    </div>
+</div>

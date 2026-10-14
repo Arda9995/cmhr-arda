@@ -1,0 +1,22 @@
+[
+  {
+    "ContainingType": "Quark.Hangfire.Api.Controllers.IndexController",
+    "Method": "GetAANews",
+    "RelativePath": "Index/GetAANews",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Quark.Hangfire.Api.Controllers.IndexController",
+    "Method": "GetRssItems",
+    "RelativePath": "Index/GetRssItems",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

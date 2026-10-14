@@ -1,0 +1,20 @@
+﻿@{
+    var hasPremiumMembership = "False";
+
+    var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    if (id !=  null)
+    {
+        hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+    }
+}
+
+@if (hasPremiumMembership == "True")
+{
+    
+}
+else
+{
+    <div class="ads-box" style="">
+        <img class="mx-auto mx-auto" src="https://placehold.co/480x320" alt="" loading="lazy">
+    </div>
+}

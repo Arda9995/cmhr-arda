@@ -1,0 +1,6 @@
+﻿# Copilot Instructions
+
+## Project Guidelines
+- For this repository, Google AI RSS HTML cleanup must apply only to the generated feed/archive content. It must never delete articles, modify their stored HTML, or change their publication status; preserve article text, semantic markup, and images in the feed.
+- Hangfire job methods must be async (`Task`-returning) and use `await`; never block async calls with `.Result` or `.GetAwaiter().GetResult()`.
+- `QuarkDataContext` is not thread-safe. In Hangfire/background services, do not run concurrent operations on the shared scoped context; for database access in background jobs, create a short-lived context via `IDbContextFactory<QuarkDataContext>` (registered in `Quark.Hangfire/Program.cs`).

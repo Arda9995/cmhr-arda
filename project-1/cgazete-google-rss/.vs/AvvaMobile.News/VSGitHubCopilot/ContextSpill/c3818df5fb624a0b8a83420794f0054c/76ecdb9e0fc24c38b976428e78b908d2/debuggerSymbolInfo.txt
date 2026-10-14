@@ -1,0 +1,415 @@
+﻿Quark.API.Business.Services.NewsService.GetNewsDetailService Method (E:\GitHub\cgazete-google-rss\Quark.API.Business\Services\NewsService.cs):
+```
+        private async Task<ServiceResult<GetNewsDetailResponse>> GetNewsDetailService(int ID)
+        {
+            var result = new ServiceResult<GetNewsDetailResponse>();
+
+            var newsPublished = await _context.NewsPublished.Where(np => np.NewsID == ID).AnyAsync();
+
+            if (!newsPublished)
+            {
+                result.SetError("News not found");
+                return result;
+            }
+
+            var news = await (
+                from np in _context.NewsPublished
+                join t in _context.NewsTypes on np.NewsTypeID equals t.ID
+                join c in _context.Categories on np.CategoryID equals c.ID into categories
+                from category in categories.DefaultIfEmpty()
+                where np.NewsID == ID
+                select new GetNewsDetailResponse
+                {
+                    ID = ID,
+                    NewsSlug = np.Slug,
+                    NewsTypeID = np.NewsTypeID,
+                    Title = np.Title,
+                    SubTitle = np.Subtitle ?? np.UpSubtitle,
+                    Content = np.Content,
+                    Headline = np.Headline ?? np.Title,
+                    UpHeadline = np.UpHeadline,
+                    UpdateDate = np.ManuelUpdatedDate ?? DateTime.Now,
+                    CreatedDate = np.PublishedDate,
+                    PublishDate = np.PublishedDate,
+                    SourceIDs = np.SourceIDs,
+                    AuthorID = np.AuthorID,
+                    CategoryID = np.CategoryID ?? 0,
+                    PressNo = np.PressNo,
+                    BoxCount = np.BoxCount,
+                    CategorySlug = _appSettingsKeys.Common_ClientWebSite + (category != null ? category.Url : ""),
+                    CategoryName = category.Name ?? string.Empty,
+                    CategoryBreadcrumb = category.Breadcrumb ?? category.Name,
+                    Video = np.Video,
+                    VideoPlayerID = np.VideoPlayerID,
+                    SecondaryCategoryMap = np.SecondaryCategoryMap,
+                    SeoDescription = !string.IsNullOrEmpty(np.SeoDescription)
+                        ? np.SeoDescription
+                        : np.Content.ExtractTextFromHtml(),
+                    SeoTitle = !string.IsNullOrEmpty(np.SeoTitle) ? np.SeoTitle : np.Title,
+                }).FirstOrDefaultAsync();
+
+
+            if (news == null)
+            {
+                result.Message = "Haber bulunamadı.";
+                return result;
+            }
+
+            if (news.PublishDate > news.UpdateDate)
+            {
+                news.UpdateDate = news.PublishDate;
+            }
+
+            if (string.IsNullOrEmpty(news.SubTitle))
+            {
+                news.SubTitle = news.Content.ExtractTextFromHtml(160);
+            }
+
+            var offsetUpdatedDate = new DateTimeOffset(news.UpdateDate, TimeSpan.FromHours(3));
+            var offsetUPublishedDate = new DateTimeOffset(news.PublishDate, TimeSpan.FromHours(3));
+            var formattedUpdateDate =
+                offsetUpdatedDate.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
+            var formattedPublishedDate =
+                offsetUPublishedDate.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
+
+            news.UpdateDateForMetaTag = formattedUpdateDate;
+            news.PublishDateForMetaTag = formattedPublishedDate;
+            news.Tags = news.TagList != null ? string.Join(", ", news.TagList.Select(x => x.Text)) : string.Empty;
+
+            #region Yazar İşlemleri
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles ||
+                news.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews)
+            {
+                var authors = await _context.Authors.Select(x => new AuthorCachingResponse
+                {
+                    ID = x.ID,
+                    Firstname = x.Firstname,
+                    Lastname = x.Lastname,
+                    Url = x.Url,
+                    Photo = x.ClichePhoto,
+                    AuthorSocialFacebook = x.FacebookUrl,
+                    AuthorSocialInstagram = x.InstagramUrl,
+                    AuthorSocialLinkedIn = x.LinkedinUrl,
+                    AuthorSocialMail = x.Email,
+                    AuthorSocialX = x.XUrl
+                }).ToListAsync();
+
+                var author = authors.FirstOrDefault(a => a.ID == news.AuthorID);
+
+                news.AuthorName = author != null
+                    ? $"{author.Firstname} {author.Lastname}".Trim()
+                    : string.Empty;
+                news.AuthorSlug = author != null
+                    ? _appSettingsKeys.Common_ClientWebSite + author.Url.TrimStart('/')
+                    : string.Empty;
+
+                if (news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles && author != null)
+                {
+                    var authorsLastArticles = await (
+                        from np in _context.NewsPublished
+                        where np.AuthorID == author.ID && np.NewsTypeID == (int)NewsTypesEnum.ColumnArticles
+                        orderby np.PublishedDate descending
+                        select new AuthorsLastColumnArticles
+                        {
+                            NewsID = (int)np.NewsID,
+                            Headline = np.Headline ?? np.Title,
+                            UpSubtitle = np.UpSubtitle ?? np.Subtitle,
+                            Slug = _appSettingsKeys.Common_ClientWebSite + np.Slug.TrimStart('/'),
+                            PublishDate = np.PublishedDate.ToFormattedDate()
+                        }).Take(6).ToListAsync();
+
+                    news.ColumnArticleDetails = new ColumnArticleDetails
+                    {
+                        AuthorFullName = news.AuthorName,
+                        AuthorSlug = _appSettingsKeys.Common_ClientWebSite + author.Url.TrimStart('/'),
+                        AuthorPhoto = author.Photo.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                            _appSettingsKeys.CDN_AuthorPhotos),
+                        AuthorSocialFacebook = author.AuthorSocialFacebook,
+                        AuthorSocialInstagram = author.AuthorSocialInstagram,
+                        AuthorSocialX = author.AuthorSocialX,
+                        AuthorSocialLinkedIn = author.AuthorSocialLinkedIn,
+                        AuthorSocialMail = author.AuthorSocialMail,
+                        AuthorsLastColumnArticles = authorsLastArticles
+                    };
+                }
+            }
+
+            #endregion
+
+            #region Foto Galeri
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+            {
+                news.PhotoGalleryItems = await _context.NewsPublishedPhotoGalleryItems
+                    .Where(x => x.NewsID == ID)
+                    .OrderBy(x => x.Order)
+                    .Select(x => new PhotoGalleryItem
+                    {
+                        ImageURL = x.PhotoUrl,
+                        Content = x.Content
+                    }).ToListAsync();
+            }
+
+            #endregion
+
+            #region İkincil Kategoriler
+
+            var secondaryCategoryIds =
+                await _context.NewsSecondaryCategories.Where(x => x.NewsID == news.ID).ToListAsync();
+            if (secondaryCategoryIds.Any())
+            {
+                news.SecondaryCategoryIDList = secondaryCategoryIds.Select(x => x.SecondaryCategoryID).ToList();
+                news.SecondaryCategoryNameList = await _context.Categories
+                    .Where(x => news.SecondaryCategoryIDList.Contains(x.ID))
+                    .Select(x => x.Name).ToListAsync();
+            }
+
+            #endregion
+
+            #region Kaynaklar
+
+            var sourceIds = await _context.NewsSources.Where(x => x.NewsID == news.ID).Select(x => x.SourceID)
+                .ToListAsync();
+            if (sourceIds.Any())
+            {
+                news.SourceList = await _context.Sources
+                    .Where(x => sourceIds.Contains(x.ID))
+                    .Select(x => new SourceList
+                    {
+                        ID = x.ID,
+                        Name = x.Name,
+                        Slug = _appSettingsKeys.Common_ClientWebSite + _appSettingsKeys.SlugPrefix_Sources + "/" +
+                               x.Url.TrimStart('/')
+                    }).ToListAsync();
+
+                news.Sources = string.Join(", ", news.SourceList.Select(x => x.Name));
+            }
+
+            #endregion
+
+            #region Kapak Fotoğrafı
+
+            var coverPhoto = await _context.NewsPublishedPhotos
+                .Where(p => p.NewsID == ID &&
+                            (p.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto ||
+                             p.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto))
+                .OrderBy(p => p.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto ? 0 : 1)
+                .FirstOrDefaultAsync();
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles
+                && coverPhoto.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+            {
+                news.CoverPhoto = coverPhoto != null
+                    ? coverPhoto.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_AuthorPhotos)
+                    : string.Empty;
+            }
+            else
+            {
+                news.CoverPhoto = coverPhoto != null
+                    ? coverPhoto.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder)
+                    : string.Empty;
+            }
+
+            #endregion
+
+            #region Etiketler
+
+            news.TagList = await (from nt in _context.NewsTags
+                                  join t in _context.Tags on nt.TagID equals t.ID
+                                  where nt.NewsID == ID
+                                  select new TagList
+                                  {
+                                      ID = t.ID,
+                                      Text = t.Text,
+                                      Slug = _appSettingsKeys.Common_ClientWebSite + _appSettingsKeys.SlugPrefix_Tags + "/" +
+                                             t.Url.TrimStart('/')
+                                  }).ToListAsync();
+
+            #endregion
+
+            #region Kategori Haberleri
+
+            news.CategoryNewsList = await (
+                from np in _context.NewsPublished
+                join n in _context.News on np.NewsID equals n.ID
+                let photo = (from ph in _context.NewsPublishedPhotos
+                             where ph.NewsID == np.NewsID &&
+                                   (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                                    ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                             orderby
+                                 ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                     ? 0
+                                     : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                         ? 1
+                                         : 2
+                             select ph).FirstOrDefault()
+                orderby n.ViewCount descending
+                select new CategoryNews
+                {
+                    ID = (int)np.NewsID,
+                    Headline = np.Headline ?? np.Title,
+                    UpSubtitle = np.UpSubtitle ?? np.Subtitle ?? np.Content.ExtractTextFromHtml(),
+                    Slug = _appSettingsKeys.Common_ClientWebSite + np.Slug.TrimStart('/'),
+                    ImageURL = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                }).Take(4).ToListAsync();
+
+            #endregion
+
+            #region İlişkili Haberler
+
+            news.RelatedNewsList = await (from n in _context.RelatedNews
+                                          join np in _context.NewsPublished on n.RelatedNewsID equals np.NewsID
+                                          let photo = (from ph in _context.NewsPublishedPhotos
+                                                       where ph.NewsID == np.NewsID &&
+                                                             (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                                                              ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                                                       orderby
+                                                           ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                               ? 0
+                                                               : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                                   ? 1
+                                                                   : 2
+                                                       select ph).FirstOrDefault()
+                                          where n.NewsID == ID && !string.IsNullOrEmpty(np.Slug)
+                                          orderby n.Order
+                                          select new Models.Responses.NewsResponses.RelatedNews
+                                          {
+                                              ID = (int)n.NewsID,
+                                              Title = np.Title,
+                                              Slug = _appSettingsKeys.Common_ClientWebSite + np.Slug.TrimStart('/'),
+                                              Subtitle = np.Subtitle,
+                                              ImageURL = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                                  _appSettingsKeys.CDN_MediaGalleryFolder),
+                                          }).ToListAsync();
+
+            #endregion
+
+            #region Anketler
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.Survey)
+            {
+                var newsVersionIds = await _context.NewsVersions
+                    .Where(x => x.NewsID == news.ID)
+                    .OrderByDescending(x => x.ID)
+                    .Select(x => x.ID)
+                    .ToListAsync();
+
+                Survey survey = null;
+
+                foreach (var versionId in newsVersionIds)
+                {
+                    survey = await _context.Surveys
+                        .Where(x => x.NewsVersionID == versionId)
+                        .FirstOrDefaultAsync();
+
+
+                    if (survey != null)
+                    {
+                        break;
+                    }
+                }
+
+                var surveyOptionList = await _context.SurveyOptions.Where(x =>
+                        x.SurveyID == survey.ID && x.NewsVersionID == (int)survey.NewsVersionID)
+                    .ToListAsync();
+
+                var totalAnswerCount = surveyOptionList.Sum(x => x.AnswerCount);
+
+                var surveyOptions = surveyOptionList
+                    .OrderBy(x => x.Order)
+                    .Select(x => new SurveySection
+                    {
+                        Option = x.Option,
+                        Percent = totalAnswerCount > 0
+                            ? (int)Math.Round((double)x.AnswerCount / totalAnswerCount * 100)
+                            : 0,
+                        OptionID = x.ID,
+                        SurveyID = x.SurveyID,
+                    })
+                    .ToList();
+
+
+                var surveyNews = await _context.NewsPublished
+                    .Where(np => np.NewsTypeID == (int)NewsTypesEnum.Survey)
+                    .Select(np => new
+                    {
+                        NewsPublishedForSurvey = np,
+                        NewsVersions = _context.NewsVersions
+                                .Where(nv => nv.NewsID == np.NewsID)
+                                .OrderByDescending(nv => nv.ID)
+                            .ToList()
+                    })
+                    .ToListAsync();
+
+
+                var finalResult = surveyNews
+                    .Select(x => new
+                    {
+                        x.NewsPublishedForSurvey,
+                        LatestSurvey = x.NewsVersions
+                                .Select(nv => _context.Surveys
+                                    .Where(s => s.NewsVersionID == nv.ID)
+                                    .OrderByDescending(s => s.ID)
+                                    .FirstOrDefault())
+                                .FirstOrDefault(s => s != null)
+                    })
+                        .Where(x => x.LatestSurvey != null)
+                        .Select(x => new SurveyNews
+                        {
+                            ID = x.LatestSurvey.ID,
+                            Title = x.NewsPublishedForSurvey.Title ?? x.LatestSurvey.Question,
+                            Question = x.LatestSurvey.Question ?? x.NewsPublishedForSurvey.Title,
+                            Slug = _appSettingsKeys.Common_ClientWebSite + x.NewsPublishedForSurvey.Slug.TrimStart('/'),
+                            ImageURL = _context.NewsPublishedPhotos
+                                .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                            p.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto)
+                                .FirstOrDefault().PhotoUrl != null
+                                ? _context.NewsPublishedPhotos
+                                    .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                                p.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto)
+                                    .FirstOrDefault().PhotoUrl
+                                    .PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_MediaGalleryFolder)
+                                : _context.NewsPublishedPhotos
+                                    .Where(p => p.NewsID == x.NewsPublishedForSurvey.NewsID &&
+                                                p.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                                    .FirstOrDefault().PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                            RemainingTime = x.LatestSurvey.EndDate.DateToShortCountdown(x.LatestSurvey.StartDate),
+                            JoinedUserCount = (int)_context.SurveyOptions
+                                .Where(so => so.SurveyID == x.LatestSurvey.ID)
+                                .Sum(so => so.AnswerCount),
+                        })
+                    .OrderByDescending(sn => sn.JoinedUserCount)
+                    .Take(7)
+                    .ToList();
+
+                news.SurveyElements = new SurveyElements
+                {
+                    JoinedUserCount = (int)surveyOptionList.Select(x => x.AnswerCount).ToList().Sum(),
+                    RemainingTime = survey.EndDate.DateToLongCountdown(survey.StartDate),
+                    SurveyQuestion = survey.Question,
+                    SurveySections = surveyOptions,
+                    CategoryNews = news.CategoryNewsList.Take(3).ToList(),
+                    SurveyNewsThird = finalResult.Take(3).ToList(),
+                    SurveyNewsQuad = finalResult.Skip(3).Take(4).ToList()
+                };
+            }
+
+            #endregion
+
+            #region Scrool News
+
+            var randomNewsIds =
+                await GetRandomRelatedNewsIds(news.ID, news.NewsTypeID, news.CategoryID, news.SecondaryCategoryMap);
+            news.ScrollNewsIDs = string.Join(",", randomNewsIds);
+            news.NewsDetailNextNewsIDs = randomNewsIds;
+
+            #endregion
+
+            result.Data = news;
+            return result;
+        }
+```

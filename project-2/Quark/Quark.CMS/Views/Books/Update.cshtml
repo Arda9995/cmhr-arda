@@ -1,0 +1,108 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["Books"];
+    ViewData[ViewDataNames.AsideMenu] = "Content";
+    ViewData[ViewDataNames.AsideSubMenu] = "Books";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(@_localizer["Content"], string.Empty),
+        new BreadcrumbItem(@_localizer["Books"], "/Books/List")
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.BookRequests.UpdateBookRequest
+@section Scripts
+{
+    <script src="/Scripts/Books/Common.js" asp-append-version="true"></script>
+}
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["BookInformation"]></h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data" id="booksForm">
+        <input type="hidden" asp-for="ID" />
+        <input id="url-prefix" type="hidden" value="@_appSettings.News_URLSchema" />
+        <div class="card-body border-0 p-9">
+            <div class="row mb-10">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["BookPhoto"]</label>
+                <div class="col-lg-9">
+                    <div class="image-input image-input-outline" data-kt-image-input="true">
+                        <div id="backgroundPhoto" class="image-input-wrapper w-125px h-125px bgi-position-center" style="background-size: 75%;
+                            background-image: url('@(Model.ImageURL)')"></div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="@_localizer["Update"]">
+                            <i class="bi bi-pencil-fill fs-7"></i>
+                            <input type="file" name="Image" accept=".png, .jpg, .jpeg" />
+                            <input type="hidden" name="avatar_remove" />
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="@_localizer["Cancel"]">
+                            <i class="bi bi-x fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">@_localizer["UploadImageHelpText"]</div>
+                    <span class="fv-plugins-message-container invalid-feedback" id="imageValidation"></span>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <div class="row mb-6">
+                    <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Name"]</label>
+                    <div class="col-lg-9 fv-row">
+                        <input type="text" asp-for="Name" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+                        <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Name"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Author"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input type="text" asp-for="Author" class="form-control form-control-lg form-control-solid" />
+                </div>
+            </div>
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 ">@_localizer["Description"]</label>
+                <div class="col-lg-9 fv-row">
+                    <textarea asp-for="Description" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" rows="4"></textarea>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Description"></span>
+                </div>
+            </div>
+
+
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 ">@_localizer["Url"]</label>
+                <div class="col-lg-9 fv-row">
+                    <input asp-for="Slug" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"></input>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Slug"></span>
+                </div>
+            </div>
+
+            <div>
+                <div class="row mb-6 mt-10">
+                    <div class="col-lg-9 fv-row">
+                        <h3 class="fw-bolder m-0">@_localizer["SeoSettings"]</h3>
+                    </div>
+                </div>
+                <div class="row mb-6">
+                    <label class="col-lg-3 col-form-label fw-bold fs-6 ">@_localizer["SeoTitle"]</label>
+                    <div class="col-lg-9 fv-row">
+                        <input type="text" asp-for="SeoTitle" class="form-control form-control-lg form-control-solid" />
+                    </div>
+                </div>
+                <div class="row mb-6">
+                    <label class="col-lg-3 col-form-label fw-bold fs-6 ">@_localizer["SeoDescription"]</label>
+                    <div class="col-lg-9 fv-row">
+                        <input type="text" asp-for="SeoDescription" class="form-control form-control-lg form-control-solid" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Update"]</button>
+            <a href="/Books/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

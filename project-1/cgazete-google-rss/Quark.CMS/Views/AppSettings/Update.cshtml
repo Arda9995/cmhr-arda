@@ -1,0 +1,125 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["Settings"];
+    ViewData[ViewDataNames.AsideMenu] = "Management";
+    ViewData[ViewDataNames.AsideSubMenu] = "AppSettings";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Management"], string.Empty)
+    };
+}
+
+@model List<Quark.Data.Models.AppSettingsGroup>
+
+<ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-7">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        if (i < 10)
+        {
+            var activeClass = i == 0 ? "active" : string.Empty;
+
+            <li class="nav-item">
+                <a class="nav-link text-active-primary pe-1 mb-5 @activeClass" data-bs-toggle="tab" href="#group_@Model[i].ID">@Model[i].Name</a>
+            </li>
+        }
+    }
+
+    @if (Model.Count > 10)
+    {
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">Daha Fazla</a>
+            <ul class="dropdown-menu bg-secondary w-150px">
+                @for (int i = 10; i < Model.Count; i++)
+                {
+                    <li><a class="nav-item dropdown-item fs-4 fw-semibold text-gray-500" data-bs-toggle="tab" href="#group_@Model[i].ID">@Model[i].Name</a></li>
+                }
+            </ul>
+        </li>
+    }
+</ul>
+
+<form method="post">
+    <div class="tab-content mb-10">
+
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var activeClass = i == 0 ? "show active" : string.Empty;
+
+            <input type="hidden" asp-for="@Model[i].ID"/>
+            <div class="tab-pane fade @activeClass" id="group_@Model[i].ID">
+                <div class="card py-4">
+                    <div class="card-header">
+                        <div class="card-title pb-2">
+                            <i class="ki-outline ki-gear fs-2x ps-0 pe-3 mt-n5 text-gray-700"></i>
+                            <div class="flex-column">
+                                <h2 class="">@Model[i].Name</h2>
+                                <span class="form-text fw-semibold fs-7">@Model[i].Description</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body mb-0 pb-0 mt-2">
+                        @for (int j = 0; j < @Model[i].Keys.Count; j++)
+                        {
+                            <div class="row my-10">
+                                <input type="hidden" asp-for="@Model[i].Keys[j].Key"/>
+                                <input type="hidden" asp-for="@Model[i].Keys[j].DataType"/>
+                                <label class="col-3 col-form-label fs-6">@Model[i].Keys[j].Label</label>
+                                <div class="col-9 fv-row">
+
+                                    @if (@Model[i].Keys[j].DataType == "string")
+                                    {
+                                        <input type="text" asp-for="@Model[i].Keys[j].Value" class="form-control form-control-lg form-control-solid" placeholder="@Model[i].Keys[j].Placeholder" value="@Model[i].Keys[j].Value"/>
+                                    }
+                                    else if (@Model[i].Keys[j].DataType == "url")
+                                    {
+                                        <div class="input-group input-group-solid mb-5">
+                                            <input type="text" id="txt_@Model[i].Keys[j].Key" asp-for="@Model[i].Keys[j].Value" class="form-control form-control-lg form-control-solid" placeholder="@Model[i].Keys[j].Placeholder" value="@Model[i].Keys[j].Value"/>
+                                            <span class="input-group-text" id="basic-addon2">
+                                                <a role="button" class="mb-n2" onclick="window.open($('#txt_@Model[i].Keys[j].Key').val())">
+                                                    Test
+                                                </a>
+                                            </span>
+                                        </div>
+                                    }
+                                    else if (@Model[i].Keys[j].DataType == "textarea")
+                                    {
+                                        <textarea asp-for="@Model[i].Keys[j].Value" class="form-control form-control-lg form-control-solid" placeholder="@Model[i].Keys[j].Placeholder" value="@Model[i].Keys[j].Value" rows="10"></textarea>
+                                    }
+                                    else if (@Model[i].Keys[j].DataType == "int")
+                                    {
+                                        <input type="number" asp-for="@Model[i].Keys[j].Value" class="form-control form-control-lg form-control-solid" min="0" max="9999999" placeholder="@Model[i].Keys[j].Placeholder" value="@Model[i].Keys[j].Value"/>
+                                    }
+                                    else if (@Model[i].Keys[j].DataType == "bool")
+                                    {
+                                        <div class="form-check form-switch form-check-custom form-check-solid mt-2">
+                                            <input asp-for="@Model[i].Keys[j].Value" class="form-check-input" type="checkbox"/>
+                                        </div>
+                                    }
+
+                                    <div class="form-text">@Html.Raw(Model[i].Keys[j].Description)</div>
+                                    @if (Model[i].Keys[j].PreviewImage.IsNotNull())
+                                    {
+                                        <div class="w-100px mt-5">
+                                            <a class="overlay" data-fslightbox="lightbox-basic" href="@Model[i].Keys[j].PreviewImage">
+                                                <div class="overlay-wrapper bgi-no-repeat bgi-position-center bgi-size-cover card-rounded h-100px w-100px border border-2" style="background-image:url('@Model[i].Keys[j].PreviewImage')">
+                                                </div>
+                                                <div class="overlay-layer card-rounded bg-dark bg-opacity-25 shadow">
+                                                    <i class="bi bi-eye-fill text-white fs-3x"></i>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="separator separator-dashed mt-10"></div>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer d-flex py-6 px-9 border-0">
+                        <div class="col-3"></div>
+                        <button type="submit" class="btn btn-primary ms-2">@_localizer["Save"]</button>
+                        <button type="reset" class="btn btn-light btn-light ms-6">@_localizer["Cancel"]</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</form>

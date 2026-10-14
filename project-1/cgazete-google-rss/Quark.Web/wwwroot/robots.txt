@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /haber-sayac/*
+Disallow: /okuma-listem
+Disallow: /arama
+Disallow: /uye/*
+Disallow: /uye
+
+Sitemap: https://www.cumhuriyet.com.tr/sitemaps/news.xml
+Sitemap: https://www.cumhuriyet.com.tr/sitemaps/posts.xml
+Sitemap: https://www.cumhuriyet.com.tr/sitemaps/tags.xml

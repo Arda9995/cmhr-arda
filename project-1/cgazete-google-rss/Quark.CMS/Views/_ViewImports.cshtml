@@ -1,0 +1,13 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Localization
+@using Quark.CMS
+@using Quark.Data.Models
+@using AvvaMobile.Core
+@using AvvaMobile.Core.Caching
+@using AvvaMobile.Core.Extensions
+@using AvvaMobile.Core.Business
+@using AvvaMobile.Core.DataTable
+@using Quark.Business.Common.Enums
+@inject IStringLocalizer<Quark.Resources.CommonResource> _localizer
+@inject ICacheManager _cacheManager
+@inject Quark.Business.Common.Caching.AppSettingsKeys _appSettings

@@ -1,0 +1,7 @@
+﻿@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="mb-10 fv-row w-100">
+    <label class="required form-label">@_localizer["BoxCount"]</label>
+    <input asp-for="@Model.BoxCount" type="text" class="form-control" />
+    <span asp-validation-for="@Model.BoxCount" class="fv-plugins-message-container invalid-feedback"></span>
+</div>

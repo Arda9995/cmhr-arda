@@ -1,0 +1,16 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+@{
+    var sourceIdsValue = (Model.SourceIDs != null && Model.SourceIDs.Any())
+        ? string.Join(",", Model.SourceIDs)
+        : "";
+}
+
+<div class="w-100">
+    <label class="required form-label">@_localizer["NewsSource"]</label>
+    <input type="hidden" value="@sourceIdsValue" id="source-id-string" />
+    <div class="input-group mb-2">
+        <select asp-items="@Model.Sources" asp-for="@Model.SourceIDs" class="form-select sources-search-ajax" data-control="select2" multiple id="source-select"></select>
+    </div>
+    <span asp-validation-for="@Model.SourceIDs" class="fv-plugins-message-container invalid-feedback"></span>
+</div>

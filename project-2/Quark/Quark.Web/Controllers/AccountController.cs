@@ -1,0 +1,312 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using Quark.API.Business.Interfaces;
+using Quark.API.Business.Models.Requests.AccountRequests;
+using Quark.API.Business.Models.Responses.AccountResponses;
+using Quark.Business.Common.PaymentServices;
+using Quark.Business.Common.PaymentServices.Models.Requests;
+
+namespace Quark.Web.Controllers;
+
+public class AccountController : CumhuriyetBaseController
+{
+    private readonly IAccountService _accountService;
+    private readonly ISubscriptionService _paymentService;
+    private readonly IMemberService _memberService;
+
+    public AccountController(IAccountService accountService, ISubscriptionService paymentService, IMemberService memberService)
+    {
+        _accountService = accountService;
+        _paymentService = paymentService;
+        _memberService = memberService;
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    [OutputCache(PolicyName = "DynamicTTL")]
+    public IActionResult LogIn()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> LogIn(EmailLoginRequest model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var result = await _accountService.EmailLoginAsync(model);
+
+        if (result == null || !result.IsSuccess)
+        {
+            ModelState.AddModelError("", "Giriş bilgileri hatalı.");
+            return View(model);
+        }
+
+        return RedirectToAction("AccountMainPage");
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    [OutputCache(PolicyName = "DynamicTTL")]
+    public async Task<IActionResult> Register()
+    {
+        var result = await _accountService.RegisterAsync();
+        if (!result.IsSuccess)
+        {
+            return RedirectToAction("AccountMainPage");
+        }
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> Register(RegistrationRequest model)
+    {
+        var result = await _accountService.RegisterAsync(model);
+
+        if (!result.IsSuccess)
+        {
+            return View(model);
+        }
+
+        var loginRequest = new EmailLoginRequest
+        {
+            Email = model.Email,
+            Password = model.Password,
+            RememberMe = true
+        };
+
+        var loginResult = await _accountService.EmailLoginAsync(loginRequest);
+
+        if (!loginResult.IsSuccess)
+        {
+            return RedirectToAction("LogIn");
+        }
+
+        return RedirectToAction("AccountInformations");
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> AccountInformations(RegistrationResponse model)
+    {
+        var result = await _accountService.AccountInformations();
+
+        if (!result.IsSuccess)
+        {
+            return RedirectToAction("Payment");
+        }
+
+        var newModel = new RegistrationRequest
+        {
+            Countries = result.Data.Countries,
+        };
+
+        return View(newModel);
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> AccountInformations(RegistrationRequest model)
+    {
+        var result = await _accountService.AccountInformations(model);
+
+        if (!result.IsSuccess)
+        {
+            return View(model);
+        }
+
+        return RedirectToAction("Payment");
+    }
+
+    [HttpGet]
+    [OutputCache(PolicyName = "DynamicTTL")]
+    public async Task<IActionResult> MembershipIntroduction()
+    {
+        var result = await _accountService.MembershipIntroduction();
+        return View(result.Data);
+    }
+
+    [HttpGet]
+    [OutputCache(PolicyName = "DynamicTTL")]
+    public IActionResult ForgotPassword()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var result = await _accountService.ForgotPasswordAsync(model);
+
+        ViewBag.EmailSent = true;
+        return View();
+    }
+
+    [HttpGet]
+    [Authorize]
+    [OutputCache(PolicyName = "DynamicTTL")]
+    public IActionResult ChangePassword()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var result = await _accountService.ChangePasswordAsync(model);
+
+        if (!result.IsSuccess)
+        {
+            return View(model);
+        }
+
+        ViewBag.Success = true;
+        return View();
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> MembershipInformations()
+    {
+        var accountInfo = await _accountService.GetAccountInformationAsync();
+
+        if (accountInfo == null || !accountInfo.IsSuccess)
+        {
+            return RedirectToAction("LogIn");
+        }
+
+        return View(accountInfo.Data);
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> MembershipInformations(AccountMainPageResponse model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var result = await _accountService.UpdateAccountInformationAsync(model);
+
+        if (!result.IsSuccess)
+        {
+            return View(model);
+        }
+
+        ViewBag.Success = true;
+        return View(model);
+    }
+
+    [HttpGet]
+    [Authorize]
+    [OutputCache(PolicyName = "DynamicTTL")]
+    public async Task<IActionResult> Payment()
+    {
+        var result = await _paymentService.GetSubscriptionInformations();
+
+        if (result.Data.IsEnableForPayment)
+        {
+            return RedirectToAction("AccountInformations");
+        }
+
+        if (!result.IsSuccess)
+        {
+            return RedirectToAction("AccountMainPage");
+        }
+        return View(result.Data);
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> Payment(SubscriptionRequest request)
+    {
+        var subRequest = new CreateCumhuriyetSubscriptionRequest
+        {
+            PaymentCardCVC = request.CardCVV,
+            PaymentCardExpireMonth = request.CardMonth,
+            PaymentCardExpireYear = request.CardYear,
+            PaymentCardHolderName = request.CardOwnerFullName,
+            PlanID = request.SelectedPlanID,
+            PaymentCardNumber = request.CardNumber.Replace(" ", ""),
+        };
+        var result = await _memberService.CreateSubscriptionAsync(subRequest);
+
+        if (result.IsSuccess)
+        {
+            return RedirectToAction("SuccessPayment");
+        }
+
+        return View(request);
+    }
+
+    [HttpGet]
+    [Authorize]
+    [OutputCache(PolicyName = "DynamicTTL")]
+    public IActionResult SuccessPayment()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [Authorize]
+    [OutputCache(PolicyName = "DynamicTTL")]
+    public IActionResult Support()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> AccountMainPage()
+    {
+        var accountInfo = await _accountService.GetAccountInformationAsync();
+
+        if (accountInfo == null || !accountInfo.IsSuccess)
+        {
+            return RedirectToAction("LogIn");
+        }
+
+        return View(accountInfo.Data);
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> CancelMembershipRenewal()
+    {
+        await _accountService.CancelPremiumMembershipRenewalAsync();
+        return RedirectToAction("AccountMainPage");
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Logout()
+    {
+        var result = await _accountService.LogoutAsync();
+
+        if (!result.IsSuccess)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        return Redirect("/");
+    }
+
+}

@@ -1,0 +1,43 @@
+﻿@using Quark.Web.ViewComponents.Models
+
+<!-- MAIN START -->
+@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsListResponse
+@{
+	var hasPremiumMembership = "False";
+
+	var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+	if (id != null)
+	{
+		hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+	}
+}
+@if (hasPremiumMembership == "False")
+{
+
+	@section AdScripts {
+		<!-- Google -->
+		<!-- Start GPT Tag -->
+		<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+		<script data-cfasync="false" async src="https://media.cumhuriyet.com.tr/assets/js/cmhads.js?v=1.01"></script>
+    }
+}
+<partial name="~/Views/Shared/_Header.cshtml" />
+<partial name="~/Views/Shared/AdContainers/_GeneralFloatingAdArea.cshtml" />
+<main id="main" class="my-4 px-5 tablet:px-0">
+	<partial name="~/Views/Shared/AdContainers/_GeneralHeaderAdArea.cshtml" />
+	<div class="max-w-container mx-auto space-y-6 undefined">
+		<!-- Breadcrumb Start -->
+		<nav class="flex items-center gap-2 text-xs undefined">
+			<a href="/" class="text-gray-500 hover:text-gray-600 transition-all font-medium">Haberler</a><span>
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M6 12L10 8L6 4" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+				</svg>
+			</span><a href="@Model.CategorySlug" class="text-[#FF8800] font-semibold">@Model.CategoryBreadcrumb </a>
+		</nav> <!-- Breadcrumb End -->
+		<div class="grid grid-cols-12 gap-x-6 gap-y-8">
+			<partial name="~/Views/Category/SurveyListPartials/_TopAndMidSurveys.cshtml" model="Model" />
+			<partial name="~/Views/Category/SurveyListPartials/_BottomSurveys.cshtml" model="Model" />
+			@await Component.InvokeAsync("News", new NewsViewComponentModel { MethodName = "MostViewedNews", NewsCount = 3 })
+		</div>
+	</div>
+</main>

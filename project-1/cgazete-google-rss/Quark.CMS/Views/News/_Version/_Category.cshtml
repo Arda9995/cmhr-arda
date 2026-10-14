@@ -1,0 +1,21 @@
+@using Microsoft.IdentityModel.Tokens
+@model Quark.CMS.Business.Models.Responses.NewsResponses.NewsVersionResponseComparable
+
+<div class="card card-flush mb-10 shadow">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>@_localizer["Category"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        <div class="badge badge-light-primary rounded-pill badge-lg mb-3">@Model.MainCategory</div>
+
+        @if (Model.SecondaryCategories != null)
+        {
+            @foreach (var category in Model.SecondaryCategories)
+            {
+                <div class="badge badge-light-primary rounded-pill badge-lg mb-3">@category</div>
+            }
+        }
+    </div>
+</div>

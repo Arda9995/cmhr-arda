@@ -1,0 +1,29 @@
+<!-- Sidebar Start -->
+@model List<Quark.API.Business.Models.Responses.NewsResponses.TodaysColumnArticles>
+
+<div class="col-span-12 lg:col-span-4 hidden lg:block">
+    <div class="sticky top-32">
+        <!-- Title Start -->
+        @if (Model.Any())
+        {
+            <div class="flex items-center lg:gap-3 mb-4 mb-0">
+                <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span> <a href="/gunun-kose-yazilari" class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">
+                    <h2>Bugünün Köşe Yazıları</h2>
+                </a> <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+            </div> <!-- Title End -->
+            <div class="divide-y divide-gray-200 *:py-4">
+                @foreach (var article in Model)
+                {
+                    <a href="@article.Slug" class="block">
+                        <div class="font-semibold text-sm">@article.Headline</div>
+                        <p class="text-sm font-medium mt-1 mb-2 line-clamp-2">@article.UpSubtitle</p>
+                        <div class="flex gap-1 items-center text-sm font-helvetica">
+                            <img src="@article.AuthorPhoto" alt="" class="size-8 rounded-full object-cover" loading="lazy">
+                            <span>@article.AuthorFullName</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div> <!-- Sidebar End -->

@@ -1,0 +1,147 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["NewsDetails"];
+    ViewData[ViewDataNames.AsideMenu] = "News";
+    ViewData[ViewDataNames.AsideSubMenu] = "News";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["NewsMultiple"], "/News/List")
+    };
+}
+
+@using Quark.Core.Extentions;
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+@section Styles{
+    <link href="https://metronic.b-cdn.net/8.1.5/assets/plugins/custom/jstree/jstree.bundle.css" rel="stylesheet" type="text/css"/>
+}
+
+@section Scripts
+{
+    <script src="@_appSettings.CDN_AssetsFolderFullUrl/assets/plugins/custom/draggable/draggable.bundle.js"></script>
+    @* <script src="https://metronic.avvamobile.com/lib/swappable/swappable.js"></script> *@
+    <partial name="_CKEditorScripts" />
+    <script>var newsID = @Model.NewsID</script>
+    <script src="/Scripts/News/Details.js" asp-append-version="true"></script>
+    <script src="/Scripts/News/DetailsCharts.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <script src="https://metronic.b-cdn.net/8.1.5/assets/plugins/custom/jstree/jstree.bundle.js" type="text/javascript"></script>
+    <script src="/Scripts/News/ListMediaGallery.js" asp-append-version="true"></script>
+    <script src="/Scripts/Notification/Notification.js" asp-append-version="true"></script>
+}
+
+<input asp-for="@Model.StatusID" id="status-check" type="hidden" value="@Model.StatusID" />
+<input asp-for="@Model.IsLocked" id="lock-check" type="hidden" value="@Model.IsLocked" />
+<input asp-for="@Model.LockedBy" id="locked-by" type="hidden" value="@Model.LockedBy" />
+<input asp-for="@Model.IsLockedByCurrentUser" id="user-check" type="hidden" value="@Model.IsLockedByCurrentUser" />
+<input asp-for="@Model.NewsID" id="newsID" type="hidden" value="@Model.NewsID" />
+@{
+    var coverPhoto = string.Empty;
+    var coverPhotoData = Model.Photos.FirstOrDefault(x => x.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto);
+    if (coverPhotoData != null)
+    {
+        coverPhoto = coverPhotoData.PhotoURL;
+    }
+}
+<input type="hidden" id="cover-photo" name="CoverPhoto" value="@coverPhoto" />
+<input type="hidden" id="news-full-url" value="@Model.Slug.PrepareWebsiteUrl(_appSettings.Common_ClientWebSite)" />
+
+@section ToolBarLeft
+{
+    <partial name="_Details/_ToolBarLeft" />
+}
+
+@section ToolBarRight
+{
+    <partial name="_Details/_ToolBarRight" />
+}
+
+
+@if (Model.IsLocked)
+{
+    <partial name="_Details/_AlertLocked" />
+}
+
+@if (Model.StatusID == (int)NewsStatusEnum.Draft && Model.IsPublished)
+{
+    <partial name="_Details/_AlertDraft" />
+}
+
+<partial name="_Details/_Url" />
+
+<form method="post" class="form row g-10">
+    <!--begin::Content-->
+    <div class="col-xxl-12">
+   
+
+        <partial name="_Details/_Content" />
+        @if (Model.NewsTypeID == (int)NewsTypesEnum.Survey)
+        {
+            <script src="//www.google.com/jsapi"></script>
+            <script src="/Scripts/Surveys/Details.js" asp-append-version="true"></script>
+
+
+            <partial name="_Details/_SurveyComponents" />
+        }
+        <partial name="_Details/_Photos" />
+        @if (!Model.Video.IsNullOrEmtpy())
+        {
+            <partial name="_Details/_Video" />
+        }
+    </div>
+    <!--end::Content-->
+    <!--begin::Aside-->
+    @* <div class="col-xxl-3">
+
+    <partial name="_Details/_Status"/>
+    <partial name="_Details/_History"/>
+    <partial name="_Details/_Ads"/>
+    </div>*@
+    <!--end::Aside-->
+</form>
+
+@if (Model.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+{
+    <div class="row">
+        <partial name="_Details/_PhotoGalleryItems" />
+    </div>
+}
+
+<div class="row">
+    @if (Model.NewsTypeID != (int)NewsTypesEnum.GovernmentAnnouncement)
+    {
+        <partial name="_Details/_NewsRelations" model="Model" />
+    }
+    <partial name="_Details/_SocialMedias" />
+    <partial name="_Details/_Analytics" />
+</div>
+
+<partial name="_Details/_HistoryDrawer" />
+@if (Model.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+{
+    <partial name="_Details/_PhotoGalleryItemsOrders" />
+}
+<partial name="_Edit/_MediaGallery" />
+
+<div class="modal fade" tabindex="-1" id="unpublishModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">@_localizer["UnPublish"]</h3>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross-circle-circle fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <label class="required form-label">@_localizer["UnPublishDescription"]</label>
+                <textarea id="description" type="text" class="form-control maxlength" maxlength="2000" rows="4"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">@_localizer["Cancel"]</button>
+                <button type="button" class="btn btn-primary" onclick="unPublish(@Model.NewsID)">@_localizer["Save"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_Details/_SendNotification" model="Model"/>

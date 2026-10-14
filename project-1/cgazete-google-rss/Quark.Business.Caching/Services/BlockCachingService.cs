@@ -1,0 +1,275 @@
+using AvvaMobile.Core.Business;
+using AvvaMobile.Core.Caching;
+using AvvaMobile.Core.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Caching.Models.Responses.PageCachingResponses;
+using Quark.Business.Common.BaseServices;
+using Quark.Business.Common.Caching;
+using Quark.Core.Extentions;
+using Quark.Data;
+using Quark.Data.Models;
+using Quark.Data.Models.News;
+using Quark.Resources;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+
+namespace Quark.Business.Caching.Services;
+
+public class BlockCachingService : BaseService, IBlockCachingService
+{
+    private readonly INewsCachingService _newsCachingService;
+
+    public BlockCachingService(IHttpContextAccessor httpContext, QuarkDataContext context, IStringLocalizer<CommonResource> localizer, AppSettingsKeys appSettingsKeys, ICacheManager cache, INewsCachingService newsCachingService) : base(httpContext, context, localizer, appSettingsKeys, cache)
+    {
+        _newsCachingService = newsCachingService;
+    }
+
+    public async Task<ServiceResult> RefreshAll()
+    {
+        var result = new ServiceResult();
+
+        var blockTypes = await (from bt in _context.BlockTypes
+                                select new SelectListItem
+                                {
+                                    Value = bt.ID.ToString(),
+                                    Text = bt.Name
+                                }).ToListAsync();
+        await _cache.Set_SelectListItems(RedisKeys.BlockTypes, blockTypes);
+
+        var blocks = await _context.Blocks.Select(x => x.Key).ToListAsync();
+
+        foreach (var block in blocks)
+        {
+            await RefreshBlockNewsWithKey(block);
+        }
+
+
+        await _newsCachingService.RefreshMainPageZodiacSignBlock();
+        return result;
+    }
+
+    public async Task<ServiceResult<List<SelectListItem>>> BlockTypes()
+    {
+        var result = new ServiceResult<List<SelectListItem>>();
+
+        result.Data = await _cache.Get<List<SelectListItem>>(RedisKeys.BlockTypes);
+        if (result.Data == null)
+        {
+            await RefreshAll();
+            result.Data = await _cache.Get<List<SelectListItem>>(RedisKeys.BlockTypes);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshBlockNews()
+    {
+        var result = new ServiceResult();
+
+        var news = await (from blck in _context.Blocks
+                          join blcks in _context.BlockItems on blck.ID equals blcks.BlockID
+                          join np in _context.NewsPublished on blcks.NewsID equals np.NewsID
+                          let photo = (from ph in _context.NewsPublishedPhotos
+                                       where ph.NewsID == np.NewsID &&
+                                             (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                                              ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                                       orderby
+                                           ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                               ? 0
+                                               : ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                   ? 1
+                                                   : 2
+                                       select ph).FirstOrDefault()
+                          select new PageNewsCachingResponse
+                          {
+                              BlockName = blck.Name,
+                              BlockTitle = blck.Title,
+                              NewsPhoto = photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                  _appSettingsKeys.CDN_MediaGalleryFolder),
+                              NewsHeadline = !string.IsNullOrEmpty(np.Headline) ? np.Headline
+                                  : !string.IsNullOrEmpty(np.Title) ? np.Title
+                                  : null,
+                              BlockKey = blck.Key,
+                              NewsSlug = np.Slug.PrepareWebsiteUrl(_appSettingsKeys.Common_ClientWebSite),
+                          }).ToListAsync();
+
+        foreach (var block in news.Select(x => x.BlockKey).Distinct())
+        {
+            var blockNews = news.Where(x => x.BlockKey == block).ToList();
+            var jsonData = JsonConvert.SerializeObject(blockNews);
+            await _cache.Set(string.Format(RedisKeys.BlockNewsItem, block), jsonData, RedisTTLSeconds.Block_TTL);
+        }
+
+        return result;
+    }
+
+    public async Task<ServiceResult> RefreshBlockNewsWithKey(string key)
+    {
+        var result = new ServiceResult();
+
+        var blockNews = await (from blck in _context.Blocks
+                               join blcks in _context.BlockItems on blck.ID equals blcks.BlockID
+                               join news in _context.NewsPublished on blcks.NewsID equals news.NewsID
+                               join cat in _context.Categories on news.CategoryID equals cat.ID
+                               join blockCat in _context.Categories on blck.CategoryID equals blockCat.ID into blockCatJoin
+                               from blockCat in blockCatJoin.DefaultIfEmpty()
+                               let photo = (from ph in _context.NewsPublishedPhotos
+                                            where ph.NewsID == news.NewsID &&
+                                                  (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                                                   ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                                            orderby
+                                                ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl) ? 0 :
+                                                    ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl) ? 1 :
+                                                    2
+                                            select ph).FirstOrDefault()
+                               
+                               where blck.Key == key
+                               orderby blcks.Order
+                               select new PageNewsCachingResponse
+							   {
+                                   BlockID = blcks.ID,
+                                   BlockTitle = blck.Title ?? string.Empty,
+                                   BlockKey = blck.Key,
+                                   BlockName = blck.Name ?? string.Empty,
+                                   NewsContent = news.Content ?? string.Empty,
+                                   CategoryPhotoUrl =
+                                   cat.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_CategoryPhotos),
+                                   ShowUpHeadline = news.ShowUpHeadline,
+                                   ShowUpSubHeading = news.ShowUpSubHeading,
+                                   NewsID = (int)news.NewsID,
+                                   NewsTitle = !string.IsNullOrWhiteSpace(news.Title)
+                                   ? news.Title
+                                   : !string.IsNullOrWhiteSpace(news.Headline)
+                                       ? news.Headline
+                                   : string.Empty,
+
+                                   NewsUpSubtitle = !string.IsNullOrWhiteSpace(news.UpSubtitle)
+                                   ? news.UpSubtitle
+                                   : !string.IsNullOrWhiteSpace(news.Subtitle)
+                                       ? news.Subtitle
+                                   : string.Empty,
+
+                                   NewsSubtitle = !string.IsNullOrWhiteSpace(news.Subtitle)
+                                   ? news.Subtitle
+                                   : !string.IsNullOrWhiteSpace(news.UpSubtitle)
+                                       ? news.UpSubtitle
+                                       : string.Empty,
+                                   NewsTypeID = news.NewsTypeID,
+                                   NewsHeadline = news.Headline ?? news.Title,
+                                   NewsUpHeadline = news.ShowUpHeadline ? news.UpHeadline : string.Empty,
+                                   NewsUpSubHeading = news.ShowUpSubHeading ? news.UpSubHeading : string.Empty,
+                                   NewsSubHeading = news.ShowSubHeading ? news.SubHeading : string.Empty,
+                                   NewsSlug = _appSettingsKeys.Common_ClientWebSite + (news.Slug ?? string.Empty).TrimStart('/'),
+                                   ShowHeadline = news.ShowHeadline,
+                                   CategoryName = cat.Name,
+                                   BlockCategoryName = blockCat != null ? blockCat.Name ?? string.Empty : string.Empty,
+                                   BlockCategoryID = blockCat != null ? blockCat.ID : (int?)null,
+                                   BlockCategorySlug = blockCat != null && !string.IsNullOrWhiteSpace(blockCat.Url)
+                                   ? _appSettingsKeys.Common_ClientWebSite + blockCat.Url.TrimStart('/')
+                                   : string.Empty,
+                                   BlockCategoryBackgroundPhotoUrl =
+                                   blockCat != null && !string.IsNullOrWhiteSpace(blockCat.BackgroundPhotoUrl)
+                                       ? blockCat.BackgroundPhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                           _appSettingsKeys.CDN_CategoryPhotos)
+                                       : string.Empty,
+                                   NewsPhoto = photo != null && !string.IsNullOrWhiteSpace(photo.PhotoUrl)
+                                   ? photo.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                       _appSettingsKeys.CDN_MediaGalleryFolder)
+                                   : string.Empty
+                               }).ToListAsync();
+
+        blockNews = blockNews.GroupBy(n => n.NewsID).Select(blockNews => blockNews.FirstOrDefault()).ToList();
+
+        var surveyBlock = blockNews.FirstOrDefault(x => x.NewsTypeID == (int)NewsTypesEnum.Survey);
+
+        if (surveyBlock != null)
+        {
+            var newsVersions = await _context.NewsVersions.Where(x => x.NewsID == surveyBlock.NewsID)
+                .OrderByDescending(x => x.ID).Select(x => x.ID).ToListAsync();
+
+            for (int i = 0; i < newsVersions.Count; i++)
+            {
+                var newsVersionID = newsVersions[i];
+
+                var survey = await _context.Surveys.Where(x => x.NewsVersionID == newsVersionID).FirstOrDefaultAsync();
+
+                if (survey != null)
+                {
+                    var joinedUserCount = await _context.SurveyOptions
+                        .Where(x => x.NewsVersionID == newsVersionID && x.SurveyID == survey.ID)
+                        .Select(x => x.AnswerCount).SumAsync();
+
+                    var surveyItem = new SurveyItem
+                    {
+                        JoinedUserCount = (int?)joinedUserCount ?? 0,
+                        Question = survey.Question,
+                    };
+
+                    surveyBlock.SurveyItem = surveyItem;
+
+                    break;
+                }
+            }
+        }
+
+        foreach (var item in blockNews)
+        {
+            var extractedContent = item.NewsContent.ExtractTextFromHtml();
+
+            if (string.IsNullOrWhiteSpace(item.NewsUpSubtitle))
+            {
+                item.NewsUpSubtitle = !string.IsNullOrWhiteSpace(item.NewsSubtitle)
+                    ? item.NewsSubtitle
+                    : extractedContent ?? string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(item.NewsSubtitle))
+            {
+                item.NewsSubtitle = !string.IsNullOrWhiteSpace(item.NewsUpSubtitle)
+                    ? item.NewsUpSubtitle
+                    : extractedContent ?? string.Empty;
+            }
+        }
+        var jsonData = JsonConvert.SerializeObject(blockNews);
+        await _cache.Set(string.Format(RedisKeys.BlockNewsItem, key), jsonData, RedisTTLSeconds.Block_TTL);
+        return result;
+    }
+
+    public async Task<ServiceResult<List<PageNewsCachingResponse>>> GetBlockNews(List<string> blockKeys)
+    {
+        var result = new ServiceResult<List<PageNewsCachingResponse>>();
+
+        var searchResult = new List<PageNewsCachingResponse>();
+        foreach (var blockKey in blockKeys)
+        {
+            var blockNews = await _cache.Get<List<PageNewsCachingResponse>>(string.Format(RedisKeys.BlockNewsItem, blockKey));
+            if (blockNews == null)
+            {
+                await RefreshBlockNewsWithKey(blockKey);
+                blockNews = await _cache.Get<List<PageNewsCachingResponse>>(string.Format(RedisKeys.BlockNewsItem, blockKey));
+            }
+
+            if (blockNews != null)
+            {
+                foreach (var news in blockNews)
+                {
+                    news.NewsSlug = news.NewsSlug.ReplaceWebsiteUrl(_appSettingsKeys.Common_ClientWebSite);
+
+                    if (!string.IsNullOrWhiteSpace(news.BlockCategorySlug))
+                    {
+                        news.BlockCategorySlug = news.BlockCategorySlug.ReplaceWebsiteUrl(_appSettingsKeys.Common_ClientWebSite);
+                    }
+                }
+
+                searchResult.AddRange(blockNews);
+            }
+        }
+
+        result.Data = searchResult;
+        return result;
+    }
+}

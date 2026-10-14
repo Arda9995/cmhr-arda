@@ -1,0 +1,46 @@
+﻿@{
+	Layout = "_LayoutMobile";
+}
+
+@model Quark.API.Business.Models.Responses.PageResponses.MainPageResponse
+@section MetaTags {
+    <title>Cumhuriyet - Haberler, Spor, Ekonomi, Gündem Haberleri, Güncel Son Dakika Haberleri, </title>
+    <meta name="description" content="Cumhuriyet, en güncel haberler, 100 yıllık tarihiyle güvenilir ve gündeme dair haberler, son dakika haberleri Cumhuriyet'de!">
+    <meta name="keywords" content="cumhuriyet, gazete, haber, haberler, son dakika, güncel, yazar, yazarlar, köşeyazısı, siyaset, türkiye, dünya, ekonomi, kültür sanat, çizerler, spor, yaşam, teknoloji">
+    <meta http-equiv="refresh" content="180">
+    <link rel="canonical" href="https://www.cumhuriyet.com.tr" />
+
+    <meta property="og:title" content="Cumhuriyet Haber Verir - Güncel Son Dakika Haberleri" />
+    <meta property="og:description" content="Cumhuriyet haber, 90 yılı aşkın birikimiyle Türkiye'deki doğru haberin tek adresidir. Son dakika haberlerinden, güncel haberlerin tümü Cumhuriyet'te!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.cumhuriyet.com.tr" />
+    <meta property="og:image:url" content="https://media.cumhuriyet.com.tr/assets/images/main/cumhuriyet.jpg" />
+    <meta property="og:image" content="https://media.cumhuriyet.com.tr/assets/images/main/cumhuriyet.jpg" />
+}
+@section AdScripts {
+    <!-- Google -->
+    <!-- Start GPT Tag -->
+    <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+    <script data-cfasync="false" async src="https://media.cumhuriyet.com.tr/assets/js/cmhads.js?v=1.01"></script>
+    <script>
+        PageCategories.push("Anasayfa");
+    </script>
+}
+<main id="main" class="my-4">
+	<div class="mx-auto">
+        <partial name="~/Views/Shared/AdContainers/_HomePageHeaderAdArea.cshtml" />
+		<partial name="~/Views/Shared/MobileBlockContainers/_MainSlider.cshtml" model="Model"/>
+        <partial name="~/Views/Shared/CommonContainers/_MobileCrypto.cshtml" />
+
+        <partial name="~/Views/Shared/AdContainers/_HomePageUnderSliderMobileAdArea.cshtml" />
+		<partial name="~/Views/Shared/MobileBlockContainers/_SubHeadingBox.cshtml" model="Model" />
+		<partial name="~/Views/Shared/MobileBlockContainers/_SubHeadingSlider.cshtml" model="Model" />
+		<partial name="~/Views/Shared/MobileBlockContainers/_SurveyAuthorsWith12News.cshtml" model="Model"/>
+		<partial name="~/Views/Shared/MobileBlockContainers/_MiniSlider.cshtml" model="Model" />
+        <partial name="~/Views/Shared/AdContainers/_HomePage320x480_1_AdArea.cshtml" />
+		<partial name="~/Views/Shared/MobileBlockContainers/_UnderMainSliderBox.cshtml" model="Model" />
+        <partial name="~/Views/Shared/AdContainers/_HomePage320x480_2_AdArea.cshtml" />
+		<partial name="~/Views/Shared/MobileBlockContainers/_SocialMediaAndOtherBlocks.cshtml" model="Model" />
+        <partial name="~/Views/Shared/AdContainers/_HomePage320x480_2_AdArea.cshtml" />
+	</div>
+</main> 

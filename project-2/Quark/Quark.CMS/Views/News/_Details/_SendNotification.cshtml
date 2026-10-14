@@ -1,0 +1,57 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+@using AvvaMobile.Core.Extensions;
+
+<div class="modal fade" tabindex="-1" id="notification_modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Bildirim Gönderme</h3>
+
+                <!--begin::Close-->
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+                <!--end::Close-->
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="notification-title" class="form-label">Başlık</label>
+                    @{
+                        var title = Model.Headline ?? Model.Title;
+                    }
+                    <input asp-for="@title" type="text" class="form-control" id="notification-title" placeholder="Enter first value" />
+                </div>
+                <div class="mb-3">
+                    <label for="notification-description" class="form-label">Açıklama</label>
+                    @{
+                        var description = Model.SubHeading ?? Model.Headline;
+                        var coverPhoto = Model.Photos.Where(x => x.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto).FirstOrDefault();
+                        var mainPhoto = Model.Photos.Where(x => x.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto).FirstOrDefault();
+
+                        var photo = string.Empty;
+
+                        if (coverPhoto != null)
+                        {
+                            photo = !string.IsNullOrEmpty(coverPhoto.PhotoURL) ? coverPhoto.PhotoURL : mainPhoto != null && !string.IsNullOrEmpty(mainPhoto.PhotoURL) ? mainPhoto.PhotoURL : string.Empty;
+                        }
+
+                        var photoUrl = photo.PrepareCDNUrl(_appSettings.CDN_BaseUrl, _appSettings.CDN_MediaGalleryFolder);
+                    }
+                    <input asp-for="@description" type="text" class="form-control" id="notification-description" placeholder="Enter second value" />
+                    <input asp-for="@Model.Type" type="hidden" id="notification-type" />
+                    <input asp-for="@Model.NewsID" type="hidden" id="notification-newsid" />
+                    <input asp-for="@photoUrl" type="hidden" id="cover-photo" />
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kapat</button>
+                <button onclick="SendWebNotification()" type="button" class="btn btn-primary">Web Bildirim Gönder</button>
+                <button onclick="SendMobileNotification()" type="button" class="btn btn-primary">Mobil Bildirim Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+

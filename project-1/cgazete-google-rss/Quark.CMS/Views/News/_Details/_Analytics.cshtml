@@ -1,0 +1,36 @@
+<div class="card h-xl-100">
+    <div class="card-header collapsible cursor-pointer rotate collapsed" data-bs-toggle="collapse" data-bs-target="#analytics_card">
+        <div class="card-title">
+            <h2>@_localizer["NewsPerformance"]</h2>
+        </div>
+        <div class="card-toolbar rotate-180">
+            <i class="ki-duotone ki-down fs-1"></i>
+        </div>
+    </div>
+    <div id="analytics_card" class="collapse">
+        <div class="card-body pb-0">
+            <ul class="nav justify-content-end mx-0" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link btn btn-sm btn-color-muted btn-active-primary fw-bold px-4 me-1 active" data-bs-toggle="tab" href="#tab_minute">@_localizer["Minutely"]</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-sm btn-color-muted btn-active-primary fw-bold px-4 me-1" data-bs-toggle="tab" href="#tab_hour">@_localizer["Hourly"]</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-sm btn-color-muted btn-active-primary fw-bold px-4 me-1" data-bs-toggle="tab" href="#tab_day">@_localizer["Daily"]</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_minute">
+                    <div id="kt_apexcharts_1" style="height: 350px;"></div>
+                </div>
+                <div class="tab-pane" id="tab_hour">
+                    <div id="kt_apexcharts_2" style="height: 350px;"></div>
+                </div>
+                <div class="tab-pane" id="tab_day">
+                    <div id="kt_apexcharts_3" style="height: 350px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

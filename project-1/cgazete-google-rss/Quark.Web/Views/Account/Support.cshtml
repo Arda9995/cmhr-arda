@@ -1,0 +1,184 @@
+@{
+	Layout = "_LayoutNoAds";
+}
+
+<head>
+	<meta name="description" content="Reklamsız Cumhuriyet destek sayfası ve sık sorulan sorular.">
+	<title>Destek - Reklamsız Cumhuriyet</title><!-- Plugins -->
+</head>
+
+<partial name="_Header"/>
+
+<main id="main" class="my-4 px-5 tablet:px-0">
+	<div class="max-w-container mx-auto space-y-6 max-w-none">
+		<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full font-helvetica">
+			<div class="flex flex-col lg:flex-row gap-8"> <!-- Sidebar Navigation -->
+				<partial name="~/Views/Account/_AccountSideBar.cshtml" />
+				<div class="flex-1">
+					<div class="bg-white shadow rounded-lg overflow-hidden">
+						<div class="p-6 sm:p-8">
+							<h2 class="text-2xl font-bold text-gray-900 mb-8">Destek</h2>
+							<div class="space-y-2">
+								<h3 class="text-lg font-medium text-gray-900 mb-4">Yaşadığınız sorun aşağıdakilerden
+									birisi mi?</h3> <!-- Accordion Items -->
+								<div class="space-y-4">
+									<div class="border border-gray-200 rounded-lg">
+										<button
+											class="w-full px-4 py-4 text-left flex items-center justify-between hover:bg-gray-50"
+											data-accordion-target="item1"><span
+												class="text-sm font-medium text-gray-900">Reklamsız Cumhuriyet abonesi olduğum halde reklamları göremiyorum. Ne yapmalıyım?</span>
+											<svg class="w-5 h-5 text-gray-500 transition-transform" fill="none"
+											     viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												      d="M19 9l-7 7-7-7"></path>
+											</svg>
+										</button>
+										<div class="hidden px-4 pb-4" id="item1">
+											<p class="text-sm text-gray-600 font-helvetica">Tarayıcınızın önbelleğini
+												temizlemeyi deneyin. Eğer sorun devam ederse, çıkış yapıp tekrar giriş
+												yapmayı deneyebilirsiniz. Hala çözülmediyse, lütfen bizimle iletişime
+												geçin.</p>
+										</div>
+									</div>
+									<div class="border border-gray-200 rounded-lg">
+										<button
+											class="w-full px-4 py-4 text-left flex items-center justify-between hover:bg-gray-50"
+											data-accordion-target="item2"><span
+												class="text-sm font-medium text-gray-900">Mobil uygulamada giriş yapamıyorum. Ne yapabilirim?</span>
+											<svg class="w-5 h-5 text-gray-500 transition-transform" fill="none"
+											     viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												      d="M19 9l-7 7-7-7"></path>
+											</svg>
+										</button>
+										<div class="hidden px-4 pb-4" id="item2">
+											<p class="text-sm text-gray-600 font-helvetica">Uygulamanın son sürümünü
+												kullandığınızdan emin olun. Uygulamayı silip yeniden yüklemeyi
+												deneyebilirsiniz. Sorun devam ederse, e-posta ve şifrenizi kontrol
+												edin.</p>
+										</div>
+									</div>
+									<div class="border border-gray-200 rounded-lg">
+										<button
+											class="w-full px-4 py-4 text-left flex items-center justify-between hover:bg-gray-50"
+											data-accordion-target="item3"><span
+												class="text-sm font-medium text-gray-900">Aboneliğimi nasıl iptal edebilirim?</span>
+											<svg class="w-5 h-5 text-gray-500 transition-transform" fill="none"
+											     viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												      d="M19 9l-7 7-7-7"></path>
+											</svg>
+										</button>
+										<div class="hidden px-4 pb-4" id="item3">
+											<p class="text-sm text-gray-600 font-helvetica">Üyelik sayfanızdan
+												aboneliğinizi kolayca iptal edebilirsiniz. App Store veya Google Play
+												üzerinden aldıysanız, ilgili mağazanın abonelik yönetimi bölümünden
+												iptal işlemini gerçekleştirebilirsiniz.</p>
+										</div>
+									</div>
+									<div class="border border-gray-200 rounded-lg">
+										<button
+											class="w-full px-4 py-4 text-left flex items-center justify-between hover:bg-gray-50"
+											data-accordion-target="item4"><span
+												class="text-sm font-medium text-gray-900">Ödeme yöntemimi nasıl güncelleyebilirim?</span>
+											<svg class="w-5 h-5 text-gray-500 transition-transform" fill="none"
+											     viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												      d="M19 9l-7 7-7-7"></path>
+											</svg>
+										</button>
+										<div class="hidden px-4 pb-4" id="item4">
+											<p class="text-sm text-gray-600 font-helvetica">Hesap ayarlarınızdan ödeme
+												bilgilerinizi güncelleyebilirsiniz. Farklı bir kart eklemek veya mevcut
+												kartınızı değiştirmek için üyelik bilgileri sayfasını ziyaret edin.</p>
+										</div>
+									</div>
+									<div class="border border-gray-200 rounded-lg">
+										<button
+											class="w-full px-4 py-4 text-left flex items-center justify-between hover:bg-gray-50"
+											data-accordion-target="item5"><span
+												class="text-sm font-medium text-gray-900">Fatura bilgilerimi nasıl güncelleyebilirim?</span>
+											<svg class="w-5 h-5 text-gray-500 transition-transform" fill="none"
+											     viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												      d="M19 9l-7 7-7-7"></path>
+											</svg>
+										</button>
+										<div class="hidden px-4 pb-4" id="item5">
+											<p class="text-sm text-gray-600 font-helvetica">Üyelik bilgileri sayfasından
+												fatura bilgilerinizi güncelleyebilirsiniz. Bireysel veya kurumsal fatura
+												tercihlerinizi buradan değiştirebilirsiniz.</p>
+										</div>
+									</div>
+								</div> <!-- Farklı Sorun Butonu -->
+								<div class="mt-8">
+									<button type="button" id="supportButton"
+									        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+										Farklı bir sorun yaşıyorum
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<div id="supportModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+			<div class="flex items-center justify-center min-h-screen p-4 text-center sm:p-0">
+				<div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+				<div
+					class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+					<div class="absolute top-0 right-0 pt-4 pr-4">
+						<button type="button" id="closeModal" class="text-gray-400 hover:text-gray-500"><span
+								class="sr-only">Kapat</span>
+							<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+								      d="M6 18L18 6M6 6l12 12"></path>
+							</svg>
+						</button>
+					</div>
+					<div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+						<h3 class="text-lg font-medium text-gray-900 mb-4">Bize Ulaşın</h3>
+						<p class="text-sm text-gray-600 mb-6">Lütfen bilgilerinizi girip, sorununuzu bize iletin. En
+							kısa sürede size dönüş yapılacaktır.</p>
+						<form class="space-y-4">
+							<div><label for="name" class="block text-sm font-medium text-gray-700">Ad Soyad</label>
+								<input type="text" name="name" id="name"
+								       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+							</div>
+							<div><label for="email" class="block text-sm font-medium text-gray-700">E-Posta</label>
+								<input type="email" name="email" id="email"
+								       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+							</div>
+							<div><label for="phone" class="block text-sm font-medium text-gray-700">Cep Telefonu</label>
+								<input type="tel" name="phone" id="phone"
+								       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+							</div>
+							<div><label for="subject" class="block text-sm font-medium text-gray-700">Konu</label>
+								<input type="text" name="subject" id="subject"
+								       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm">
+							</div>
+							<div><label for="message" class="block text-sm font-medium text-gray-700">Mesaj</label>
+								<textarea name="message" id="message" rows="4"
+								          placeholder="Yaşadığınız problemi lütfen detaylı bir şekilde açıklayın ..."
+								          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 sm:text-sm"></textarea>
+							</div>
+						</form>
+					</div>
+					<div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+						<button type="button"
+						        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+							Mesajı gönder
+						</button>
+						<button type="button"
+						        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:w-auto sm:text-sm">
+							Kapat
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+
+

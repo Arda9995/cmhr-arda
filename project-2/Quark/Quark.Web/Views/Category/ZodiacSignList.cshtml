@@ -1,0 +1,36 @@
+﻿@using Quark.Web.ViewComponents.Models
+@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsListResponse
+@{
+    var hasPremiumMembership = "False";
+
+    var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    if (id != null)
+    {
+        hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+    }
+}
+@if (hasPremiumMembership == "False")
+{
+
+    @section AdScripts {
+        <!-- Google -->
+        <!-- Start GPT Tag -->
+        <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+        <script data-cfasync="false" async src="https://media.cumhuriyet.com.tr/assets/js/cmhads.js?v=1.01"></script>
+    }
+}
+@section Scripts {
+    <script src="~/js/Scripts/Category/newsList.js"></script>
+}
+
+<partial name="~/Views/Shared/_Header.cshtml" />
+<partial name="~/Views/Shared/AdContainers/_GeneralFloatingAdArea.cshtml" />
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <partial name="~/Views/Shared/AdContainers/_GeneralHeaderAdArea.cshtml" />
+	<div class="max-w-container mx-auto space-y-6 undefined">
+		<div class="grid grid-cols-12 gap-6">
+			<partial name="~/Views/Category/ZodiacSignListPartials/_SliderAndBottomNews.cshtml" model="Model" />
+            @await Component.InvokeAsync("News", new NewsViewComponentModel { MethodName = "ZodiacSignListMostViewedNews", NewsCount = 8 })
+		</div>
+	</div>
+</main>

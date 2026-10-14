@@ -1,0 +1,74 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["Subscriptions"];
+    ViewData[ViewDataNames.AsideMenu] = "PaymentManagements";
+    ViewData[ViewDataNames.AsideSubMenu] = "Subscriptions";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["PaymentManagements"], string.Empty),
+        new BreadcrumbItem(_localizer["Subscriptions"], "/PaymentManagement/Subscriptions"),
+    };
+}
+
+
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <partial name="Icons/Search" />
+                <input type="text" data-kt-filter="datatable-search" id="search-value" class="form-control form-control-solid w-250px ps-14" placeholder="@_localizer["Search"]">
+            </div>
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <table id="subscriptionsDatatable">
+            <thead>
+            <tr>
+                <th>@_localizer["Customer"]</th>
+                <th>@_localizer["SubscriptionReferenceCode"]</th>
+                <th>@_localizer["Price"]</th>
+                <th>@_localizer["SubscriptionStartDate"]</th>
+                <th>@_localizer["SubscriptionEndDate"]</th>
+                <th>@_localizer["SubscriptionPlanReferenceCode"]</th>
+                <th>@_localizer["Status"]</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <div style="display:none">
+                <div id="Col1">
+                    <a href="/PaymentManagement/SubscriptionDetail/{2}">{1}</a>
+                </div>
+                <div id="Col2">
+                    {1}
+                </div>
+                <div id="Col3">
+                    {1}
+                </div>
+                <div id="Col4">
+                    {1}
+                </div>
+                <div id="Col5">
+                    {1}
+                </div>
+                <div id="Col6">
+                    {1}
+                </div>
+                <div id="Col7">
+                    <span class="badge fw-bolder badge-{0}">
+                        {1}
+                    </span>
+                </div>
+                <div id="Col8">
+                    <a href="/PaymentManagement/SubscriptionDetail/{0}">
+                        <partial name="Icons/Details" />  
+                    </a>
+                </div>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/Scripts/PaymentManagement/Subscriptions.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,12 @@
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\bin\Quark.Data\debug\Quark.Data.deps.json
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\bin\Quark.Data\debug\Quark.Data.dll
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\bin\Quark.Data\debug\Quark.Data.pdb
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\Quark.Data.csproj.AssemblyReference.cache
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\Quark.Data.GeneratedMSBuildEditorConfig.editorconfig
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\Quark.Data.AssemblyInfoInputs.cache
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\Quark.Data.AssemblyInfo.cs
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\Quark.Data.csproj.CoreCompileInputs.cache
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\Quark.Data.dll
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\refint\Quark.Data.dll
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\Quark.Data.pdb
+E:\GitHub\cgazete-google-rss\tools\GoogleAiArchiveCheck\bin\creator-validation\obj\Quark.Data\debug\ref\Quark.Data.dll

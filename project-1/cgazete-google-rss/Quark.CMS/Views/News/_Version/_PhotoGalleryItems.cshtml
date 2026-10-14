@@ -1,0 +1,13 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.NewsVersionResponseComparable
+
+@foreach (var item in Model.PhotoGalleryItems)
+{
+    <div class="card card-flush mb-10 shadow">
+        <div class="card-body m-5">
+            <div class="d-flex justify-content-center mb-5">
+                <img src="@item.PhotoURL" alt="@item.Order"/>
+            </div>
+            <p>@Html.Raw(item.Content)</p>
+        </div>
+    </div>
+}

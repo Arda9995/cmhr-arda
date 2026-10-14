@@ -1,0 +1,53 @@
+﻿@if (TempData["SucessMessage"] != null)
+{
+    <div class="alert alert-dismissible bg-primary d-flex flex-column flex-sm-row p-5 mb-10">
+        <i class="ki-duotone ki-shield-tick fs-2hx text-white me-4">
+            <span class="path1"></span><span class="path2"></span>
+        </i>
+        <div class="d-flex flex-column text-light pe-0 pe-sm-10 fs-5">
+            <h4 class="mb-2 text-light">@_localizer["Success"]</h4>
+            <span>@TempData["SucessMessage"]</span>
+        </div>
+        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+            <i class="ki-duotone ki-cross-circle fs-1 text-light">
+                <span class="path1"></span><span class="path2"></span>
+            </i>
+        </button>
+    </div>
+}
+
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-dismissible bg-warning d-flex flex-column flex-sm-row p-5 mb-10">
+        <i class="ki-duotone ki-shield fs-2hx text-white me-4">
+            <span class="path1"></span><span class="path2"></span>
+        </i>
+        <div class="d-flex flex-column text-light pe-0 pe-sm-10 fs-5">
+            <h4 class="mb-2 text-light">@_localizer["Warning"]</h4>
+            <span>@TempData["WarningMessage"]</span>
+        </div>
+        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+            <i class="ki-duotone ki-cross-circle fs-1 text-light">
+                <span class="path1"></span><span class="path2"></span>
+            </i>
+        </button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-dismissible bg-danger d-flex flex-column flex-sm-row p-5 mb-10">
+        <i class="ki-duotone ki-shield-cross fs-2hx text-white me-4">
+            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+        </i>
+        <div class="d-flex flex-column text-light pe-0 pe-sm-10 fs-5">
+            <h4 class="mb-2 text-light">@_localizer["Error"]</h4>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+            <i class="ki-duotone ki-cross-circle fs-1 text-light">
+                <span class="path1"></span><span class="path2"></span>
+            </i>
+        </button>
+    </div>
+}

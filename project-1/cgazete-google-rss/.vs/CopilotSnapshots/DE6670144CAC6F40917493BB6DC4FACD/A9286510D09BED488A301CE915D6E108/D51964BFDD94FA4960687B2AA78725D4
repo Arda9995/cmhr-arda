@@ -1,0 +1,401 @@
+﻿//keycloak var.
+using AvvaMobile.Core.Redis;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using Quark.API.Business;
+using Quark.API.Business.Services;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Common.Caching;
+using Quark.Business.ElasticSearch.DependencyInjection;
+using Quark.Data;
+using Quark.Web.Diagnostics;
+using Quark.Web.Handler;
+using Quark.Web.Middlewares;
+using Quark.Web.Middlewares.Interfaces;
+using Quark.Web.Middlewares.Services;
+using Quark.Web.Models;
+using Quark.Web.OutputCachePolicy;
+using Quark.Web.RouteConfigs;
+using StackExchange.Redis;
+using System.Security.Claims;
+using System.Text;
+
+var builder = WebApplication.CreateBuilder(args);
+ConfigurationManager _configuration = builder.Configuration;
+
+builder.Services.AddDbContext<QuarkDataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")),
+    ServiceLifetime.Scoped);
+
+builder.Services.AddDbContext<StatisticsDataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString"));
+});
+
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
+builder.Services.AddBusinessServices(builder.Configuration);
+
+builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<IUrlMappingService, UrlMappingService>();
+builder.Services.AddScoped<IRouteHealthCheckService, RouteHealthCheckService>();
+
+builder.Services.AddSingleton<IEndpointRouteBuilder>(sp =>
+{
+    var appAccessor = new EndpointRouteBuilderAccessor();
+    return appAccessor;
+});
+
+builder.Services.AddElasticSearch(builder.Configuration);
+
+#region Localization
+
+builder.Services.AddLocalization(o =>
+{
+    o.ResourcesPath = "Resources";
+});
+
+#endregion
+
+builder.Services.Configure<GoogleAiRssAuthOptions>(
+    builder.Configuration.GetSection("GoogleAiRss"));
+
+#region Authentication
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath = "/uye/giris";
+    options.LogoutPath = "/uye/cikis";
+    options.AccessDeniedPath = "/uye/giris";
+
+    options.ExpireTimeSpan = TimeSpan.FromHours(24);
+    options.SlidingExpiration = true;
+
+    options.Cookie.Name = "Quark.Auth";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+})
+.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
+{
+    options.Authority = _configuration["Keycloak:Authority"];
+    options.ClientId = _configuration["Keycloak:ClientId"];
+    options.ClientSecret = _configuration["Keycloak:ClientSecret"];
+
+    options.ResponseType = OpenIdConnectResponseType.Code;
+    options.UsePkce = true;
+    options.SaveTokens = true;
+
+    options.RequireHttpsMetadata =
+        _configuration.GetValue<bool>("Keycloak:RequireHttpsMetadata");
+
+    options.GetClaimsFromUserInfoEndpoint = true;
+
+    options.Scope.Clear();
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+    options.Scope.Add("roles");
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        NameClaimType = "preferred_username",
+        RoleClaimType = "roles",
+        ValidateIssuer = true,
+        ValidateAudience = false
+    };
+
+    options.Events = new OpenIdConnectEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var identity = context.Principal?.Identity as ClaimsIdentity;
+
+            if (identity != null)
+            {
+                var subscriptionType =
+                    identity.FindFirst("subscription_type")?.Value;
+
+                var subscriptionExpiry =
+                    identity.FindFirst("subscription_expiry_date")?.Value;
+
+                if (!string.IsNullOrEmpty(subscriptionType))
+                {
+                    identity.AddClaim(
+                        new Claim("subscription_type", subscriptionType));
+                }
+
+                if (!string.IsNullOrEmpty(subscriptionExpiry))
+                {
+                    identity.AddClaim(
+                        new Claim("subscription_expiry_date", subscriptionExpiry));
+                }
+            }
+
+            return Task.CompletedTask;
+        },
+
+        OnAuthenticationFailed = context =>
+        {
+            context.Response.Redirect(
+                "/uye/giris?error=auth_failed");
+
+            context.HandleResponse();
+
+            return Task.CompletedTask;
+        }
+    };
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opt =>
+{
+    opt.Authority = _configuration["Keycloak:Authority"];
+    opt.Audience = _configuration["Keycloak:ClientId"];
+
+    opt.RequireHttpsMetadata =
+        _configuration.GetValue<bool>("Keycloak:RequireHttpsMetadata");
+
+    opt.Events = new JwtBearerEvents()
+    {
+        OnAuthenticationFailed = context =>
+        {
+            context.Response.OnStarting(() =>
+            {
+                context.Response.ContentType = "text/plain";
+
+                return global::System.Threading.Tasks.Task.CompletedTask;
+            });
+
+            return Task.CompletedTask;
+        },
+
+        OnMessageReceived = context =>
+        {
+            var authCookie = context.Request.Cookies["Authorization"];
+
+            if (!string.IsNullOrEmpty(authCookie) &&
+                authCookie.StartsWith("Bearer "))
+            {
+                context.Token =
+                    authCookie.Substring("Bearer ".Length);
+            }
+
+            return Task.CompletedTask;
+        }
+    };
+
+    opt.SaveToken = true;
+
+    opt.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateAudience = true,
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        RoleClaimType = "roles",
+        NameClaimType = "preferred_username"
+    };
+})
+.AddScheme<AuthenticationSchemeOptions,
+    GoogleAiRssBasicAuthenticationHandler>(
+        GoogleAiRssBasicAuthenticationHandler.SchemeName,
+        options => { });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ActiveSubscription", policy =>
+        policy.RequireAssertion(context =>
+        {
+            var expiryStr =
+                context.User.FindFirst("subscription_expiry_date")?.Value;
+
+            if (string.IsNullOrEmpty(expiryStr))
+                return false;
+
+            if (DateTime.TryParse(expiryStr, out var expiry))
+                return expiry > DateTime.UtcNow;
+
+            return false;
+        }));
+
+    options.AddPolicy("PremiumMember", policy =>
+        policy.RequireClaim(
+            "subscription_type",
+            "premium",
+            "enterprise"));
+
+    options.AddPolicy("FreeMember", policy =>
+        policy.RequireClaim(
+            "subscription_type",
+            "free",
+            "premium",
+            "enterprise"));
+});
+
+#endregion
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("DynamicTTL", policyBuilder =>
+    {
+        policyBuilder.AddPolicy<CustomOutputCachePolicy>();
+    });
+});
+
+var app = builder.Build();
+
+UrlMappingService.SetApplicationInstance(app);
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+
+        var isGoogleAiFeed =
+            context.Request.Path.StartsWithSegments("/feeds");
+
+
+        if (context.Response.StatusCode == 401)
+        {
+            if (!isGoogleAiFeed)
+            {
+                context.Response.Redirect("/uye/giris");
+            }
+        }
+        else if (context.Response.StatusCode == 401)
+        {
+            context.Response.Redirect("/uye/giris");
+        }
+        else if (context.Response.StatusCode >= 400 && context.Response.StatusCode < 500 && !context.Response.HasStarted)
+        {
+            context.Request.Path = "/Home/404";
+            context.Response.StatusCode = 404;
+
+            await next();
+        }
+        else if (context.Response.StatusCode >= 500)
+        {
+            context.Request.Path = "/Home/500";
+            context.Response.StatusCode = 500;
+
+            await next();
+        }
+    }
+    catch (Exception)
+    {
+        context.Request.Path = "/Home/500";
+        context.Response.StatusCode = 500;
+        await next();
+    }
+});
+
+app.UseExceptionHandler("/Home/500");
+
+app.UseHsts();
+
+app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
+app.UseUrlRedirection();
+
+app.UseRouting();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.UseOutputCache();
+
+app.UseEndpoints(endpoints =>
+{
+    var scope = app.Services.CreateScope();
+    var serviceProvider = scope.ServiceProvider;
+
+    // EndpointRouteBuilderAccessor'e endpoints'i set et
+    var endpointRouteBuilder =
+        app.Services.GetRequiredService<IEndpointRouteBuilder>()
+        as EndpointRouteBuilderAccessor;
+
+    if (endpointRouteBuilder != null)
+    {
+        endpointRouteBuilder.SetEndpoints(endpoints);
+    }
+
+    // Create the single ControllerActionEndpointDataSource BEFORE
+    // Task.Run InitializeRoutes.
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    var scopeForInit = app.Services.CreateScope();
+
+    var appsettings =
+        scopeForInit.ServiceProvider.GetService<AppSettingsKeys>();
+
+    {
+        try
+        {
+            if (appsettings != null)
+            {
+                RouteInitializer.InitializeRoutes(endpoints, app, appsettings).GetAwaiter().GetResult();
+            }
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                using var logScope =
+                    app.Services.CreateScope();
+
+                var logger =
+                    logScope.ServiceProvider
+                        .GetService<ILogger<Program>>();
+
+                logger?.LogError(
+                    ex,
+                    "Route initialization failed");
+            }
+            catch
+            {
+                // swallow
+            }
+        }
+    }
+});
+
+app.Run();
+
+public class EndpointRouteBuilderAccessor : IEndpointRouteBuilder
+{
+    private IEndpointRouteBuilder _endpoints;
+
+    public void SetEndpoints(
+        IEndpointRouteBuilder endpoints)
+    {
+        _endpoints = endpoints;
+    }
+
+    public IServiceProvider ServiceProvider =>
+        _endpoints?.ServiceProvider;
+
+    public ICollection<EndpointDataSource> DataSources =>
+        _endpoints?.DataSources;
+
+    public IApplicationBuilder CreateApplicationBuilder() =>
+        _endpoints?.CreateApplicationBuilder();
+}

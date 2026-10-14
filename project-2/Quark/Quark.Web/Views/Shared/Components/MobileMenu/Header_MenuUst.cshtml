@@ -1,0 +1,12 @@
+﻿@model List<Quark.Web.Models.ViewComponentResponses.MenuItems>
+
+<nav class="hidden lg:flex items-center justify-center text-sm gap-8 *:py-1">
+    @foreach (var menu in Model)
+    {
+        <a href="@menu.URL"
+           class="text-nav hover:text-red-custom transition-all font-semibold relative before:absolute before:top-1/2 before:-translate-y-1/2 before:w-px before:bg-[#CECED4] before:rounded-sm before:-right-4 before:h-2">
+            @menu.Name
+        </a>
+    }
+    <a href="#" class="transition-all font-semibold bg-gradient-to-r from-[#FF0101] to-[#0D4ABC] text-transparent bg-clip-text modal-link">Cumhuriyete Özel</a>
+</nav>

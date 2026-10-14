@@ -1,0 +1,17 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+
+@{
+    var sourceNameList = Model.SourceName.Split(",");
+}
+
+<div class="fv-row">
+    <label class="form-label">@_localizer["NewsSource"] : </label>
+   
+    @foreach (var sourceName in sourceNameList)
+    {
+        <div class="badge badge-light-primary rounded-pill badge-lg mb-3">@sourceName</div>
+    }
+
+</div>
+

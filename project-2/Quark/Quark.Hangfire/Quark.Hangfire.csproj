@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\Development.pubxml" />
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\Production.pubxml" />
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\Staging.pubxml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire" Version="1.8.11" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quark.API.Business\Quark.API.Business.csproj" />
+    <ProjectReference Include="..\Quark.Business.Common\Quark.Business.Common.csproj" />
+    <ProjectReference Include="..\Quark.Hangfire.Business\Quark.Hangfire.Business.csproj" />
+  </ItemGroup>
+
+</Project>

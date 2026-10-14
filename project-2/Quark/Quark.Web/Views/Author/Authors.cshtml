@@ -1,0 +1,137 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutNoAds.cshtml";
+}
+
+@model List<Quark.API.Business.Models.Responses.AuthorResponses.GetAuthorListResponse>
+
+@section Metatags {
+	<meta name="title" itemprop="title" content="Tüm Köşe Yazarları | Cumhuriyet" />
+
+	<meta name="description" content="Türkiye'nin en iyi köşe yazarları en güzel köşe yazıları ile Cumhuriyet'te! Usta yazarlar ve güncel köşe yazılarını okumak için tıklayın!">
+
+	<title>
+		Tüm Köşe Yazarları | Cumhuriyet
+	</title>
+
+	<meta property="fb:admins" content="619332001" />
+	<meta property="fb:app_id" content="168546753348847" />
+	<link rel="canonical" href="https://www.cumhuriyet.com.tr/yazarlar" />
+	<link rel="alternate" type="application/rss+xml" href="https://www.cumhuriyet.com.tr/rss" />
+}
+
+@section Scripts {
+	<script type="application/ld+json">
+		{
+		"@@context": "https://schema.org",
+		"@@type": "BreadcrumbList",
+		"itemListElement": [{
+		"@@type": "ListItem",
+		"position": 1,
+		"item": {
+			"@@id": "https://www.cumhuriyet.com.tr/",
+			"name": "Cumhuriyet"
+			}
+		},{
+		"@@type": "ListItem",
+		"position": 2,
+		"item": {
+			"@@id": "https://www.cumhuriyet.com.tr/yazarlar",
+			"name": "Yazarlar"
+			}
+		}]
+		}
+	</script>
+}
+
+<partial name="~/Views/Shared/_Header.cshtml" />
+<!-- MAIN START -->
+<main id="main" class="my-4 px-5 tablet:px-0">
+	<div class="max-w-container mx-auto space-y-6 undefined">
+		<div>
+			<!-- Breadcrumb Start -->
+			<nav class="flex items-center gap-2 text-xs undefined">
+				<a href="/" class="text-gray-500 hover:text-gray-600 transition-all font-medium"> Anasayfa </a>
+				<span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 12L10 8L6 4" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </span>
+				<a href="/yazarlar" class="text-red-600 font-semibold"> Yazarlar </a>
+			</nav>
+			<!-- Breadcrumb End -->
+			<!-- Links Start -->
+			<div class="!mt-4 overflow-x-auto">
+				<nav class="flex gap-4 whitespace-nowrap">
+					<a href="/gunun-kose-yazilari" class="px-3 py-1  transition-all font-semibold bg-[#051E4B] text-white"> Günün Köşe Yazıları </a>
+					<a href="/yazarlar/spor-yazarlari" class="px-3 py-1  transition-all font-semibold bg-gray-200 hover:bg-gray-300 text-secondary-400 "> Spor </a>
+					<a href="/yazarlar/konuk-yazarlari" class="px-3 py-1  transition-all font-semibold bg-gray-200 hover:bg-gray-300 text-secondary-400 "> Konuk </a>
+					<a href="/yazarlar/yasam-yazarlari" class="px-3 py-1  transition-all font-semibold bg-gray-200 hover:bg-gray-300 text-secondary-400 "> Yaşam </a>
+					<a href="/yazarlar" class="px-3 py-1  transition-all font-semibold bg-gray-200 hover:bg-gray-300 text-secondary-400 "> Tüm Yazarlar </a>
+				</nav>
+			</div>
+			<!-- Links End -->
+			<div class="grid grid-cols-12 mt-2 lg:mt-0">
+				<!-- Letters Start -->
+				<div class="flex flex-col lg:flex-row my-4 gap-5 col-span-1 lg:col-span-12 order-2 lg:order-1 items-center lg:items-start author-links !my-3">
+					<button id="az-za" data-sort="desc">
+						<svg class="hidden lg:inline-block" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M8.23719 3.6679C8.16547 3.47288 8.03095 3.30374 7.85233 3.18404C7.67372 3.06433 7.45989 3 7.24062 3C7.02135 3 6.80752 3.06433 6.62891 3.18404C6.45029 3.30374 6.31577 3.47288 6.24405 3.6679L3.29862 11.6766C3.25225 11.8 3.23227 11.9308 3.23985 12.0615C3.24742 12.1922 3.28239 12.3202 3.34275 12.4382C3.40311 12.5561 3.48766 12.6617 3.59154 12.7487C3.69541 12.8358 3.81656 12.9026 3.948 12.9454C4.07945 12.9882 4.21859 13.0062 4.35742 12.9981C4.49625 12.9901 4.63202 12.9563 4.75692 12.8987C4.88182 12.8411 4.99338 12.7608 5.08517 12.6625C5.17696 12.5641 5.24718 12.4497 5.29177 12.3257L5.7252 11.1446H8.75499L9.18947 12.3257C9.28231 12.5727 9.47521 12.7752 9.72608 12.889C9.97694 13.0027 10.2654 13.0184 10.5286 12.9327C10.7917 12.847 11.0082 12.6668 11.1307 12.4315C11.2532 12.1962 11.2719 11.9248 11.1826 11.6766L8.23719 3.6679ZM6.45496 9.16052L7.24062 7.02659L8.02522 9.16052H6.45496Z"
+								fill="#6B6B7D"
+							></path>
+							<path
+								d="M14.2828 3.32544C14.1017 3.53381 14 3.81643 14 4.11111C14 4.4058 14.1017 4.68841 14.2828 4.89679C14.4639 5.10516 14.7094 5.22222 14.9655 5.22222H18.1034L14.1931 11.2222C14.0855 11.3873 14.02 11.5836 14.0039 11.7891C13.9878 11.9946 14.0217 12.2012 14.1019 12.3858C14.1821 12.5704 14.3054 12.7256 14.4579 12.8341C14.6104 12.9425 14.7862 13 14.9655 13H20.0345C20.2906 13 20.5361 12.8829 20.7172 12.6746C20.8983 12.4662 21 12.1836 21 11.8889C21 11.5942 20.8983 11.3116 20.7172 11.1032C20.5361 10.8948 20.2906 10.7778 20.0345 10.7778H16.8966L20.8069 4.77778C20.9145 4.6127 20.98 4.41641 20.9961 4.2109C21.0122 4.00538 20.9783 3.79877 20.8981 3.61421C20.8179 3.42965 20.6946 3.27443 20.5421 3.16594C20.3896 3.05746 20.2138 3 20.0345 3H14.9655C14.7094 3 14.4639 3.11706 14.2828 3.32544Z"
+								fill="#6B6B7D"
+							></path>
+							<path
+								d="M18.707 15.2819C18.5184 15.099 18.2658 14.9978 18.0036 15C17.7414 15.0023 17.4906 15.1079 17.3052 15.2941C17.1198 15.4803 17.0146 15.7321 17.0123 15.9954C17.01 16.2587 17.1108 16.5123 17.293 16.7017L17.586 16.9959H4C3.73478 16.9959 3.48043 17.1017 3.29289 17.29C3.10536 17.4783 3 17.7337 3 18C3 18.2663 3.10536 18.5217 3.29289 18.71C3.48043 18.8983 3.73478 19.0041 4 19.0041H17.586L17.293 19.2983C17.1108 19.4877 17.01 19.7413 17.0123 20.0046C17.0146 20.2679 17.1198 20.5197 17.3052 20.7059C17.4906 20.8921 17.7414 20.9977 18.0036 21C18.2658 21.0022 18.5184 20.901 18.707 20.7181L20.707 18.7099C20.8945 18.5216 20.9998 18.2663 20.9998 18C20.9998 17.7337 20.8945 17.4784 20.707 17.2901L18.707 15.2819Z"
+								fill="#6B6B7D"
+							></path>
+						</svg>
+						<svg class="lg:hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M7.97899 2.673C7.91098 2.47651 7.78342 2.3061 7.61404 2.18549C7.44467 2.06488 7.24191 2.00007 7.03399 2.00007C6.82606 2.00007 6.6233 2.06488 6.45393 2.18549C6.28456 2.3061 6.15699 2.47651 6.08899 2.673L3.29599 10.742C3.25201 10.8663 3.23307 10.9982 3.24025 11.1299C3.24743 11.2616 3.2806 11.3905 3.33783 11.5094C3.39507 11.6282 3.47524 11.7345 3.57374 11.8222C3.67224 11.9099 3.78712 11.9773 3.91176 12.0204C4.0364 12.0636 4.16835 12.0816 4.29999 12.0735C4.43164 12.0655 4.56038 12.0314 4.67882 11.9734C4.79726 11.9153 4.90304 11.8344 4.99008 11.7354C5.07712 11.6363 5.1437 11.5209 5.18599 11.396L5.59699 10.206H8.46999L8.88199 11.396C8.97002 11.6449 9.15294 11.8489 9.39082 11.9635C9.62871 12.0781 9.90225 12.094 10.1518 12.0076C10.4013 11.9213 10.6066 11.7397 10.7227 11.5026C10.8389 11.2655 10.8566 10.9921 10.772 10.742L7.97899 2.673ZM6.28899 8.207L7.03399 6.057L7.77799 8.207H6.28899ZM3.74999 14C3.74999 13.7348 3.85534 13.4804 4.04288 13.2929C4.23042 13.1054 4.48477 13 4.74999 13H9.99999C10.1857 13 10.3677 13.0517 10.5257 13.1493C10.6837 13.247 10.8114 13.3867 10.8944 13.5528C10.9775 13.7189 11.0126 13.9048 10.9959 14.0898C10.9793 14.2748 10.9114 14.4514 10.8 14.6L6.74999 20H9.99999C10.2652 20 10.5196 20.1054 10.7071 20.2929C10.8946 20.4804 11 20.7348 11 21C11 21.2652 10.8946 21.5196 10.7071 21.7071C10.5196 21.8946 10.2652 22 9.99999 22H4.74999C4.56428 22 4.38223 21.9483 4.22426 21.8507C4.06628 21.753 3.93861 21.6133 3.85556 21.4472C3.77251 21.2811 3.73735 21.0952 3.75403 20.9102C3.77071 20.7252 3.83856 20.5486 3.94999 20.4L7.99999 15H4.74999C4.48477 15 4.23042 14.8946 4.04288 14.7071C3.85534 14.5196 3.74999 14.2652 3.74999 14ZM17.5 2C17.7652 2 18.0196 2.10536 18.2071 2.29289C18.3946 2.48043 18.5 2.73478 18.5 3V18.586L20.293 16.793C20.4816 16.6108 20.7342 16.51 20.9964 16.5123C21.2586 16.5146 21.5094 16.6198 21.6948 16.8052C21.8802 16.9906 21.9854 17.2414 21.9877 17.5036C21.9899 17.7658 21.8891 18.0184 21.707 18.207L18.207 21.707C18.0195 21.8945 17.7652 21.9998 17.5 21.9998C17.2348 21.9998 16.9805 21.8945 16.793 21.707L13.293 18.207C13.1108 18.0184 13.01 17.7658 13.0123 17.5036C13.0146 17.2414 13.1198 16.9906 13.3052 16.8052C13.4906 16.6198 13.7414 16.5146 14.0036 16.5123C14.2658 16.51 14.5184 16.6108 14.707 16.793L16.5 18.586V3C16.5 2.73478 16.6053 2.48043 16.7929 2.29289C16.9804 2.10536 17.2348 2 17.5 2Z"
+								fill="#6B6B7D"
+							></path>
+						</svg>
+					</button>
+					<nav class="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 *:lg:flex-1 lg:flex-1 *:text-zinc-400 *:font-semibold">
+						<a href="#Tümü">Tümü</a><a href="#A">A</a><a href="#B">B</a><a href="#C">C</a><a href="#D">D</a><a href="#E">E</a><a href="#F">F</a><a href="#G">G</a><a href="#H">H</a><a href="#I">I</a><a href="#İ">İ</a>
+						<a href="#J">J</a><a href="#K">K</a><a href="#L">L</a><a href="#M">M</a><a href="#N">N</a><a href="#O">O</a><a href="#Ö">Ö</a><a href="#P">P</a><a href="#R">R</a><a href="#S">S</a><a href="#Ş">Ş</a><a href="#T">T</a>
+						<a href="#U">U</a><a href="#Ü">Ü</a><a href="#V">V</a><a href="#Y">Y</a><a href="#Z">Z</a>
+					</nav>
+				</div>
+				<!-- Letters End -->
+				<!-- Authors Start -->
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 col-span-11 lg:col-span-12 order-1 lg:order-2 author-posts">
+					@foreach (var author in @Model)
+					{
+						<div data-filter="@author.FullName" class="p-4 bg-neutral-50 hover:bg-[#F2F2F7] flex gap-3 transition-all post">
+							<div class="text-center space-y-3 shrink-0">
+								<!-- Image Start -->
+								<a href="@author.Slug"> 
+									<img src="@author.ImageURL" class="size-14 rounded-full" alt="" loading="lazy"/> </a>
+								<!-- Image End -->
+								<!-- Posts Count Start -->
+								<div class="text-slate-900 text-sm font-helvetica">@author.TotalNewsCount Yazı</div>
+								<!-- Posts Count End -->
+							</div>
+							<!-- Content Start -->
+							<div class="space-y-1 flex flex-col">
+								<!-- Name Start -->
+								<a href="@author.Slug" class="text-gray-700 font-medium">@author.FullName</a>
+								<!-- Name End -->
+								<!-- Link Start -->
+								<a href="@author.Slug" class="font-semibold text-slate-900 text-sm">@author.Description</a>
+								<!-- Link End -->
+								<a href="@author.Slug" class="text-xs font-semibold text-red-custom hover:text-secondary-400 transition-all">Tüm Yazıları</a>
+							</div>
+							<!-- Content End -->
+						</div>
+					}
+				</div>
+				<!-- Authors End -->
+			</div>
+		</div>
+	</div>
+</main>

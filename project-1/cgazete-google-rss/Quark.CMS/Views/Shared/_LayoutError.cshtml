@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <title>@ViewData[ViewDataNames.Title] | @_appSettings.Common_AppName</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="@_appSettings.Common_AppName" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="/img/favicon.png" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+    <link href="@_appSettings.CDN_AssetsFolderFullUrl/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="@_appSettings.CDN_AssetsFolderFullUrl/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="@_appSettings.CDN_AssetsFolderFullUrl/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body data-kt-name="metronic" id="kt_body" class="app-blank app-blank bgi-size-cover bgi-position-center bgi-no-repeat">
+    <script>if (document.documentElement) { const defaultThemeMode = "system"; const name = document.body.getAttribute("data-kt-name"); let themeMode = localStorage.getItem("kt_" + (name !== null ? name + "_" : "") + "theme_mode_value"); if (themeMode === null) { if (defaultThemeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } else { themeMode = defaultThemeMode; } } document.documentElement.setAttribute("data-theme", themeMode); }</script>
+    <div class="d-flex flex-column flex-root" id="kt_app_root">
+        <style>
+            body {
+                background-image: url('https://metronic.avvamobile.com/8.1.5/assets/media/auth/bg1.jpg');
+            }
+
+            [data-theme="dark"] body {
+                background-image: url('https://metronic.avvamobile.com/8.1.5/assets/media/auth/bg1-dark.jpg');
+            }
+        </style>
+        @RenderBody()
+    </div>
+    <script src="@_appSettings.CDN_AssetsFolderFullUrl/assets/plugins/global/plugins.bundle.js"></script>
+    <script src="@_appSettings.CDN_AssetsFolderFullUrl/assets/js/scripts.bundle.js"></script>
+</body>
+</html>

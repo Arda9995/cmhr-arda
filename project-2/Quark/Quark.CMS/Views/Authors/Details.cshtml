@@ -1,0 +1,96 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["Author"]+" "+_localizer["Informations"];
+    ViewData[ViewDataNames.AsideMenu] = "Content";
+    ViewData[ViewDataNames.AsideSubMenu] = "Authors";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Content"], string.Empty),
+        new BreadcrumbItem(_localizer["Authors"], "/Authors/List")
+    };
+}
+
+@section Scripts
+{
+    <script src="/Scripts/Authors/Details.js" asp-append-version="true"></script>
+}
+
+@model Quark.CMS.Business.Models.Requests.AuthorRequests.DetailsAuthorRequest
+
+<input type="hidden" id="authorId" value="@Model.ID"/>
+<div class="card mb-5 mb-xxl-8">
+    <div class="card-body pt-9 pb-0">
+        <div class="d-flex flex-wrap flex-sm-nowrap">
+
+            @if (string.IsNullOrEmpty(Model.Photo))
+            {
+                <div class="me-7 mb-7">
+                    <div class="symbol symbol-150px">
+                        <div class="symbol-label fs-4x fw-semibold text-success">@Model.Fullname.GetInitials()</div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="me-7 mb-7">
+                    <div class="symbol symbol-100px symbol-lg-150px symbol-fixed position-relative">
+                        <img src="@Model.Photo" alt="@_localizer["Author"]" />
+                    </div>
+                </div>
+            }
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="#" class="text-gray-900 text-hover-primary fs-2 fw-bold me-2">@Model.Fullname</a>
+
+                             @if (Model.IsEnabled)
+                             { 
+                                 <div class="badge badge-light-success">@_localizer["Enabled"]</div> 
+                             } 
+                             else 
+                             { 
+                                <div class="badge badge-light-danger">@_localizer["Disabled"]</div> 
+                            } 
+                        </div>
+                        <div class="d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2">
+                            <a href="mailto:@Model.Email" class="d-flex align-items-center text-gray-400 text-hover-primary mb-2">
+                                <partial name="Icons/Email" />
+                                @Model.Email
+                            </a>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div>
+                            <button class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                <i class="ki-solid ki-dots-horizontal fs-2x me-1"></i>
+                            </button>
+                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                                <div class="menu-item px-3">
+                                    <div class="menu-content text-muted pb-2 px-3 fs-7 text-uppercase">
+                                        @_localizer["Actions"]
+                                    </div>
+                                </div>
+                                <div class="menu-item px-3">
+                                    <a href="/Authors/Update/@Model.ID" class="menu-link px-3">
+                                        @_localizer["Update"]
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold">
+            <li class="nav-item">
+                <a class="nav-link text-active-primary ms-0 me-10 py-5 active" data-bs-toggle="tab" href="#News">@_localizer["NewsMultiple"]</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="tab-content" id="tabContents">
+    <div class="tab-pane fade active show" id="News" role="tabpanel">
+        <partial name="_AuthorNews" />
+    </div>
+</div>

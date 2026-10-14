@@ -1,0 +1,285 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["HomePage"];
+    ViewData[ViewDataNames.AsideMenu] = "Dashboard";
+    ViewData[ViewDataNames.AsideSubMenu] = "Dashboard";
+    //ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    //{
+    //    new BreadcrumbItem("Dokümantasyonlar1", string.Empty),
+    //    new BreadcrumbItem("Dokümantasyonlar2", "/Deneme/1")
+    //};
+}
+@model Quark.CMS.Business.Models.Responses.HomeResponses.HomeResponse
+
+@section Scripts
+{
+    <script src="/Scripts/Home/Index.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function() {
+      
+            $('#webPushNotificationForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                var formData = {
+                    title: $('#webTitle').val(),
+                    message: $('#webMessage').val(),
+                    iconUrl: $('#iconUrl').val(),
+                    url: $('#webUrl').val()
+                };
+                
+                $.ajax({
+                    url: '/Home/SendTestWebPushNotification"',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        var resultDiv = $('#webNotificationResult');
+                        var alertDiv = resultDiv.find('.alert');
+                        
+                        resultDiv.show();
+                        if (response.success) {
+                            alertDiv.removeClass('alert-danger').addClass('alert-success');
+                            alertDiv.text(response.message + ' (notification key ' + response.notificationKey + ')');
+                        } else {
+                            alertDiv.removeClass('alert-success').addClass('alert-danger');
+                            alertDiv.text(response.message);
+                        }
+                    },
+                    error: function() {
+                        var resultDiv = $('#webNotificationResult');
+                        var alertDiv = resultDiv.find('.alert');
+                        
+                        resultDiv.show();
+                        alertDiv.removeClass('alert-success').addClass('alert-danger');
+                        alertDiv.text('An error occurred while sending the web push notification.');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
+<partial name="_NewsWidgetGroup" model="Model" />
+<partial name="_NewsTypeAndCategoryWidgetGroup" model="Model" />
+<partial name="_LastPublishedAndNewsGraphWidgetGroup" model="Model" />
+
+
+
+
+
+
+@*
+<div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+    <div class="col-xxl-3 col-xl-6">
+        <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #F1416C;">
+            <div class="card-header pt-5 mb-3">
+                <div class="d-flex flex-center rounded-circle h-80px w-80px" style="border: 1px dashed rgba(255, 255, 255, 0.4);background-color: #F1416C;">
+                    <i class="ki-duotone ki-element-9 text-white fs-2qx lh-0">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-end mb-3">
+                <div class="d-flex align-items-center">
+                    <span class="fs-4hx text-white fw-bold me-6">@Model.DailyCreatedNewsCount</span>
+                    <div class="fw-bold fs-6 text-white">
+                        <span class="d-block">@_localizer["Today"]</span>
+                        <span class="">@_localizer["EnteredNews"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-4 col-xl-6">
+        <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #3A7BD5;">
+            <div class="card-header pt-5 mb-3">
+                <div class="d-flex flex-center rounded-circle h-80px w-80px" style="border: 1px dashed rgba(255, 255, 255, 0.4);background-color: #3A7BD5;">
+                    <i class="ki-duotone ki-profile-user text-white fs-2qx lh-0">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                        <span class="path5"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-end mb-3">
+                <div class="d-flex align-items-center">
+                    <span class="fs-4hx text-white fw-bold me-6">@Model.CurrentViewerCount</span>
+                    <div class="fw-bold fs-6 text-white">
+                        <span class="d-block">@_localizer["Minutely"]</span>
+                        <span class="">@_localizer["UserCount"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-5 col-xl-12">
+        <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #7239EA;">
+            <div class="card-header pt-5 mb-3">
+                <div class="d-flex flex-center rounded-circle h-80px w-80px" style="border: 1px dashed rgba(255, 255, 255, 0.4);background-color: #7239EA;">
+                    <i class="ki-duotone ki-eye text-white fs-2qx lh-0">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-end mb-3">
+                <div class="d-flex align-items-center">
+                    <span class="fs-4hx text-white fw-bold me-6">@Model.DailyTotalViewsCount</span>
+                    <div class="fw-bold fs-6 text-white">
+                        <span class="d-block">@_localizer["Today"]</span>
+                        <span class="">@_localizer["PageViews"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-3 col-xl-6">
+        <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #7239EA;">
+            <div class="card-header pt-5 mb-3">
+                <div class="d-flex flex-center rounded-circle h-80px w-80px" style="border: 1px dashed rgba(255, 255, 255, 0.4);background-color: #7239EA;">
+                    <i class="ki-duotone ki-eye text-white fs-2qx lh-0">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-end mb-3">
+                <div class="d-flex align-items-center">
+                    <span class="fs-4hx text-white fw-bold me-6">@Model.TotalPublishedNewsCount</span>
+                    <div class="fw-bold fs-6 text-white">
+                        <span class="d-block">@_localizer["Total"]</span>
+                        <span class="">@_localizer["PublishedNews"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-4 col-xl-6">
+        <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #7239EA;">
+            <div class="card-header pt-5 mb-3">
+                <div class="d-flex flex-center rounded-circle h-80px w-80px" style="border: 1px dashed rgba(255, 255, 255, 0.4);background-color: #7239EA;">
+                    <i class="ki-duotone ki-eye text-white fs-2qx lh-0">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-end mb-3">
+                <div class="d-flex align-items-center">
+                    <span class="fs-4hx text-white fw-bold me-6">@Model.DailyPublishedNewsCount</span>
+                    <div class="fw-bold fs-6 text-white">
+                        <span class="d-block">@_localizer["Today"]</span>
+                        <span class="">@_localizer["PublishedNews"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-5 col-xl-12">
+        <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #7239EA;">
+            <div class="card-header pt-5 mb-3">
+                <div class="d-flex flex-center rounded-circle h-80px w-80px" style="border: 1px dashed rgba(255, 255, 255, 0.4);background-color: #7239EA;">
+                    <i class="ki-duotone ki-eye text-white fs-2qx lh-0">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-end mb-3">
+                <div class="d-flex align-items-center">
+                    <span class="fs-4hx text-white fw-bold me-6">@Model.NewsWithTagsCount</span>
+                    <div class="fw-bold fs-6 text-white">
+                        <span class="d-block">@_localizer["Total"]</span>
+                        <span class="">@_localizer["NewsWithTags"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-3 col-xl-6">-
+        <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-xl-100" style="background-color: #7239EA;">
+            <div class="card-header pt-5 mb-3">
+                <div class="d-flex flex-center rounded-circle h-80px w-80px" style="border: 1px dashed rgba(255, 255, 255, 0.4);background-color: #7239EA;">
+                    <i class="ki-duotone ki-eye text-white fs-2qx lh-0">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-end mb-3">
+                <div class="d-flex align-items-center">
+                    <span class="fs-4hx text-white fw-bold me-6">@Model.NewsWithRelatedNewsCount</span>
+                    <div class="fw-bold fs-6 text-white">
+                        <span class="d-block">@_localizer["Total"]</span>
+                        <span class="">@_localizer["NewsWithRelatedNews"]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> *@
+
+<div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+    <div class="card card-flush">
+        <div class="card-header border-0 pt-6">
+            <div class="card-title">
+                <h3>@_localizer["MostReadNewsToday"]</h3>
+            </div>
+        </div>
+        <div class="card-body py-4">
+            <table id="datatable">
+                <thead>
+                    <tr>
+                        <th class="w-75px">@_localizer["News"]</th>
+                        <th></th>
+                        <th>@_localizer["PublishDate"]</th>
+                        <th>@_localizer["ViewCount"]</th>
+                        <th>@_localizer["Status"]</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <div style="display:none">
+                        <div id="Col2">
+                            <img src="{0}" alt="{1}" class="w-75px shadow-sm rounded border" />
+                        </div>
+                        <div id="Col3">
+                            {0}
+                        </div>
+                        <div id="Col6">
+                            {0}
+                        </div>
+                        <div id="Col9">
+                            {0}
+                        </div>
+                        <div id="Col10">
+                            {0}
+                        </div>
+                        <div class="text-center" id="Col12">
+                            {0}
+                        </div>
+                    </div>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row g-5 mb-10">
+    <div class="col-xxl-12 col-xl-12">
+        <partial name="_SystemLogs" />
+    </div>
+</div>

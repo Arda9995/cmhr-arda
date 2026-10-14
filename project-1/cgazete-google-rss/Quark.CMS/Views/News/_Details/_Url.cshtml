@@ -1,0 +1,35 @@
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+<div class="mb-3 mt-6">
+
+    @if (!string.IsNullOrWhiteSpace(Model.RedirectURL) && Uri.IsWellFormedUriString(Model.RedirectURL, UriKind.Absolute))
+    {
+        
+            var cleanedUrl = Model.RedirectURL.Replace(":/", "://").Replace("///", "//"); // Gereksiz /// ve :/ hatalarýný düzelt
+            cleanedUrl = cleanedUrl.Replace("https://", "https://").Replace("http://", "http://"); // Baþlangýçta tekrar oluþmasýný engelle
+        
+
+        <a id="pUrl" href="@cleanedUrl" target="_blank" class="text-hover-info fs-4 me-1">
+            @cleanedUrl
+        </a>
+
+    }
+    else
+    {
+        <span class="text-danger fs-4 me-1">Geçersiz URL</span>
+    }
+
+
+    <button onclick="copyUrl();" class="btn btn-icon btn-sm btn-secondary mt-n2">
+        <i class="ki-duotone ki-copy"></i>
+    </button>
+</div>
+
+<script>
+    function copyUrl() {
+        navigator.clipboard.writeText(document.getElementById("pUrl").textContent)
+         .then(() => {
+            ShowSuccess("@_localizer["CopiedToClipboard"]");
+        })
+    }
+</script>

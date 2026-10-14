@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Quark.Business.Common\Quark.Business.Common.csproj" />
+      <ProjectReference Include="..\Quark.Business.ElasticSearch\Quark.Business.ElasticSearch.csproj" />
+      <ProjectReference Include="..\Quark.Cloudflare.Adapter\Quark.Cloudflare.Adapter.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\Requests\XmlFeedCachingRequest\" />
+    </ItemGroup>
+
+</Project>

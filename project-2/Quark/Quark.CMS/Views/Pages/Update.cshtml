@@ -1,0 +1,113 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["Page"] + " " + _localizer["Update"];
+    ViewData[ViewDataNames.AsideMenu] = "Content";
+    ViewData[ViewDataNames.AsideSubMenu] = "Pages";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["Content"], string.Empty),
+        new BreadcrumbItem(_localizer["Pages"], "/Pages/List")
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.PageRequests.UpdateRequest
+
+@section Scripts
+{
+    <partial name="_CKEditorScripts"/>
+}
+
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Page"] @_localizer["Informations"]</h3>
+        </div>
+    </div>
+    <form class="form" method="post" enctype="multipart/form-data" id="updatePageForm">
+        <input type="hidden" asp-for="ID"/>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Page"] @_localizer["Name"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Name" class="form-control form-control-lg form-control-solid"/>
+                    <div class="form-text">
+                        @_localizer["PageNameText"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Name"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Description"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Description" class="form-control form-control-lg form-control-solid"/>
+                    <div class="form-text">
+                        @_localizer["PageDescriptionText"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Description"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">URL</label>
+                <div class="col-lg-9">
+                    <div class="input-group input-group-solid mb-5">
+                        <span class="input-group-text" id="basic-addon3">@_appSettings.Common_ClientWebSite</span>
+                        <input type="text" asp-for="Slug" class="form-control form-control-lg form-control-solid"/>
+                        <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Slug"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Keyword"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Key" class="form-control form-control-lg form-control-solid"/>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Key"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Keywords"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Keywords" class="form-control form-control-lg form-control-solid tagify" />
+                    <div class="form-text">
+                        @_localizer["PageKeyWordText"]
+                    </div>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Keywords"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6">@_localizer["SeoTitle"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="SeoTitle" class="form-control form-control-lg form-control-solid"/>
+                    @* <div class="form-text"> *@
+                    @*     @_localizer["PageKeyWordText"] *@
+                    @* </div> *@
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="SeoTitle"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["SeoDescription"]</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="SeoDescription" class="form-control form-control-lg form-control-solid"/>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="SeoDescription"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">Breadcrumb</label>
+                <div class="col-lg-9">
+                    <input type="text" asp-for="Breadcrumb" class="form-control form-control-lg form-control-solid"/>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="Breadcrumb"></span>
+                </div>
+            </div>
+            <div class="mb-6 row">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Content"]</label>
+                <div class="col-lg-9">
+                    <textarea asp-for="@Model.Content" class="form-control @_appSettings.Text_Editor"></textarea>
+                    <span id="summernoteValidation" class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/Pages/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

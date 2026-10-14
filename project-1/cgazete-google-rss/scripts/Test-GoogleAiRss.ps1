@@ -1,0 +1,230 @@
+<#
+.SYNOPSIS
+	Google AI RSS akisinin gunluk arsiv dosyasini ve (istege bagli) endpoint'ini dogrular.
+
+.EXAMPLE
+	.\Test-GoogleAiRss.ps1
+
+.EXAMPLE
+	.\Test-GoogleAiRss.ps1 -Url "https://localhost:5001/api/XmlFeed/feeds/google-ai.xml" -Username google-ai-rss -Password "..."
+#>
+[CmdletBinding()]
+param(
+	[string]$ArchivePath = 'E:\GitHub\cgazete-google-rss\GoogleAiFeedArchive',
+	[int]$MaxAgeMinutes = 5,
+	[int]$WindowHours = 48,
+	[string]$Url,
+	[string]$Username,
+	[string]$Password,
+	[switch]$SkipCertificateCheck
+)
+
+$ErrorActionPreference = 'Stop'
+$script:Failures = 0
+$script:Warnings = 0
+
+function Pass([string]$Message) { Write-Host "[OK]    $Message" -ForegroundColor Green }
+function Warn([string]$Message) { $script:Warnings++; Write-Host "[UYARI] $Message" -ForegroundColor Yellow }
+function Fail([string]$Message) { $script:Failures++; Write-Host "[HATA]  $Message" -ForegroundColor Red }
+
+$ns = @{
+	content = 'http://purl.org/rss/1.0/modules/content/'
+	media   = 'http://search.yahoo.com/mrss/'
+	atom    = 'http://www.w3.org/2005/Atom'
+	dc      = 'http://purl.org/dc/elements/1.1/'
+}
+
+function Get-RssItemLinks([xml]$Doc) {
+	@($Doc.SelectNodes('/rss/channel/item/link') | ForEach-Object { $_.InnerText })
+}
+
+function Test-RssDocument([xml]$Doc, [string]$Source) {
+	Write-Host "`n--- Icerik kontrolu: $Source ---" -ForegroundColor Cyan
+
+	if ($Doc.rss -and $Doc.rss.version -eq '2.0') { Pass 'rss version="2.0"' } else { Fail 'rss version="2.0" kok elemani yok' }
+
+	foreach ($prefix in $ns.Keys) {
+		if ($Doc.DocumentElement.GetAttribute("xmlns:$prefix") -eq $ns[$prefix]) { Pass "xmlns:$prefix tanimli" }
+		else { Fail "xmlns:$prefix eksik veya hatali" }
+	}
+
+	$channel = $Doc.rss.channel
+	if (-not $channel) { Fail 'channel elemani yok'; return }
+	foreach ($name in 'title', 'link', 'description', 'language', 'lastBuildDate') {
+		if ([string]::IsNullOrWhiteSpace([string]$channel.$name)) { Fail "channel/$name bos" } else { Pass "channel/$name dolu" }
+	}
+
+	$items = $Doc.SelectNodes('/rss/channel/item')
+	if ($items.Count -eq 0) {
+		Warn "Akista hic item yok (son $WindowHours saatte AllowToSendRSS + AllowGoogleAiFeed haber olmayabilir)."
+		return
+	}
+	Pass "$($items.Count) item bulundu"
+
+	$mgr = New-Object System.Xml.XmlNamespaceManager($Doc.NameTable)
+	foreach ($prefix in $ns.Keys) { $mgr.AddNamespace($prefix, $ns[$prefix]) }
+
+	$since = (Get-Date).AddHours(-$WindowHours).AddMinutes(-5)
+	$seen = @{}
+	$index = 0
+	foreach ($node in $Doc.SelectNodes('/rss/channel/item')) {
+		$index++
+		$link = [string]$node.SelectSingleNode('link').InnerText
+		$label = "item #$index ($link)"
+
+		foreach ($name in 'title', 'link', 'guid', 'pubDate', 'description') {
+			$el = $node.SelectSingleNode($name)
+			if (-not $el -or [string]::IsNullOrWhiteSpace($el.InnerText)) { Fail "$label : $name eksik/bos" }
+		}
+		if (-not $node.SelectSingleNode('enclosure/@url')) { Fail "$label : enclosure url yok" }
+		if (-not $node.SelectSingleNode('media:content/@url', $mgr)) { Fail "$label : media:content url yok" }
+
+		$creator = $node.SelectSingleNode('dc:creator', $mgr)
+		if (-not $creator -or [string]::IsNullOrWhiteSpace($creator.InnerText)) {
+			Warn "$label : dc:creator yok (yazar ve News.CreatedBy editor adi bos olabilir)"
+		}
+
+		$encoded = $node.SelectSingleNode('content:encoded', $mgr)
+		if (-not $encoded -or [string]::IsNullOrWhiteSpace($encoded.InnerText)) {
+			Fail "$label : content:encoded eksik/bos"
+		}
+		else {
+			$html = $encoded.InnerText
+			if ($html -match '(?i)<\s*(script|style)\b') { Fail "$label : content:encoded icinde script/style etiketi var" }
+			if ($html -match '(?i)<link\b[^>]*rel\s*=\s*["'']?[^"''>]*stylesheet') { Fail "$label : stylesheet link'i var" }
+			if ($html -match '(?i)\s(style|class|on[a-z]+)\s*=') { Fail "$label : style/class/on* niteligi kalmis" }
+			if ($html -match '(?i)(href|src)\s*=\s*["'']?\s*(javascript|vbscript):') { Fail "$label : javascript:/vbscript: URL'si var" }
+		}
+
+		$pub = [string]$node.SelectSingleNode('pubDate').InnerText
+		$parsed = [DateTimeOffset]::MinValue
+		$formats = [string[]]@('ddd, dd MMM yyyy HH:mm:ss zzz', 'ddd, dd MMM yyyy HH:mm:ss zzzz')
+		$normalized = $pub -replace '([+-]\d{2})(\d{2})$', '$1:$2'
+		if ([DateTimeOffset]::TryParseExact($normalized, $formats, [Globalization.CultureInfo]::InvariantCulture,
+				[Globalization.DateTimeStyles]::None, [ref]$parsed)) {
+			if ($parsed.LocalDateTime -lt $since) { Fail "$label : pubDate $WindowHours saatlik pencerenin disinda ($pub)" }
+			if ($parsed.LocalDateTime -gt (Get-Date).AddMinutes(5)) { Fail "$label : pubDate gelecekte ($pub)" }
+		}
+		else { Fail "$label : pubDate RFC 822 formatinda degil ($pub)" }
+
+		if ($seen.ContainsKey($link)) { Fail "$label : ayni link birden fazla kez var" } else { $seen[$link] = $true }
+	}
+}
+
+Write-Host "=== Google AI RSS dogrulama ===" -ForegroundColor Cyan
+Write-Host "Arsiv yolu: $ArchivePath"
+
+# 1) Arsiv klasoru ve gunluk dosya
+$now = Get-Date
+$yearDir = Join-Path $ArchivePath $now.ToString('yyyy')
+$todayFile = Join-Path $yearDir ("feed-{0}.xml" -f $now.ToString('yyyy-MM-dd'))
+$fileDoc = $null
+
+if (-not (Test-Path $ArchivePath)) {
+	Fail "Arsiv klasoru yok: $ArchivePath"
+}
+else {
+	Pass 'Arsiv klasoru var'
+
+	if (Test-Path $todayFile) {
+		Pass "Bugunun dosyasi var: $todayFile"
+		$age = ($now - (Get-Item $todayFile).LastWriteTime).TotalMinutes
+		if ($age -le $MaxAgeMinutes) { Pass ("Dosya {0:N1} dk once guncellendi" -f $age) }
+		else { Fail ("Dosya {0:N0} dk'dir guncellenmedi (Hangfire 'Refresh Google AI RSS' isi calisiyor mu?)" -f $age) }
+
+		$bytes = [IO.File]::ReadAllBytes($todayFile)
+		$bom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
+		$bodyStart = if ($bom) { 3 } else { 0 }
+		if ($bytes.Length -ge ($bodyStart + 3) -and $bytes[$bodyStart] -eq 0xEF -and $bytes[$bodyStart + 1] -eq 0xBB -and $bytes[$bodyStart + 2] -eq 0xBF) {
+			Fail 'Dosyada cift UTF-8 BOM var'
+		}
+
+		try {
+			$fileDoc = New-Object System.Xml.XmlDocument
+			$fileDoc.Load($todayFile)
+			Pass 'XML gecerli (well-formed)'
+		}
+		catch { Fail "XML okunamadi: $($_.Exception.Message)"; $fileDoc = $null }
+	}
+	else {
+		Fail "Bugunun dosyasi yok: $todayFile"
+	}
+
+	# Gunluk dosya adlandirma kurali ve artik gecici dosyalar
+	$badNames = Get-ChildItem $ArchivePath -Recurse -File -Filter '*.xml' |
+		Where-Object { $_.Name -notmatch '^feed-\d{4}-\d{2}-\d{2}\.xml$' -or $_.Directory.Name -ne $_.Name.Substring(5, 4) }
+	if ($badNames) { $badNames | ForEach-Object { Warn "Kurala uymayan XML dosyasi: $($_.FullName)" } }
+	else { Pass 'Tum XML dosyalari <yil>\feed-yyyy-MM-dd.xml kuralina uyuyor' }
+
+	$tmp = Get-ChildItem $ArchivePath -Recurse -File -Filter '*.tmp' |
+		Where-Object { ($now - $_.LastWriteTime).TotalMinutes -gt 2 }
+	if ($tmp) { $tmp | ForEach-Object { Warn "Artik gecici dosya: $($_.FullName)" } }
+
+	$errorLog = Join-Path $ArchivePath ("logs\google-ai-errors-{0}.txt" -f $now.ToString('yyyy-MM-dd'))
+	if (Test-Path $errorLog) {
+		Warn "Bugun hata gunlugu var: $errorLog (son satirlar asagida)"
+		Get-Content $errorLog -Tail 10 -Encoding UTF8 | ForEach-Object { Write-Host "        $_" -ForegroundColor DarkYellow }
+	}
+	else { Pass 'Bugun hata gunlugu yok' }
+}
+
+if ($fileDoc) { Test-RssDocument $fileDoc $todayFile }
+
+# 2) Endpoint (istege bagli)
+if ($Url) {
+	Write-Host "`n--- Endpoint kontrolu: $Url ---" -ForegroundColor Cyan
+	$common = @{ Uri = $Url; UseBasicParsing = $true; TimeoutSec = 30 }
+	if ($SkipCertificateCheck) {
+		if ($PSVersionTable.PSVersion.Major -ge 6) { $common.SkipCertificateCheck = $true }
+		else { [Net.ServicePointManager]::ServerCertificateValidationCallback = { $true } }
+	}
+
+	try {
+		Invoke-WebRequest @common | Out-Null
+		Fail 'Kimlik bilgisi olmadan 200 dondu (401 bekleniyordu)'
+	}
+	catch {
+		$status = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
+		if ($status -eq 401) { Pass 'Kimlik bilgisi olmadan 401 donuyor' }
+		else { Fail "Kimlik bilgisi olmadan beklenmeyen sonuc: $status $($_.Exception.Message)" }
+	}
+
+	if ($Username -and $Password) {
+		$token = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("${Username}:${Password}"))
+		try {
+			$response = Invoke-WebRequest @common -Headers @{ Authorization = "Basic $token" }
+			if ([int]$response.StatusCode -eq 200) { Pass 'Kimlik bilgisiyle 200 donuyor' } else { Fail "Durum kodu: $($response.StatusCode)" }
+
+			$contentType = [string]$response.Headers['Content-Type']
+			if ($contentType -match 'application/rss\+xml') { Pass "Content-Type: $contentType" } else { Warn "Content-Type beklenenden farkli: $contentType" }
+
+			$text = if ($response.Content -is [byte[]]) { [Text.Encoding]::UTF8.GetString($response.Content) } else { [string]$response.Content }
+			$text = $text.TrimStart([char]0xFEFF)
+			$endpointDoc = New-Object System.Xml.XmlDocument
+			$endpointDoc.LoadXml($text)
+			Pass 'Endpoint XML gecerli'
+			Test-RssDocument $endpointDoc 'endpoint'
+
+			if ($fileDoc) {
+				$fileLinks = @(Get-RssItemLinks $fileDoc)
+				$endpointLinks = @(Get-RssItemLinks $endpointDoc)
+				$diff = if ($fileLinks.Count -eq 0 -and $endpointLinks.Count -eq 0) { $null }
+						elseif ($fileLinks.Count -eq 0) { $endpointLinks | ForEach-Object { [pscustomobject]@{ SideIndicator = '=>'; InputObject = $_ } } }
+						elseif ($endpointLinks.Count -eq 0) { $fileLinks | ForEach-Object { [pscustomobject]@{ SideIndicator = '<='; InputObject = $_ } } }
+						else { Compare-Object $fileLinks $endpointLinks }
+				if (-not $diff) { Pass 'Endpoint (cache) ile gunluk dosya ayni haberleri iceriyor' }
+				else {
+					Warn 'Endpoint (cache) ile gunluk dosya farkli (yenileme arasinda olabilir; 1 dk sonra tekrar deneyin):'
+					$diff | ForEach-Object { Write-Host ("        {0} {1}" -f $_.SideIndicator, $_.InputObject) -ForegroundColor DarkYellow }
+				}
+			}
+		}
+		catch { Fail "Kimlik bilgisiyle istek basarisiz: $($_.Exception.Message)" }
+	}
+	else {
+		Warn 'Username/Password verilmedi; yetkili istek atlandi.'
+	}
+}
+
+Write-Host "`n=== Sonuc: $script:Failures hata, $script:Warnings uyari ===" -ForegroundColor ($(if ($script:Failures) { 'Red' } elseif ($script:Warnings) { 'Yellow' } else { 'Green' }))
+exit ([int]($script:Failures -gt 0))

@@ -1,0 +1,54 @@
+﻿@using Quark.CMS.Business.Models.Responses.BlockResponses
+@model List<ListBlockNewsResponseItem>
+
+@foreach (var newsItem in Model)
+{
+    <div class="card border draggable p-0 mt-5 shadow-sm newsItem">
+        <input type="hidden" class="newsIds" value="@newsItem.ID"/>
+        <div class="card-body p-5">
+            <div class="d-flex flex-row">
+                <div class="">
+                    <img alt="" class="align-top w-60px rounded me-3" src="@newsItem.PhotoUrl"/>
+                </div>
+                <div class="d-flex flex-column flex-grow-1 mt-n1 draggable-handle user-select-none">
+                    <div class="d-flex flex-row">
+                        <div class="d-flex flex-row-fluid">@newsItem.Title</div>
+                        @if (@newsItem.InUse)
+                        {
+                            <div class="d-flex flex-row-auto w-40px flex-center align-items-start" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-html="true" title="@_localizer["BlockManageNewsUsed"]" data-bs-content="<ul>@foreach (var block in newsItem.InUseBlockList) { <li> @block </li> } </ul>">
+                                <partial name="Icons/Information"/>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-3 fw-semibold fs-6 text-gray-500">
+                        <span class="badge badge-light-primary rounded-pill p-2 me-1 user-select-none">
+                            <i class="ki-duotone ki-category me-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                            </i>
+                            @newsItem.Category
+                        </span>
+                        <span class="badge badge-light-danger rounded-pill p-2 me-1 user-select-none" title="@_localizer["ViewCount"]">
+                            <i class="ki-duotone ki-eye me-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            @newsItem.ViewCount
+                        </span>
+                        <span class="badge badge-light-success rounded-pill p-2 user-select-none" title="@_localizer["PublishDate"]">
+                            <i class="ki-duotone ki-calendar me-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            @newsItem.PublishDate
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

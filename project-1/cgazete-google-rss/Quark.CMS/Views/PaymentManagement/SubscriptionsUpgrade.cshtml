@@ -1,0 +1,45 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["Plans"];
+    ViewData[ViewDataNames.AsideMenu] = "PaymentManagements";
+    ViewData[ViewDataNames.AsideSubMenu] = "Subscriptions";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["PaymentManagements"], string.Empty),
+        new BreadcrumbItem(_localizer["Plans"], "/PaymentManagement/Plans"),
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.PaymentManagement.SubscriptionsUpgradeRequest
+
+<div class="card mb-5 mb-xl-10 col-8">
+    <div class="card-header border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">Abonelik Paketi Değiştirme</h3>
+        </div>
+    </div>
+
+    <form class="form" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="@Model.CurrentPlanID"/>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-4 col-form-label fw-bold fs-6 required">Güncel Ödeme Planı</label>
+                <div class="col-lg-8 fv-row">
+                    <input asp-for="@Model.CurrentPlanName" readonly class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"/>
+                </div>
+            </div>
+            <div class="row mb-6 coupon-type-select">
+                <label class="col-lg-4 col-form-label fw-bold fs-6 required">Ödeme Planları</label>
+                <div class="col-lg-8 fv-row">
+                    <select asp-items="@Model.PaymentPlans" asp-for="@Model.SelectedPlanID" class="form-select form-select-lg form-select-solid change-coupon-type" data-control="select3" data-placeholder="-- Seçiniz --" data-allow-clear="true">
+                    </select>
+                    <span asp-validation-for="@Model.SelectedPlanID" class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary">@_localizer["Save"]</button>
+            <a href="/PaymentManagement/Plans" class="btn btn-white btn-active-light-primary me-2">@_localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

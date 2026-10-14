@@ -1,0 +1,91 @@
+﻿@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsListResponse
+
+@{
+    Layout = "_LayoutNoAds";
+}
+<partial name="~/Views/Shared/_Header.cshtml" />
+
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <div class="max-w-container mx-auto space-y-6 !space-y-4 lg:!space-y-7">
+        <!-- Breadcrumb Start -->
+        <nav class="flex items-center gap-2 text-xs mb-4 sm:mb-5">
+            <a href="/" class="text-gray-500 hover:text-gray-600 transition-all font-medium">Anasayfa</a><span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 12L10 8L6 4" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </span><a href="@Model.CategorySlug" class="text-red-600 font-semibold ">@Model.CategoryBreadcrumb</a>
+        </nav> <!-- Breadcrumb End -->
+        <div class="sm:flex items-center justify-between mb-5 space-y-3 sm:space-y-0">
+            <!-- Title Start -->
+            <div class="text-slate-900 text-base md:text-xl font-semibold">Resmi İlanlar</div> <!-- Title End --> <!-- Right Area Start -->
+            <div class="flex gap-3">
+                <input type="text" id="datepicker-without-range" class="text-secondary-500 border border-[#CECED4] font-semibold bg-[#FAFAFA] py-1 px-2 max-w-28 cursor-pointer" value="@DateTime.Now.ToString("dd.MM.yyyy")"> 
+                <button id="getAnnouncementsBtn" class="bg-slate-900 text-white py-1 px-4 font-semibold">İlanları Getir</button>
+            </div> <!-- Right Area End -->
+        </div>
+        <div id="newsListContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 aspect-[16/9]">
+            @foreach (var news in Model.GovernmentAnnouncementNews)
+            {
+                <div class="basin-ilan" id="bik-ilan-@news.PressNo">
+                    <a class="block space-y-1 aspect-[16/9]" href="@news.Slug">
+                        <!-- Thumbnail Start -->
+                        <img class="w-full h-full object-cover object-cover" src="@news.ImageURL" alt="" loading="lazy"> <!-- Thumbnail End --> <!-- Title Start -->
+                        <div class="font-semibold text-sm line-clamp-2">@news.Headline</div> <!-- Title End -->
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+         
+            $('#getAnnouncementsBtn').click(function() {
+                var selectedDate = $('#datepicker-without-range').val();
+                getAnnouncementsByDate(selectedDate);
+            });
+
+            function getAnnouncementsByDate(date) {
+                $.ajax({
+                    url: '/Category/GetGovernmentAnnouncementListByDate',
+                    type: 'POST',
+                    data: { date: date },
+                    success: function(response) {
+                        if (response.isSuccess) {
+                            updateNewsList(response.data);
+                        } else {
+                            alert('İlanlar getirilirken bir hata oluştu.');
+                        }
+                    },
+                    error: function() {
+                        alert('İlanlar getirilirken bir hata oluştu.');
+                    }
+                });
+            }
+
+            function updateNewsList(newsList) {
+                var container = $('#newsListContainer');
+                container.empty();
+
+                if (newsList.length === 0) {
+                    container.html('<div class="col-span-full text-center text-gray-500">Seçilen tarihe ait ilan bulunamadı.</div>');
+                    return;
+                }
+
+                newsList.forEach(function(news) {
+                    var newsHtml = `
+                        <div class="basin-ilan" id="bik-ilan-${news.pressNo}">
+                            <a class="block space-y-1 aspect-[16/9]" href="${news.slug}">
+                                <img class="w-full h-full object-cover object-cover" src="${news.coverPhoto}" alt="" loading="lazy">
+                                <div class="font-semibold text-sm line-clamp-2">${news.headline}</div>
+                            </a>
+                        </div>
+                    `;
+                    container.append(newsHtml);
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,28 @@
+<div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="left-start" data-kt-menu-offset="-15px, 0">
+    <a href="#" class="menu-link px-5">
+        <span class="menu-title position-relative">
+            @_localizer["ChangeLanguage"] 
+            <span class="fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0">
+                @Html.Raw(string.Format(_localizer["CurrentLanguageWithFlags"], _appSettings.CDN_AssetsFolderFullUrl))
+            </span>
+        </span>
+    </a>
+    <div class="menu-sub menu-sub-dropdown w-175px py-4" style="">
+        <div class="menu-item px-3">
+            <a href="/Account/ChangeLanguage?lang=tr" class="menu-link d-flex px-5 @(int.Parse(_localizer["Current_Language_ID"]) == (int)LanguageEnum.Turkish ? "active" : ""))">
+                <span class="symbol symbol-20px me-4">
+                    <img data-kt-element="lang-flag" class="rounded-1" src="@_appSettings.CDN_AssetsFolderFullUrl/assets/media/flags/turkey.svg" alt="">
+                </span>
+                @_localizer["Turkish"]
+            </a>
+        </div>
+        <div class="menu-item px-3">
+            <a href="/Account/ChangeLanguage?lang=en" class="menu-link d-flex px-5 @(int.Parse(_localizer["Current_Language_ID"]) == (int)LanguageEnum.English ? "active" : "")">
+                <span class="symbol symbol-20px me-4">
+                    <img data-kt-element="lang-flag" class="rounded-1" src="@_appSettings.CDN_AssetsFolderFullUrl/assets/media/flags/united-states.svg" alt="">
+                </span>
+                @_localizer["English"]
+            </a>
+        </div>
+    </div>
+</div>

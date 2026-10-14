@@ -1,0 +1,173 @@
+using AvvaMobile.Core.Redis;
+using AvvaMobile.Core.SMSSender;
+using AvvaMobile.Core.Utilities.FtpUpload;
+using AvvaMobile.Core.Utilities.Mail;
+using AvvaMobile.Core.Utilities.PushNotification;
+using Hangfire;
+using Hangfire.SqlServer;
+using Microsoft.EntityFrameworkCore;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Caching.Services;
+using Quark.Business.Common.AgencyAdapter;
+using Quark.Business.ElasticSearch.DependencyInjection;
+using Quark.Cloudflare.Adapter;
+using Quark.Cloudflare.Adapter.Interfaces;
+using Quark.CMS.Business.Interfaces;
+using Quark.CMS.Business.Services;
+using Quark.Data;
+using Quark.Hangfire;
+using Quark.Hangfire.Business.Interfaces;
+using Quark.Hangfire.Business.Services;
+using AppSettingsService = Quark.API.Business.Services.AppSettingsService;
+using IAppSettingsService = Quark.API.Business.Interfaces.IAppSettingsService;
+
+var builder = WebApplication.CreateBuilder(args);
+
+#region AvvaMobile.Core
+/// Do not change top 4 registrations order. (Murat Yılmaz)
+builder.Services.AddSingleton<IRedisClient, RedisClient>(r => new RedisClient(
+    connectionString: builder.Configuration.GetValue<string>("RedisConnectionString")
+));
+builder.Services.AddScoped<AvvaMobile.Core.Caching.ICacheManager, AvvaMobile.Core.Caching.RedisCacheManager>();
+builder.Services.AddScoped<AvvaMobile.Core.Caching.AppSettingsKeys>();
+builder.Services.AddScoped<Quark.Business.Common.Caching.AppSettingsKeys>();
+/// Do not change top 4 registrations order. (Murat Yılmaz)
+builder.Services.AddScoped<IAppSettingsService, AppSettingsService>();
+builder.Services.AddScoped<IMailService, MailManager>();
+builder.Services.AddScoped<IFTPClient, FTPClient>();
+builder.Services.AddScoped<FileUpload>();
+builder.Services.AddScoped<ISMSSender, IletiMerkezi>();
+builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
+#endregion
+
+#region Localization
+builder.Services.AddLocalization(o => { o.ResourcesPath = "Resources"; });
+#endregion
+
+// Add services to the container.
+builder.Services.AddDbContext<QuarkDataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectionString"]);
+});
+builder.Services.AddDbContextFactory<QuarkDataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectionString"]);
+}, ServiceLifetime.Scoped);
+builder.Services.AddDbContext<StatisticsDataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:ConnectionString"]);
+});
+builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration["ConnectionStrings:HangfireConnection"], new SqlServerStorageOptions
+{
+	PrepareSchemaIfNecessary = true
+}));
+builder.Services.AddHangfireServer();
+
+builder.Services.AddScoped<INewsCachingService, NewsCachingService>();
+builder.Services.AddScoped<IAuthorCachingService, AuthorCachingService>();
+builder.Services.AddScoped<IAnomalyCachingService, AnomalyCachingService>();
+builder.Services.AddScoped<IUserCachingService, UserCachingService>();
+builder.Services.AddScoped<ISystemLogCachingService, SystemLogCachingService>();
+builder.Services.AddScoped<IXmlFeedCachingService, XmlFeedCachingService>();
+builder.Services.AddScoped<ICommonCachingService, CommonCachingService>();
+builder.Services.AddScoped<ISourceCachingService, SourceCachingService>();
+builder.Services.AddScoped<ITagCachingService, TagCachingService>();
+builder.Services.AddScoped<INewsPhotosCachingService, NewsPhotosCachingService>();
+builder.Services.AddScoped<IBlockCachingService, BlockCachingService>();
+builder.Services.AddScoped<ICloudflareAdapter, CloudflareAdapter>();
+
+builder.Services.AddScoped<IAnomalyService, AnomalyService>();
+
+builder.Services.AddScoped<ICurrencyService, CurrencyHangfireService>();
+builder.Services.AddScoped<ICryptoHangfireService, CryptoHangfireService>();
+builder.Services.AddScoped<INewsHangfireService, NewsHangfireService>();
+builder.Services.AddScoped<IAnomalyHangfireService, AnomalyHangfireService>();
+builder.Services.AddScoped<IWeatherHangfireService, WeatherHangfireService>();
+builder.Services.AddScoped<IPrayerTimesHangfireService, PrayerTimesHangfireService>();
+builder.Services.AddScoped<IXmlFeedHangfireService, XmlFeedHangfireHangfireService>();
+builder.Services.AddScoped<IAgencydapterService, AgencyAdapterService>();
+builder.Services.AddScoped<IAgencyHangfireService, AgencyHangfireService>();
+
+builder.Services.AddElasticSearch(builder.Configuration);
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+#region Hangfire
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[]
+    {
+        new HangfireCustomBasicAuthenticationFilter
+        {
+            User=builder.Configuration["DashboardUser:Username"],
+            Pass=builder.Configuration["DashboardUser:Password"],
+        }
+    }
+});
+
+var recurringJob = new RecurringJobManager();
+
+recurringJob.AddOrUpdate<ICurrencyService>("Döviz - Döviz Kuru Güncelle", x => x.GetAllDailyCurrencyData(), builder.Configuration["CronExpSettings:UpdateCurrencyCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<ICryptoHangfireService>("Kripto - Kripto Güncelle", x => x.GetAllDailyCryptoData(), builder.Configuration["CronExpSettings:UpdateCurrencyCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IWeatherHangfireService>("Hava Durumu - Veri Güncelle", x => x.RefreshWeather(), builder.Configuration["CronExpSettings:RefreshWeatherDataCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IPrayerTimesHangfireService>("Namaz Vakitleri - Veri Güncelle", x => x.RefreshPrayerTimes(), builder.Configuration["CronExpSettings:PrayerTimesCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<INewsHangfireService>("Haberler - Haber Kilidi Kaldır", x => x.UnlockNews(), builder.Configuration["CronExpSettings:UnlockNewsCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<INewsHangfireService>("Haberler - Zamanlanmış Haberleri Yayına Al", x => x.PublishScheduledNews(), builder.Configuration["CronExpSettings:PublishScheduledNewsCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<INewsHangfireService>("Haberler - Yayın Bitiş Tarihi Gelen Haberleri Yayından Kaldır", x => x.UnPublishNewsByPublishEndDate(), builder.Configuration["CronExpSettings:UnPublishScheduledNewsCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<INewsHangfireService>("Anket - Katılan Sayısı Güncelleme", x => x.RefreshSurveyCount(), builder.Configuration["CronExpSettings:RefreshSurveyCountCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<INewsHangfireService>("Anasayfa ve Köşe Yazıları Güncelleme", x => x.RefreshAuthorsMainPageAndTodaysNewsList(), builder.Configuration["CronExpSettings:RefreshAuthorsMainPageAndTodaysNewsListCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<INewsHangfireService>("Haberler - Görüntülenme sayısı güncelleme", x => x.RefreshNewsViewCount(), builder.Configuration["CronExpSettings:RefreshNewsViewCountCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IXmlFeedHangfireService>("Refresh Monthly Posts Sitemap", x => x.RefreshMonthlyPostsSitemap(), builder.Configuration["CronExpSettings:RefreshMonthlyPostsSitemapCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IXmlFeedHangfireService>("Refresh Monthly Tag Sitemap", x => x.RefreshMonthlyTagsSitemap(), builder.Configuration["CronExpSettings:RefreshMonthlyTagsSitemap"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IXmlFeedHangfireService>("Refresh News Sitemap", x => x.RefreshNewsSiteMap(), builder.Configuration["CronExpSettings:RefreshNewsSitemapCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IXmlFeedHangfireService>("Refresh Main RSS", x => x.RefreshMainRSS(), builder.Configuration["CronExpSettings:RefreshNewsSitemapCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IXmlFeedHangfireService>("Refresh CategoryRSS", x => x.RefreshCategoryRSS(), builder.Configuration["CronExpSettings:RefreshNewsSitemapCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IXmlFeedHangfireService>("Refresh Google AI RSS", x => x.RefreshGoogleAiRSS(), builder.Configuration["GoogleAiRss:RefreshCronExp"] ?? "* * * * *", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IXmlFeedHangfireService>("Refresh 3MonthlyPostsSitemap", x => x.RefreshLast3MonthlyPostsSitemap(), builder.Configuration["CronExpSettings:RefreshNewsSitemapCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IAgencyHangfireService>("Refresh AA News", x => x.GetAANews(), builder.Configuration["CronExpSettings:RefreshAgencyAANewsCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+recurringJob.AddOrUpdate<IAgencyHangfireService>("Refresh Get Rss Item News", x => x.GetRssItemsAsync(), builder.Configuration["CronExpSettings:RefreshAgencySitemapGetsCronExp"], new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+
+#region Background Jobs
+
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshNewsSiteMap());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshTagsSiteMap());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshPostsSiteMap());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshSourcesSiteMap());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshMainRSS());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshCategoryRSS());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshGoogleAiRSS());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshSiteMaps());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshLast3MonthlyPostsSitemap());
+BackgroundJob.Enqueue<IXmlFeedHangfireService>(x => x.RefreshLast3MonthlyTagsSitemap());
+
+#endregion
+
+#endregion
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+var appsettings = app.Services.CreateScope().ServiceProvider.GetRequiredService<IAppSettingsService>();
+await appsettings.LoadAllSettingsToCache();
+
+app.Run();

@@ -1,0 +1,49 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="mb-10 fv-row">
+    <label class="required form-label">@_localizer["Title2"]</label>
+    <div class="input-group">
+        <input asp-for="@Model.Title" type="text" class="form-control maxlength" maxlength="500"/>
+        <span class="input-group-text py-0" id="openTitleAIPopup">
+            <a role="button" onclick="ToggleTitleAIDiv();" class="pulse pulse-success" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="@_localizer["AskToAI"]">
+                <span id="spanTitlePulse" class="border-5"></span>
+                <img src="/img/AI.png" alt="@_localizer["AskToAI"]" class="w-30px"/>
+            </a>
+        </span>
+    </div>
+    <span asp-validation-for="@Model.Title" class="fv-plugins-message-container invalid-feedback"></span>
+    <div class="text-muted fs-7">@_localizer["NewsTitleText"]</div>
+
+    <div id="divTitleAI" class="card card-flush shadow-lg position-absolute z-index-3 w-75 mt-n2" style="display: none;">
+        <div class="card-header">
+            <h3 class="card-title">
+                <img src="/img/AI.png" alt="@_localizer["AskToAI"]" class="w-30px me-3"/>
+                @_localizer["AskToAI"]
+            </h3>
+            <div class="card-toolbar"></div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="d-flex">
+                <input id="txtTitleAI" type="text" class="form-control form-control-solid" placeholder="@_localizer["TitleAI"]"/>
+            </div>
+            <div class="menu menu-rounded menu-column menu-title-gray-700 menu-icon-gray-500 menu-arrow-gray-500 menu-bullet-gray-500 menu-arrow-gray-500 menu-state-bg fw-semibold w-400px mt-5" data-kt-menu="true">
+                @foreach (var titlePrompt in Model.TitlePrompts)
+                {
+                    <div class="menu-item">
+                        <a onclick="sendTitleGenerationRequestToAi(@titlePrompt.ID)" class="menu-link py-3">
+                            <span class="menu-icon">
+                                <i class="bi bi-pen fs-3"></i>
+                            </span>
+                            <span class="menu-title">@titlePrompt.Name</span>
+                            <input id="titleRequestType" type="hidden" asp-for="@titlePrompt.RequestType" value="@titlePrompt.RequestType"/>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            @* <button type="submit" class="btn btn-primary me-2">Kullan</button> *@
+            <a role="button" onclick="ToggleTitleAIDiv();" class="btn btn-light btn-active-light-primary">@_localizer["Close"]</a>
+        </div>
+    </div>
+</div>

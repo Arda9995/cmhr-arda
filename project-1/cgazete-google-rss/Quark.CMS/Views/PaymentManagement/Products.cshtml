@@ -1,0 +1,67 @@
+@{
+    ViewData[ViewDataNames.Title] = _localizer["Products"];
+    ViewData[ViewDataNames.AsideMenu] = "PaymentManagements";
+    ViewData[ViewDataNames.AsideSubMenu] = "Products";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(_localizer["PaymentManagements"], string.Empty),
+        new BreadcrumbItem(_localizer["Products"], "/PaymentManagement/Products"),
+    };
+}
+
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <partial name="Icons/Search" />
+                <input type="text" data-kt-filter="datatable-search" id="search-value" class="form-control form-control-solid w-250px ps-14" placeholder="@_localizer["Search"]">
+            </div>
+        </div>
+        <div class="card-toolbar">
+            <div class="d-flex justify-content-end">
+                <a href="/PaymentManagement/CreateProduct" class="btn btn-primary">
+                    <partial name="Icons/Add" />
+                    @_localizer["New"] @_localizer["Product"]
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <table id="paymentProductDatatable">
+            <thead>
+            <tr>
+                <th>@_localizer["Name"]</th>
+                <th>@_localizer["Description"]</th>
+                <th>@_localizer["ProductReferenceCode"]</th>
+                <th>@_localizer["CreatedDate"]</th>
+                <th>@_localizer["Statu"]</th>
+            </tr>
+            </thead>
+            <tbody>
+            <div style="display:none">
+                <div id="Col1">
+                    {1}
+                </div>
+                <div id="Col2">
+                    {1}
+                </div>
+                <div id="Col3">
+                    {1}
+                </div>
+                <div id="Col4">
+                    {1}
+                </div>
+                <div id="Col5">
+                    <span class="badge fw-bolder badge-{0}">
+                        {1}
+                    </span>
+                </div>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/Scripts/PaymentManagement/Products.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,4185 @@
+using AvvaMobile.Core.Business;
+using AvvaMobile.Core.Caching;
+using AvvaMobile.Core.DataTable;
+using AvvaMobile.Core.Extensions;
+using AvvaMobile.Core.Utilities.FtpUpload;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Caching.Models.Responses.PromptCachingResponses;
+using Quark.Business.Common.BaseServices;
+using Quark.Cloudflare.Adapter.Interfaces;
+using Quark.CMS.Business.Interfaces;
+using Quark.CMS.Business.Models.Requests.NewsRequests;
+using Quark.CMS.Business.Models.Responses.NewsPhotoResponses;
+using Quark.CMS.Business.Models.Responses.NewsResponses;
+using Quark.Core.Extentions;
+using Quark.Data;
+using Quark.Data.Models;
+using Quark.Data.Models.AI;
+using Quark.Data.Models.Common;
+using Quark.Data.Models.LogModels;
+using Quark.Data.Models.MediaGallery;
+using Quark.Data.Models.News;
+using Quark.Data.Models.PhotoEditor;
+using Quark.Data.Models.Survey;
+using Quark.Data.Models.SystemLog;
+using Quark.Resources;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using System.Diagnostics;
+using System.Globalization;
+using ServiceResult = AvvaMobile.Core.Business.ServiceResult;
+using Version = Quark.CMS.Business.Models.Responses.NewsResponses.Version;
+
+namespace Quark.CMS.Business.Services
+{
+    public class NewsService(
+        IUrlMappingService urlMappingService,
+        IHttpContextAccessor httpContext,
+        QuarkDataContext context,
+        IStringLocalizer<CommonResource> localizer,
+        Quark.Business.Common.Caching.AppSettingsKeys appSettingsKeys,
+        ICacheManager cache,
+        FileUpload fileUpload,
+        INewsCachingService newsCachingService,
+        INewsPhotoTypeCachingService newsPhotoTypeCachingService,
+        IAuthorCachingService authorCachingService,
+        IAnomalyService anomalyService,
+        StatisticsDataContext statisticsContext,
+        IPromptCachingService promptCachingService,
+        ISystemLogCachingService _systemLogCachingService,
+        ICategoryCachingService _categoryCachingService,
+        INewsTypeCachingService _newsTypeCachingService,
+        INewsStatusCachingService _newsStatusCachingService,
+        FileUpload _fileUpload,
+        ICloudflareAdapter _cloudflareAdapter)
+        : BaseService(httpContext, context,
+            localizer, appSettingsKeys, cache), INewsService
+    {
+        public async Task<ServiceResult<GetNewsFiltersRequest>> GetAllPagedFilters()
+        {
+            var result = new ServiceResult<GetNewsFiltersRequest>();
+            result.Data = new GetNewsFiltersRequest();
+
+            //result.Data.StatusList = await _context.NewsStatus.ToSelectListItems().AddSELECTOption();
+
+            //TODO : Aşağıdaki kod bloğu yukarıdaki kod bloğu ile aynı işi yapmaktadır. Aşağıdakilerin hepsi için yukarıdaki gibi kullanabileceğimiz bir extention yazılması gerekir.
+
+            var statusList = await _newsStatusCachingService.GetNewsStatusAsSelectListItems();
+            result.Data.StatusList = statusList.Data;
+            result.Data.StatusList.AddALLOption();
+
+            var authorList = await authorCachingService.GetAsSelectList();
+            result.Data.Authors = authorList.Data;
+            result.Data.Authors.AddALLOption();
+
+            var categoryList = await _categoryCachingService.GetCategoriesAsSelectListItems();
+            result.Data.Categories = categoryList.Data;
+            result.Data.Categories.AddALLOption();
+
+            var newsTypesList = await _newsTypeCachingService.GetNewsTypesAsSelectListItems();
+            result.Data.Types = newsTypesList.Data;
+            result.Data.Types.AddALLOption();
+
+            var newsSourcesList = await _newsTypeCachingService.GetNewsSourcesAsSelectListItems();
+            result.Data.Sources = newsSourcesList.Data;
+            result.Data.Sources.AddALLOption();
+
+            var userList = await _context.Users.Select(x => new SelectListItem
+            {
+                Text = x.FullName,
+                Value = x.ID.ToString()
+            }).ToListAsync();
+            result.Data.Users = userList;
+            result.Data.Users.AddSELECTOption();
+
+
+
+            var createTypesList = await _newsTypeCachingService.GetAllNewsTypes();
+            result.Data.CreateTypes = createTypesList.Data;
+
+            result.Data.HasCreateUpdateRight = HasRight("NEWS_CREATE_UPDATE");
+
+            return result;
+        }
+
+        public async Task<BaseDataTableResponse<List<ListResponseNewsItem>>> GetAllPaged(
+            BaseDataTableRequest tableRequest, GetNewsFiltersRequest request)
+        {
+            var result = new BaseDataTableResponse<List<ListResponseNewsItem>>();
+
+            result.RecordsTotal = await _context.News.CountAsync();
+
+            var newsQuery = (from n in _context.News
+                             join s in _context.NewsStatus on n.StatusID equals s.ID
+                             join c in _context.Categories on n.CategoryID equals c.ID into categories
+                             from c in categories.DefaultIfEmpty()
+                             join t in _context.NewsTypes on n.NewsTypeID equals t.ID
+                             let photo = (from ph in _context.NewsPhotos
+                                          where ph.NewsID == n.ID &&
+                                                (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                                                 ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                                          orderby
+                                              ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                  ? 0
+                                                  :
+                                                  ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                      ?
+                                                      1
+                                                      : 2
+                                          select ph).FirstOrDefault()
+                             let a = (from au in _context.Authors
+                                      where n.AuthorID == au.ID
+                                      select au).FirstOrDefault()
+                             where
+                                 (request.SelectedAuthorID.IsALLSelected() || request.SelectedAuthorID == a.ID)
+                                 && (request.SelectedCategoryID.IsALLSelected() || request.SelectedCategoryID == c.ID)
+                                 && (request.SelectedStatusID.IsALLSelected() || request.SelectedStatusID == s.ID)
+                                 && (request.SelectedTypeID.IsALLSelected() || request.SelectedTypeID == t.ID)
+                             orderby n.CreatedDate descending
+                             select new
+                             {
+                                 ID = n.ID,
+                                 Title = n.Title,
+                                 SubHeading = n.SubHeading,
+                                 UpHeadline = n.UpHeadline,
+                                 UpSubHeading = n.UpSubHeading,
+                                 ShowUpHeadline = n.ShowUpHeadline,
+                                 ShowSubHeading = n.ShowSubHeading,
+                                 ShowUpSubHeading = n.ShowUpSubHeading,
+                                 Category = c.Name.ToEmptyStringIndicator(),
+                                 Type = t.Name,
+                                 TypeID = n.NewsTypeID,
+                                 CreatedDate = n.CreatedDate,
+                                 UpdatedDate = n.UpdateDate,
+                                 Status = s.Name,
+                                 PhotoTypeID = photo != null ? photo.PhotoTypeID : 0,
+                                 Views = n.ViewCount != null ? n.ViewCount : 0,
+                                 PhotoUrl = photo != null ? photo.PhotoUrl : string.Empty,
+                                 PublishedDate = n.PublishDate != null ? n.PublishDate : default(DateTime?),
+                                 Tags = n.Tags,
+                                 IsLockedAuthorized = (n.IsLocked && !(n.LockedBy == CurrentUserID)),
+                                 StatusID = n.StatusID,
+                                 CreatedBy = n.CreatedBy,
+                                 Headline = n.Headline,
+                                 SourceIDs = n.SourceIDs,
+                                 IsLockedByCurrentUser = n.LockedBy == CurrentUserID,
+                                 LockedBy = n.LockedBy,
+                                 IsPublished = n.IsPublished,
+                             }).AsNoTracking().AsQueryable();
+
+
+
+
+            if (!HasRight("NEWS_VIEW_ALL"))
+            {
+                newsQuery = newsQuery.Where(x => x.CreatedBy == CurrentUserID);
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchValue) &&
+                int.TryParse(request.SearchValue, out int searchId))
+            {
+                newsQuery = newsQuery.Where(x => x.ID == searchId);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(request.SearchValue))
+                {
+                    var search = request.SearchValue.ToUpper();
+                    newsQuery = newsQuery.Where(x =>
+                        x.Title.ToUpper().Contains(search) ||
+                        x.Headline.ToUpper().Contains(search) ||
+                        x.UpHeadline.ToUpper().Contains(search) ||
+                        x.SubHeading.ToUpper().Contains(search) ||
+                        x.UpSubHeading.ToUpper().Contains(search) ||
+                        x.ID.ToString().Contains(search));
+                }
+
+                if (!string.IsNullOrEmpty(request.Tags))
+                {
+                    var tags = request.Tags.Replace("[{\"value\":\"", "").Replace("\"},{\"value\":\"", ",")
+                        .Replace("\"}]", "");
+                    request.Tags = tags;
+                }
+
+                if (!string.IsNullOrEmpty(request.CreatedDate))
+                {
+                    string[] dates = request.CreatedDate.Split(" - ");
+                    var startDate = DateTime.ParseExact(dates[0], "dd.MM.yyyy", CultureInfo.InvariantCulture).Date;
+                    var endDate = DateTime.ParseExact(dates[1], "dd.MM.yyyy", CultureInfo.InvariantCulture).Date
+                        .AddDays(1).AddTicks(-1);
+                    newsQuery = newsQuery.Where(x => x.CreatedDate >= startDate && x.CreatedDate <= endDate);
+                }
+
+                if (!string.IsNullOrEmpty(request.PublishDate))
+                {
+                    string[] dates = request.PublishDate.Split(" - ");
+                    var startDate = DateTime.ParseExact(dates[0], "dd.MM.yyyy", CultureInfo.InvariantCulture).Date;
+                    var endDate = DateTime.ParseExact(dates[1], "dd.MM.yyyy", CultureInfo.InvariantCulture).Date
+                        .AddDays(1).AddTicks(-1);
+                    newsQuery = newsQuery.Where(x => x.PublishedDate >= startDate && x.PublishedDate <= endDate);
+                }
+
+                if (request.SelectedSourceID > 0)
+                {
+                    newsQuery = newsQuery.Where(x => x.SourceIDs.Contains(request.SelectedSourceID.ToString()));
+                }
+
+                if (request.SelectedUserID > 0)
+                {
+                    newsQuery = newsQuery.Where(x => x.CreatedBy == request.SelectedUserID);
+                }
+
+            }
+
+            result.RecordsFiltered = await newsQuery.CountAsync();
+
+            newsQuery = newsQuery.SortSkipTake(tableRequest);
+
+
+
+            result.Data = await newsQuery.Select(f => new ListResponseNewsItem
+            {
+                ID = f.ID,
+                Category = f.Category,
+                CreatedDate = f.CreatedDate.ToFormattedDateTime(),
+                UpdatedDate = f.UpdatedDate.ToFormattedDateTime(),
+                Status = f.Status,
+                Title = string.IsNullOrEmpty(f.Title) ? f.Headline : f.Title,
+                SubHeading = f.SubHeading,
+                UpHeadline = f.UpHeadline,
+                UpSubHeading = f.UpSubHeading,
+                ShowUpHeadline = f.ShowUpHeadline,
+                ShowSubHeading = f.ShowSubHeading,
+                ShowUpSubHeading = f.ShowUpSubHeading,
+                PhotoUrl = f.PhotoUrl != null
+                    ? f.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                      f.TypeID == (int)NewsTypesEnum.ColumnArticles
+                        ? f.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl, _appSettingsKeys.CDN_AuthorPhotos)
+                        : f.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                            _appSettingsKeys.CDN_MediaGalleryFolder)
+                    : _appSettingsKeys.URL_EmptyPhoto.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                Views = f.Views,
+                PublishedDate = f.PublishedDate.ToFormattedDateTime().ToEmptyStringIndicator(),
+                Type = f.Type,
+                IsLockedByCurrentUser = f.IsLockedByCurrentUser,
+                StatusId = f.StatusID,
+                RelatedNewsCount = _context.RelatedNews.Count(x => x.NewsID == f.ID),
+                HasUnPublishRight = HasRight("NEWS_UNPUBLISH"),
+                HasPublishRight = HasRight("NEWS_PUBLISH"),
+                HasCreateUpdateRight = HasRight("NEWS_CREATE_UPDATE"),
+                LockedBy = f.LockedBy ?? 0,
+                IsPublished = f.IsPublished,
+                CreatedByName = _context.Users.FirstOrDefault(x => x.ID == f.CreatedBy).FullName
+            }).ToListAsync();
+
+            #region Impressions için dummy data
+
+            foreach (var item in result.Data)
+            {
+                if (item.StatusId == (int)NewsStatusEnum.Published)
+                {
+                    var impressionsList = await statisticsContext.NewsViewsMinutelies.Where(x =>
+                            x.NewsID == item.ID && DateTime.Now.AddMinutes(-request.SelectedViewRange) <= x.ViewsDate)
+                        .ToListAsync();
+
+                    if (impressionsList != null && impressionsList.Count() > 0)
+                    {
+                        var endTime = DateTime.Now;
+                        var startTime = impressionsList.First().ViewsDate;
+
+                        var allMinutes = Enumerable.Range(0, (int)(endTime - startTime).TotalMinutes + 1)
+                            .Select(offset => startTime.AddMinutes(offset))
+                            .ToList();
+
+                        var completeData = allMinutes.Select(time => new
+                        {
+                            ViewsDate = time,
+                            ViewCount = impressionsList.FirstOrDefault(v => v.ViewsDate == time)?.ViewCount ?? 0
+                        }).ToList();
+
+                        item.Impressions = completeData.Select(x => x.ViewCount).ToList();
+                        item.ImpressionDates = completeData.Select(x => x.ViewsDate).ToList();
+                        item.IsImpressionIncreasing = item.Impressions.First() < item.Impressions.Last();
+                    }
+                    else
+                    {
+                        item.Impressions = new List<int>();
+                        item.ImpressionDates = new List<DateTime>();
+                    }
+
+                    // item.Impressions = new List<int>(); 
+                    // item.ImpressionDates = new List<DateTime>(); 
+                    //
+                    // for (int i = 0; i < 20; i++) 
+                    // { 
+                    //     item.Impressions.Add(RandomNumberGenerator.GetInt32(500, 800)); 
+                    //     item.ImpressionDates.Add(DateTime.Now.AddMinutes(-20).AddMinutes(i)); 
+                    // }
+                    //
+                    // item.IsImpressionIncreasing = item.Impressions.First() < item.Impressions.Last();
+                }
+
+                var tagsNews = await _context.NewsTags.Where(x => x.NewsID == item.ID).ToListAsync();
+                var tags = await _context.Tags.Where(x => tagsNews.Select(x => (long)x.TagID).Contains(x.ID))
+                    .ToListAsync();
+                item.Tags = string.Join(", ", tags.Select(x => x.Text).ToList());
+                item.TagsCount = tagsNews != null ? tagsNews.Count() : 0;
+            }
+
+            #endregion
+
+            return result;
+        }
+
+        public async Task<ServiceResult<NewsContentPhotoResponse>> UploadImage(IFormFile file, int photoTypeId)
+        {
+            var result = new ServiceResult<NewsContentPhotoResponse>();
+
+            if (file == null)
+            {
+                result.SetError(_localizer["Error"]);
+                return result;
+            }
+
+            if (photoTypeId != 0 && photoTypeId != null)
+            {
+                var photoType = _context.NewsPhotoTypes.FirstOrDefault(x => x.ID == photoTypeId);
+
+                if (photoType == null)
+                {
+                    result.SetError(_localizer["Error"]);
+                    return result;
+                }
+
+                using (var stream = file.OpenReadStream())
+                {
+                    using (Image<Rgba32> image = Image.Load<Rgba32>(stream))
+                    {
+                        if (image.Width != photoType.Width || image.Height != photoType.Height)
+                        {
+                            result.SetError(_localizer["Error_PhotoSize"]);
+                            return result;
+                        }
+                    }
+                }
+            }
+
+            var uploadResult = fileUpload.Upload(file, _appSettingsKeys.CDN_MediaGalleryFolder);
+            if (uploadResult.IsSuccess)
+            {
+                result.Data = new NewsContentPhotoResponse
+                {
+                    PhotoURL = _appSettingsKeys.CDN_BaseUrl + _appSettingsKeys.CDN_MediaGalleryFolder +
+                               uploadResult.FileName
+                };
+
+                var archivedPhoto = new FolderImage
+                {
+                    FolderID = -1,
+                    ImageName = uploadResult.FileName,
+                    ImageURL = result.Data.PhotoURL,
+                    UploadedBy = CurrentUserID,
+                    UploadedDate = DateTime.Now
+                };
+
+                await _context.AddAsync(archivedPhoto);
+                await _context.SaveChangesAsync();
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult<NewsRequest>> Create(int newsTypeID, int agenctNewsID = 0)
+        {
+            var result = new ServiceResult<NewsRequest> { Data = new NewsRequest { NewsTypeID = newsTypeID } };
+
+            if (!HasRight("NEWS_CREATE_UPDATE"))
+            {
+                result.SetError(_localizer["NonAuth"]);
+                return result;
+            }
+
+            if (newsTypeID == 0)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var isExist = await _context.NewsTypes.AnyAsync(x => x.ID == newsTypeID);
+            if (!isExist)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            if (newsTypeID == (int)NewsTypesEnum.ColumnArticles)
+            {
+                result.Data.CategoryIDMap = "|1|";
+            }
+
+            await FillRequest(result.Data, agenctNewsID);
+
+            return result;
+        }
+
+        public async Task<ServiceResult<NewsRequest>> Create(NewsRequest request)
+        {
+            var response = new ServiceResult<NewsRequest>();
+            if (request == null)
+            {
+                LogError(new Exception("News Request Null"), request);
+                response.SetError(GetMethodName() + " " + _localizer["InvalidRequest"]);
+                return response;
+            }
+
+            if (!request.SecondaryCategoryIDMaps.IsNullOrEmtpy())
+            {
+                foreach (var map in request.SecondaryCategoryIDMaps.Split("-"))
+                {
+                    if (map == request.CategoryIDMap)
+                    {
+                        await FillRequest(request);
+                        response.Data = request;
+
+                        response.SetError(_localizer["CategoryAlreadyMain"]);
+                        return response;
+                    }
+                }
+            }
+
+            await using var tx = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                await FillRequest(request);
+
+                var categoryId = request.NewsTypeID switch
+                {
+                    (int)NewsTypesEnum.ZodiacSigns => (int)CategoryEnum.Astrologie,
+                    (int)NewsTypesEnum.GovernmentAnnouncement => (int)CategoryEnum.GovernmentAnnouncement,
+                    _ => request.CategoryID
+                };
+
+                var categoryName = await _context.Categories
+                    .Where(x => x.ID == categoryId)
+                    .Select(x => x.Name)
+                    .FirstOrDefaultAsync();
+
+                if (categoryName == null)
+                {
+                    response.SetError("Kategori bulunamadı");
+                    return response;
+                }
+
+                var slugSource = request.Title ?? request.Headline ?? request.UpHeadline;
+                if (string.IsNullOrEmpty(slugSource))
+                {
+                    response.SetError("Haber başlığı bulunamadı");
+                    return response;
+                }
+
+                var urlTemplate = _appSettingsKeys.News_URLSchema;
+                if (string.IsNullOrEmpty(urlTemplate))
+                {
+                    response.SetError(_localizer["URLTemplateNotFound"]);
+                    return response;
+                }
+
+                request.Slug = urlTemplate
+                    .Replace("{Title}", slugSource.ToSlug() ?? string.Empty)
+                    .Replace("{ID}", "{ID}")
+                    .Replace("{Year}", DateTime.Now.Year.ToString())
+                    .Replace("{Month}", DateTime.Now.Month.ToString("D2"))
+                    .Replace("{Date}", DateTime.Now.Day.ToString("D2"));
+
+                if (request.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+                {
+                    var authorSlug = await _context.Authors.Where(x => x.ID == request.AuthorID).FirstOrDefaultAsync();
+                    if (authorSlug == null || string.IsNullOrEmpty(authorSlug.Url))
+                    {
+                        response.SetError("Yazar bulunamadı");
+                        return response;
+                    }
+
+                    request.Slug = request.Slug.Replace("{CategoryName}", authorSlug.Url.TrimStart('/'));
+                }
+                else if (request.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+                {
+                    if (string.IsNullOrEmpty(request.SelectedZodiacSignID))
+                    {
+                        response.SetError("Burç seçilmedi");
+                        return response;
+                    }
+
+                    var zodiacId = request.SelectedZodiacSignID.Split('|', StringSplitOptions.RemoveEmptyEntries)
+                        .LastOrDefault();
+                    if (string.IsNullOrEmpty(zodiacId))
+                    {
+                        response.SetError("Burç seçilmedi");
+                        return response;
+                    }
+
+                    string zodiacSlug = null;
+                    if (int.TryParse(zodiacId, out int zodiacCategoryId))
+                    {
+                        zodiacSlug = await _context.Categories
+                            .Where(x => x.ID == zodiacCategoryId)
+                            .Select(x => x.Url)
+                            .FirstOrDefaultAsync();
+                    }
+
+                    if (string.IsNullOrEmpty(zodiacSlug))
+                    {
+                        response.SetError("Burç kategorisi bulunamadı");
+                        return response;
+                    }
+
+                    var formattedZodiacSlug = $"{zodiacSlug.TrimStart('/')}-burcu";
+                    request.Slug = request.Slug.Replace("{CategoryName}",
+                        categoryName.ToSlug() + "/" + formattedZodiacSlug);
+                }
+                else
+                {
+                    request.Slug = request.Slug.Replace("{CategoryName}", categoryName.ToSlug());
+                }
+
+
+                if (request.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews)
+                {
+                    var headline = await _context.Caricaturists.Where(x => x.ID == request.CaricaturistID)
+                        .Select(x => x.Headline).FirstOrDefaultAsync();
+                    request.Headline = headline;
+                }
+
+                if (request.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+                {
+                    request.CategoryID = (int)CategoryEnum.Astrologie;
+                    request.SecondaryCategoryIDMaps = request.SelectedZodiacSignID;
+                }
+
+                var news = new News
+                {
+                    NewsTypeID = request.NewsTypeID,
+                    StatusID = (int)NewsStatusEnum.Draft,
+                    CategoryID = request.CategoryID,
+                    AuthorID = request.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews
+                        ? request.CaricaturistID
+                        : request.AuthorID,
+                    Title = request.Title,
+                    SubHeading = request.SubHeading,
+                    UpHeadline = request.UpHeadline,
+                    Headline = request.Headline,
+                    UpSubHeading = request.UpSubHeading,
+                    ShowUpHeadline = request.ShowUpHeadline,
+                    ShowSubHeading = request.ShowSubHeading,
+                    ShowUpSubHeading = request.ShowUpSubHeading,
+                    ShowHeadline = request.ShowHeadline,
+                    RedirectLink = request.RedirectLink,
+                    UpSubtitle = request.UpSubtitle,
+                    Subtitle = request.Subtitle,
+                    Content = request.Content,
+                    CreatedBy = CurrentUserID,
+                    Slug = request.Slug,
+                    CreatedDate = DateTime.Now,
+                    UpdateDate = DateTime.Now,
+                    UpdatedBy = CurrentUserID,
+                    Video = request.Video,
+                    PressNo = request.PressNo,
+                    AllowAds = request.AllowAds,
+                    AllowGoogleIndex = request.AllowGoogleIndex,
+                    AllowToSendGoogleSideMap = request.AllowToSendGoogleSideMap,
+                    AllowToSendRSS = request.AllowToSendRSS,
+                    SourceIDs = request.SourceIDs?.Any() == true ? string.Join(",", request.SourceIDs) : null,
+                    SeoDescription = request.SeoDescription,
+                    SeoTitle = request.SeoTitle.IsNullOrEmtpy() ? request.Title : request.SeoTitle,
+                    CategoryMap = request.CategoryIDMap,
+                    VideoPlayerID = request.Video.IsNullOrEmtpy() ? null : request.SelectedVideoPlayer,
+                    BoxCount = request.BoxCount == null ? 0 : request.BoxCount,
+                    PublishDate = request.PublishDate,
+                    PublishEndDate = request.PublishEndDate,
+                    ManuelUpdatedDate = request.ManuelUpdatedDate,
+                    IsPublished = false,
+                };
+
+                if (!string.IsNullOrEmpty(request.SecondaryCategoryIDMaps))
+                {
+                    List<int> secondaryCategoryIds = request.SecondaryCategoryIDMaps
+                        .Split(new[] { "|-|" }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => s.Trim('|'))
+                        .Where(s => int.TryParse(s, out _))
+                        .Select(int.Parse)
+                        .ToList();
+
+                    if (request.NewsTypeID != (int)NewsTypesEnum.ZodiacSigns)
+                    {
+                        foreach (int id in secondaryCategoryIds)
+                        {
+                            var secondaryCategory = new NewsSecondaryCategory
+                            {
+                                NewsID = news.ID,
+                                SecondaryCategoryID = id
+                            };
+                            await _context.NewsSecondaryCategories.AddAsync(secondaryCategory);
+                        }
+                        news.SecondaryCategoryMap = RearrangeString(request.SecondaryCategoryIDMaps);
+                    }
+
+                    if (!request.Video.IsNullOrEmtpy() && !secondaryCategoryIds.Contains((int)CategoryEnum.VideoGallery))
+                    {
+                        var secondaryCategory = new NewsSecondaryCategory
+                        {
+                            NewsID = news.ID,
+                            SecondaryCategoryID = (int)CategoryEnum.VideoGallery,
+                        };
+                        await _context.NewsSecondaryCategories.AddAsync(secondaryCategory);
+                        await _context.SaveChangesAsync();
+                        news.SecondaryCategoryMap += secondaryCategoryIds.Count > 0 ? $"-|{(int)CategoryEnum.VideoGallery}|" : $"|{(int)CategoryEnum.VideoGallery}|";
+                    }
+
+                    if (request.NewsTypeID == (int)NewsTypesEnum.PhotoGallery && !secondaryCategoryIds.Contains((int)CategoryEnum.PhotoGallery))
+                    {
+                        var secondaryCategory = new NewsSecondaryCategory
+                        {
+                            NewsID = news.ID,
+                            SecondaryCategoryID = (int)CategoryEnum.PhotoGallery
+                        };
+                        await _context.NewsSecondaryCategories.AddAsync(secondaryCategory);
+                        await _context.SaveChangesAsync();
+                        news.SecondaryCategoryMap += secondaryCategoryIds.Count > 0 ? $"-|{(int)CategoryEnum.PhotoGallery}|" : $"|{(int)CategoryEnum.PhotoGallery}|";
+                    }
+                }
+
+                if (request.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+                {
+                    news.SecondaryCategoryMap = request.SelectedZodiacSignID;
+                }
+
+                await _context.News.AddAsync(news);
+                await _context.SaveChangesAsync();
+
+                request.ID = news.ID;
+                request.Slug = request.Slug.Replace("{ID}", request.ID.ToString());
+                news.Slug = request.Slug;
+                _context.News.Update(news);
+
+                await _context.SaveChangesAsync();
+
+                if (request.SourceIDs != null && request.SourceIDs.Any())
+                {
+                    foreach (var source in request.SourceIDs)
+                    {
+                        var newsSource = new NewsSource
+                        {
+                            NewsID = news.ID,
+                            SourceID = source.ToInt()
+                        };
+                        await _context.NewsSources.AddAsync(newsSource);
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
+
+                if (news.NewsTypeID != (int)NewsTypesEnum.Ad &&
+                    news.NewsTypeID != (int)NewsTypesEnum.GovernmentAnnouncement &&
+                    news.NewsTypeID != (int)NewsTypesEnum.News)
+                {
+                    var socialMedias = new NewsSocialMedia
+                    {
+                        NewsID = news.ID,
+                        FacebookTitle = request.Title,
+                        FacebookContent = request.Content,
+                        FacebookPhotoUrl = Path.GetFileName(request.Photos
+                            .FirstOrDefault(x => x.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto).PhotoURL),
+                        XTitle = request.Title,
+                        XContent = request.Content,
+                        XPhotoUrl = Path.GetFileName(request.Photos
+                            .FirstOrDefault(x => x.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto).PhotoURL),
+                        InstagramTitle = request.Title,
+                        InstagramContent = request.Content,
+                        InstagramPhotoUrl = Path.GetFileName(request.Photos
+                            .FirstOrDefault(x => x.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto).PhotoURL)
+                    };
+
+                    await _context.NewsSocialMedias.AddAsync(socialMedias);
+                }
+
+                if (request.SelectedTagIDs != null && request.SelectedTagIDs.Any())
+                {
+                    if (request.SelectedTagIDs.Count > 0)
+                    {
+                        var tagsList = request.SelectedTagIDs;
+
+                        foreach (var tag in tagsList)
+                        {
+                            var newsTag = new NewsTag
+                            {
+                                NewsID = news.ID,
+                                TagID = (int)tag
+                            };
+
+                            await _context.NewsTags.AddAsync(newsTag);
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                var newsVersion = new NewsVersion
+                {
+                    NewsID = news.ID,
+                    NewsTypeID = request.NewsTypeID,
+                    StatusID = (int)NewsStatusEnum.Draft,
+                    CategoryID = request.CategoryID,
+                    AuthorID = news.AuthorID,
+                    Slug = news.Slug,
+                    Title = request.Title,
+                    SubHeading = request.SubHeading,
+                    UpHeadline = request.UpHeadline,
+                    UpSubHeading = request.UpSubHeading,
+                    ShowUpHeadline = request.ShowUpHeadline,
+                    ShowSubHeading = request.ShowSubHeading,
+                    ShowUpSubHeading = request.ShowUpSubHeading,
+                    RedirectLink = request.RedirectLink,
+                    Subtitle = request.Subtitle,
+                    UpSubtitle = request.UpSubtitle,
+                    Content = request.Content,
+                    Tags = news.Tags,
+                    CreatedBy = CurrentUserID,
+                    CreatedDate = DateTime.Now,
+                    Video = request.Video,
+                    PressNo = request.PressNo,
+                    Headline = request.Headline,
+                    ShowHeadline = request.ShowHeadline,
+                    AllowAds = request.AllowAds,
+                    SourceIDs = request.SourceIDs?.Any() == true ? string.Join(",", request.SourceIDs) : null,
+                    SeoDescription = news.SeoDescription,
+                    SeoTitle = news.SeoTitle,
+                    CategoryMap = news.CategoryMap,
+                    SecondaryCategoryMap = news.SecondaryCategoryMap,
+                    VideoPlayerID = news.VideoPlayerID,
+                    BoxCount = news.BoxCount,
+                    AllowGoogleIndex = news.AllowGoogleIndex,
+                    AllowToSendGoogleSideMap = news.AllowToSendGoogleSideMap,
+                    AllowToSendRSS = news.AllowToSendRSS,
+                    ManuelUpdatedDate = news.ManuelUpdatedDate
+                };
+                await _context.NewsVersions.AddAsync(newsVersion);
+                await _context.SaveChangesAsync();
+
+                if (request.NewsTypeID == (int)NewsTypesEnum.Survey)
+                {
+                    var surveyitem = new Survey
+                    {
+                        NewsVersionID = newsVersion.ID,
+                        Question = request.SurveyItemRequest.Question,
+                        StartDate = request.SurveyItemRequest.StartDate,
+                        EndDate = request.SurveyItemRequest.EndDate,
+                        CreatedBy = CurrentUserID,
+                        IsEnabled = true,
+                    };
+
+                    await _context.Surveys.AddAsync(surveyitem);
+                    await _context.SaveChangesAsync();
+
+                    int order = 1;
+                    if (request.SurveyOptions.Count > 0)
+                    {
+                        var oldAnswerCounts = await (from nv in _context.NewsVersions
+                                                     join s in _context.Surveys on nv.ID equals s.NewsVersionID
+                                                     join so in _context.SurveyOptions on s.ID equals so.SurveyID
+                                                     where nv.NewsID == news.ID
+                                                     select new { so.ID, so.Option, so.AnswerCount })
+                            .ToListAsync();
+
+                        // Create a mapping of option text to its answer count
+                        var optionAnswerCounts = oldAnswerCounts
+                            .GroupBy(x => x.Option)
+                            .ToDictionary(g => g.Key, g => g.Sum(x => x.AnswerCount));
+
+                        // Get the latest version's options to match with
+                        var latestVersionOptions = await (from nv in _context.NewsVersions
+                                                          join s in _context.Surveys on nv.ID equals s.NewsVersionID
+                                                          join so in _context.SurveyOptions on s.ID equals so.SurveyID
+                                                          where nv.NewsID == news.ID
+                                                          orderby nv.ID descending
+                                                          select new { so.ID, so.Option })
+                            .Take(request.SurveyOptions.Count)
+                            .ToListAsync();
+
+                        // Create a mapping of option text to its ID from the latest version
+                        var latestOptionIds = latestVersionOptions.ToDictionary(x => x.Option, x => x.ID);
+
+                        foreach (var optionText in request.SurveyOptions)
+                        {
+                            var surveyOption = new SurveyOptions
+                            {
+                                NewsVersionID = newsVersion.ID,
+                                Option = optionText,
+                                Order = order,
+                                SurveyID = surveyitem.ID,
+                                AnswerCount = optionAnswerCounts.ContainsKey(optionText)
+                                    ? optionAnswerCounts[optionText]
+                                    : 0
+                            };
+                            await _context.SurveyOptions.AddAsync(surveyOption);
+                            order++;
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                var parsedDate = int.Parse(DateTime.Today.ToString("yyyyMMdd"));
+                var archiveDayFolder = await _context.ArchiveFolders.FirstOrDefaultAsync(x =>
+                    x.ID == parsedDate);
+
+                var author = await _context.Authors.FirstOrDefaultAsync(x => x.ID == news.AuthorID);
+                if (author != null)
+                {
+                    author.TotalNewsCount += 1;
+                    author.LastNewsTitle = news.Title;
+
+                    _context.Authors.Update(author);
+                }
+
+                foreach (var photoRequest in request.Photos)
+                {
+                    var photo = new NewsPhoto
+                    {
+                        NewsID = news.ID,
+                        PhotoTypeID = photoRequest.PhotoTypeID,
+                        PhotoUrl = Path.GetFileName(photoRequest.PhotoURL)
+                    };
+
+                    var versionPhoto = new NewsVersionsPhoto
+                    {
+                        NewsID = news.ID,
+                        VersionID = newsVersion.ID,
+                        PhotoTypeID = photoRequest.PhotoTypeID,
+                        PhotoUrl = Path.GetFileName(photoRequest.PhotoURL)
+                    };
+
+                    var archiveImage = new ArchiveImage
+                    {
+                        ImageURL = Path.GetFileName(photoRequest.PhotoURL),
+                        UploadedDate = DateTime.Now,
+                        UploadedBy = CurrentUserID,
+                        FolderID = archiveDayFolder.ID
+                    };
+
+                    if (photoRequest.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto &&
+                        news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles &&
+                        string.IsNullOrEmpty(photoRequest.PhotoURL))
+                    {
+                        photo.PhotoUrl = author.Photo;
+                        versionPhoto.PhotoUrl = author.Photo;
+                    }
+
+                    await _context.NewsPhotos.AddAsync(photo);
+                    await _context.NewsVersionsPhotos.AddAsync(versionPhoto);
+                    await _context.ArchiveImages.AddAsync(archiveImage);
+                }
+
+                var log = new SystemLog
+                {
+                    UserID = CurrentUserID,
+                    IpAddress = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    LogTypeID = (int)LogTypesEnum.News,
+                    IsSuccess = true,
+                    Message = news.Title + " oluşturuldu.",
+                    ObjectID = news.ID
+                };
+                await _context.SystemLogs.AddAsync(log);
+                await _context.SaveChangesAsync();
+                await tx.CommitAsync();
+
+                await anomalyService.CheckNewsAnomaly(news);
+            }
+            catch (Exception e)
+            {
+                await tx.RollbackAsync();
+
+                var prompts = await promptCachingService.GetPrompts();
+                request.TitlePrompts = FilterPrompts(prompts.Data, (int)PromptTypesEnum.Title);
+                request.SubtitlePrompts = FilterPrompts(prompts.Data, (int)PromptTypesEnum.Subtitle);
+
+                await FillRequest(request);
+                response.Data = request;
+
+                response.SetError(_localizer["Error"]);
+
+                LogError(e, request);
+
+                return response;
+            }
+
+            response.Message = _localizer["RecordAdded"];
+            return response;
+        }
+
+        public async Task<ServiceResult<NewsRequest>> Update(long id)
+        {
+            var response = new ServiceResult<NewsRequest>();
+
+            if (!HasRight("NEWS_CREATE_UPDATE"))
+            {
+                response.SetError(_localizer["NonAuth"]);
+                return response;
+            }
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+
+            if (news == null)
+            {
+                response.SetError(_localizer["RecordNotFound"]);
+                return response;
+            }
+
+            var request = new NewsRequest
+            {
+                ID = news.ID,
+                NewsTypeID = news.NewsTypeID,
+                AuthorID = news.AuthorID != null ? news.AuthorID.Value : null,
+                CaricaturistID = news.AuthorID != null ? news.AuthorID.Value : null,
+                Slug = news.Slug,
+                Title = news.Title,
+                SubHeading = news.SubHeading,
+                UpHeadline = news.UpHeadline,
+                UpSubHeading = news.UpSubHeading,
+                ShowUpHeadline = news.ShowUpHeadline,
+                ShowSubHeading = news.ShowSubHeading,
+                ShowUpSubHeading = news.ShowUpSubHeading,
+                RedirectLink = news.RedirectLink,
+                UpSubtitle = news.UpSubtitle,
+                Subtitle = news.Subtitle,
+                Content = news.Content,
+                IsLockedByCurrentUser = (news.IsLocked && !(news.LockedBy == CurrentUserID)),
+                Video = news.Video,
+                PressNo = news.PressNo,
+                Headline = news.Headline,
+                AllowAds = news.AllowAds,
+                AllowGoogleIndex = news.AllowGoogleIndex,
+                AllowToSendGoogleSideMap = news.AllowToSendGoogleSideMap,
+                AllowToSendRSS = news.AllowToSendRSS,
+                ShowHeadline = news.ShowHeadline,
+                SourceIDs = !string.IsNullOrEmpty(news.SourceIDs)
+                    ? news.SourceIDs.Split(",").ToList()
+                    : new List<string>(),
+                SeoDescription = news.SeoDescription,
+                SeoTitle = news.SeoTitle,
+                CategoryID = news.CategoryID,
+                CategoryIDMap = news.CategoryMap,
+                SecondaryCategoryIDMaps = news.SecondaryCategoryMap,
+                SelectedVideoPlayer = news.VideoPlayerID,
+                PublishDate = news.PublishDate,
+                PublishEndDate = news.PublishEndDate,
+                ManuelUpdatedDate = news.ManuelUpdatedDate,
+                BoxCount = news.BoxCount ?? 0,
+            };
+
+            var tagList = await _context.NewsTags.Where(x => x.NewsID == id).Select(x => x.TagID).ToListAsync();
+
+            if (tagList != null && tagList.Count > 0)
+            {
+                request.SelectedTagIDs = tagList;
+            }
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+            {
+                request.SelectedZodiacSignID = news.SecondaryCategoryMap;
+            }
+
+
+            if (request.IsLockedByCurrentUser)
+            {
+                response.SetError(_localizer["NewsLocked2"]);
+                return response;
+            }
+            else
+            {
+                news.LockedBy = CurrentUserID;
+                news.IsLocked = true;
+                news.LockedTime = DateTime.Now;
+
+                _context.News.Update(news);
+                await _context.SaveChangesAsync();
+            }
+
+            await FillRequest(request);
+
+            var versions = await (from v in _context.NewsVersions
+                                  join u in _context.Users on v.CreatedBy equals u.ID
+                                  where v.NewsID == id
+                                  orderby v.ID descending
+                                  select new Version
+                                  {
+                                      VersionID = v.ID,
+                                      CreatedDate = v.CreatedDate.ToFormattedDateTime(),
+                                      UserName = u.FullName,
+                                      UserPhotoURL = u.ProfilePhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                          _appSettingsKeys.CDN_UsersImageFolder)
+                                  }).ToListAsync();
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.Survey)
+            {
+                var lastVersionID = versions.First().VersionID;
+
+                SurveyItemRequest surveyItemRequest = null;
+
+                foreach (var version in versions.OrderByDescending(v => v.VersionID))
+                {
+                    surveyItemRequest = await _context.Surveys
+                        .Where(x => x.NewsVersionID == version.VersionID)
+                        .Select(x => new SurveyItemRequest
+                        {
+                            ID = x.ID,
+                            Question = x.Question,
+                            StartDate = x.StartDate,
+                            EndDate = x.EndDate,
+                            CreatedBy = x.CreatedBy,
+                        }).FirstOrDefaultAsync();
+
+                    if (surveyItemRequest != null)
+                    {
+                        break;
+                    }
+                }
+
+                var surveyOptionsQuery = _context.SurveyOptions.Where(x => x.SurveyID == surveyItemRequest.ID);
+
+                var totalAnswerCount = await surveyOptionsQuery.SumAsync(x => x.AnswerCount);
+
+                var surveyOptions = await surveyOptionsQuery
+                    .GroupBy(x => x.Option)
+                    .Select(g => g.OrderByDescending(x => x.NewsVersionID).First())
+                    .ToDictionaryAsync(x => x.Option, x => x.AnswerCount);
+
+
+                request.SurveyItemRequest = surveyItemRequest;
+                request.SurveyItemRequest.TotalCount = totalAnswerCount;
+                request.SurveyOptions = surveyOptions.Select(x => x.Key).ToList();
+            }
+
+
+            foreach (var photo in request.Photos)
+            {
+                var newsPhoto =
+                    await _context.NewsPhotos.FirstOrDefaultAsync(x =>
+                        x.NewsID == id && x.PhotoTypeID == photo.PhotoTypeID);
+
+                if (newsPhoto != null)
+                {
+                    photo.PhotoURL = newsPhoto.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder);
+                }
+            }
+
+            response.Data = request;
+
+            return response;
+        }
+
+        public async Task<ServiceResult<NewsRequest>> Update(NewsRequest request)
+        {
+            var response = new ServiceResult<NewsRequest>();
+
+            if (!request.SecondaryCategoryIDMaps.IsNullOrEmtpy())
+            {
+                if (request.CategoryIDMap.IsNullOrEmtpy())
+                {
+                    await FillRequest(request);
+                    response.Data = request;
+
+                    response.SetError(_localizer["NewsMainCategoryText"]);
+                    return response;
+                }
+
+                if (request.SecondaryCategoryIDMaps.Contains(request.CategoryIDMap))
+                {
+                    await FillRequest(request);
+                    response.Data = request;
+
+                    response.SetError(_localizer["CategoryAlreadyMain"]);
+                    return response;
+                }
+            }
+
+            await using var tx = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var news = await _context.News.FirstOrDefaultAsync(x => x.ID == request.ID);
+
+                await FillRequest(request);
+
+                if (news == null)
+                {
+                    await FillRequest(request);
+                    response.Data = request;
+
+                    response.SetError(_localizer["RecordNotFound"]);
+                    return response;
+                }
+
+                var newsTags = await _context.NewsTags.Where(x => x.NewsID == request.ID).ToListAsync();
+
+                if (newsTags != null)
+                {
+                    _context.NewsTags.RemoveRange(newsTags);
+
+                    if (request.SelectedTagIDs != null && request.SelectedTagIDs.Count > 0)
+                    {
+                        foreach (var tag in request.SelectedTagIDs)
+                        {
+                            var newsTag = new NewsTag
+                            {
+                                NewsID = news.ID,
+                                TagID = (int)tag
+                            };
+                            await _context.NewsTags.AddAsync(newsTag);
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                var sourceTags = await _context.NewsSources.Where(x => x.NewsID == request.ID).ToListAsync();
+
+                if (sourceTags != null)
+                {
+                    _context.NewsSources.RemoveRange(sourceTags);
+
+                    if (request.SourceIDs != null && request.SourceIDs.Count > 0)
+                    {
+                        foreach (var source in request.SourceIDs)
+                        {
+                            var newsSource = new NewsSource
+                            {
+                                NewsID = news.ID,
+                                SourceID = source.ToInt()
+                            };
+                            await _context.NewsSources.AddAsync(newsSource);
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                if (request.Slug != null)
+                {
+                    if (request.IsChangeSlug)
+                    {
+                        var categoryName = await _context.Categories
+                            .Where(x => x.ID == request.CategoryID)
+                            .Select(x => x.Name)
+                            .FirstOrDefaultAsync();
+
+                        if (categoryName == null)
+                        {
+                            response.SetError("Kategori bulunamadı");
+                            return response;
+                        }
+
+                        var slugSource = request.Title ?? request.Headline ?? request.UpHeadline;
+                        if (string.IsNullOrEmpty(slugSource))
+                        {
+                            response.SetError("Haber başlığı bulunamadı");
+                            return response;
+                        }
+
+                        var urlTemplate = _appSettingsKeys.News_URLSchema;
+                        if (string.IsNullOrEmpty(urlTemplate))
+                        {
+                            response.SetError(_localizer["URLTemplateNotFound"]);
+                            return response;
+                        }
+
+                        request.Slug = urlTemplate
+                            .Replace("{Title}", slugSource.ToSlug() ?? string.Empty)
+                            .Replace("{ID}", news.ID.ToString())
+                            .Replace("{Year}", DateTime.Now.Year.ToString())
+                            .Replace("{Month}", DateTime.Now.Month.ToString("D2"))
+                            .Replace("{Date}", DateTime.Now.Day.ToString("D2"));
+
+                        if (request.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+                        {
+                            var authorSlug = await _context.Authors.Where(x => x.ID == request.AuthorID)
+                                .FirstOrDefaultAsync();
+                            if (authorSlug == null || string.IsNullOrEmpty(authorSlug.Url))
+                            {
+                                response.SetError("Yazar bulunamadı");
+                                return response;
+                            }
+
+                            request.Slug = request.Slug.Replace("{CategoryName}", authorSlug.Url.TrimStart('/'));
+                        }
+                        else if (request.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+                        {
+                            if (string.IsNullOrEmpty(request.SelectedZodiacSignID))
+                            {
+                                response.SetError("Burç seçilmedi");
+                                return response;
+                            }
+
+                            var zodiacId = request.SelectedZodiacSignID
+                                .Split('|', StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+                            if (string.IsNullOrEmpty(zodiacId))
+                            {
+                                response.SetError("Burç seçilmedi");
+                                return response;
+                            }
+
+                            string zodiacSlug = null;
+                            if (int.TryParse(zodiacId, out int zodiacCategoryId))
+                            {
+                                zodiacSlug = await _context.Categories
+                                    .Where(x => x.ID == zodiacCategoryId)
+                                    .Select(x => x.Url)
+                                    .FirstOrDefaultAsync();
+                            }
+
+                            if (string.IsNullOrEmpty(zodiacSlug))
+                            {
+                                response.SetError("Burç kategorisi bulunamadı");
+                                return response;
+                            }
+
+                            var formattedZodiacSlug = $"{zodiacSlug.TrimStart('/')}-burcu";
+                            request.Slug = request.Slug.Replace("{CategoryName}",
+                                categoryName.ToSlug() + "/" + formattedZodiacSlug);
+                        }
+                        else
+                        {
+                            request.Slug = request.Slug.Replace("{CategoryName}", categoryName.ToSlug());
+                        }
+                    }
+
+                    if (request.Slug.Contains("{Year}") || request.Slug.Contains("{Month}") ||
+                        request.Slug.Contains("{Date}"))
+                    {
+                        request.Slug = request.Slug.Replace("{Year}", DateTime.Now.Year.ToString());
+                        request.Slug = request.Slug.Replace("{Month}", DateTime.Now.Month.ToString());
+                        request.Slug = request.Slug.Replace("{Date}", DateTime.Now.Day.ToString());
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(news.Slug) &&
+                        !string.Equals(news.Slug, request.Slug, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var urlMapping = await _context.UrlMappings
+                            .Where(x => x.NewSlug == news.Slug && x.EntityTypeID == (int)EntityTypeEnum.News)
+                            .ToListAsync();
+
+                        if (urlMapping != null)
+                        {
+                            foreach (var url in urlMapping)
+                            {
+                                if (url.OldSlug == request.Slug)
+                                {
+                                    _context.UrlMappings.Remove(url);
+                                }
+                                else
+                                {
+                                    url.NewSlug = request.Slug;
+                                    _context.UrlMappings.Update(url);
+                                }
+                            }
+                        }
+
+                        var newUrlSlug = new UrlMapping
+                        {
+                            NewSlug = request.Slug,
+                            OldSlug = news.Slug,
+                            EntityTypeID = (int)EntityTypeEnum.News,
+                            CreatedDate = DateTime.Now,
+                        };
+                        await _context.UrlMappings.AddAsync(newUrlSlug);
+                        await urlMappingService.NotifyUrlMappingChanged();
+
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                if (request.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews)
+                {
+                    request.AuthorID = request.CaricaturistID;
+
+                    if (news.AuthorID != request.CaricaturistID)
+                    {
+                        var headline = await _context.Caricaturists.Where(x => x.ID == request.CaricaturistID)
+                            .Select(x => x.Headline).FirstOrDefaultAsync();
+
+                        request.Headline = headline ?? request.Headline;
+                    }
+                }
+
+                var newsVersion = new NewsVersion
+                {
+                    NewsID = news.ID,
+                    NewsTypeID = request.NewsTypeID,
+                    StatusID = (int)NewsStatusEnum.Draft,
+                    CategoryID = request.CategoryID,
+                    AuthorID = request.AuthorID,
+                    Slug = request.Slug,
+                    SubHeading = request.SubHeading,
+                    UpHeadline = request.UpHeadline,
+                    UpSubHeading = request.UpSubHeading,
+                    ShowUpHeadline = request.ShowUpHeadline,
+                    ShowSubHeading = request.ShowSubHeading,
+                    ShowUpSubHeading = request.ShowUpSubHeading,
+                    RedirectLink = request.RedirectLink,
+                    Title = request.Title,
+                    UpSubtitle = request.UpSubtitle,
+                    Subtitle = request.Subtitle,
+                    Content = request.Content,
+                    CreatedBy = CurrentUserID,
+                    CreatedDate = DateTime.Now,
+                    Video = request.Video,
+                    PressNo = request.PressNo,
+                    Headline = request.Headline,
+                    AllowAds = request.AllowAds,
+                    SourceIDs = request.SourceIDs?.Any() == true ? string.Join(",", request.SourceIDs) : null,
+                    SeoDescription = news.SeoDescription,
+                    SeoTitle = news.SeoTitle,
+                    CategoryMap = request.CategoryIDMap,
+                    SecondaryCategoryMap = request.SecondaryCategoryIDMaps,
+                    VideoPlayerID = request.Video.IsNullOrEmtpy() ? null : request.SelectedVideoPlayer,
+                    AllowToSendRSS = request.AllowToSendRSS,
+                    ShowHeadline = request.ShowHeadline,
+                    AllowToSendGoogleSideMap = request.AllowToSendGoogleSideMap,
+                    AllowGoogleIndex = request.AllowGoogleIndex,
+                    BoxCount = request.BoxCount,
+                    ManuelUpdatedDate = request.ManuelUpdatedDate,
+                };
+
+                await _context.NewsVersions.AddAsync(newsVersion);
+                await _context.SaveChangesAsync();
+
+                if (request.NewsTypeID == (int)NewsTypesEnum.Survey)
+                {
+                    var isExist = await _context.Surveys.AnyAsync(x => x.NewsVersionID == newsVersion.ID);
+
+                    var surveyitem = new Survey
+                    {
+                        NewsVersionID = newsVersion.ID,
+                        Question = request.SurveyItemRequest.Question,
+                        StartDate = request.SurveyItemRequest.StartDate,
+                        EndDate = request.SurveyItemRequest.EndDate,
+                        CreatedBy = CurrentUserID,
+                        IsEnabled = true,
+                    };
+
+                    await _context.Surveys.AddAsync(surveyitem);
+                    await _context.SaveChangesAsync();
+
+                    int order = 1;
+                    if (request.SurveyOptions.Count > 0)
+                    {
+                        var oldAnswerCounts = await (from nv in _context.NewsVersions
+                                                     join s in _context.Surveys on nv.ID equals s.NewsVersionID
+                                                     join so in _context.SurveyOptions on s.ID equals so.SurveyID
+                                                     where nv.NewsID == news.ID
+                                                     select new { so.ID, so.Option, so.AnswerCount })
+                            .ToListAsync();
+
+                        // Create a mapping of option text to its answer count
+                        var optionAnswerCounts = oldAnswerCounts
+                            .GroupBy(x => x.Option)
+                            .ToDictionary(g => g.Key, g => g.Sum(x => x.AnswerCount));
+
+                        // Get the latest version's options to match with
+                        var latestVersionOptions = await (from nv in _context.NewsVersions
+                                                          join s in _context.Surveys on nv.ID equals s.NewsVersionID
+                                                          join so in _context.SurveyOptions on s.ID equals so.SurveyID
+                                                          where nv.NewsID == news.ID
+                                                          orderby nv.ID descending
+                                                          select new { so.ID, so.Option })
+                            .Take(request.SurveyOptions.Count)
+                            .ToListAsync();
+
+                        // Create a mapping of option text to its ID from the latest version
+                        var latestOptionIds = latestVersionOptions.ToDictionary(x => x.Option, x => x.ID);
+
+                        foreach (var optionText in request.SurveyOptions)
+                        {
+                            var surveyOption = new SurveyOptions
+                            {
+                                NewsVersionID = newsVersion.ID,
+                                Option = optionText,
+                                Order = order,
+                                SurveyID = surveyitem.ID,
+                                AnswerCount = optionAnswerCounts.ContainsKey(optionText)
+                                    ? optionAnswerCounts[optionText]
+                                    : 0
+                            };
+                            await _context.SurveyOptions.AddAsync(surveyOption);
+                            order++;
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                var parsedDate = int.Parse(DateTime.Today.ToString("yyyyMMdd"));
+                var archiveDayFolder = await _context.ArchiveFolders.FirstOrDefaultAsync(x =>
+                    x.ID == parsedDate);
+
+                if (request.Photos != null)
+                {
+                    foreach (var photoRequest in request.Photos)
+                    {
+                        var photo = await _context.NewsPhotos.FirstOrDefaultAsync(x =>
+                            x.NewsID == request.ID && x.PhotoTypeID == photoRequest.PhotoTypeID);
+                        string resultUrl = null;
+
+                        if (Path.GetFileName(photo.PhotoUrl) != Path.GetFileName(photoRequest.PhotoURL))
+                        {
+                            if (photoRequest.PhotoURL != null)
+                            {
+                                Uri uri = new Uri(photoRequest.PhotoURL);
+                                string path = uri.AbsolutePath;
+                                string[] segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                                resultUrl = "/" + string.Join('/', segments.Skip(1));
+                            }
+
+                            photo.PhotoUrl = resultUrl;
+
+                            _context.NewsPhotos.Update(photo);
+
+                            var archiveImage = new ArchiveImage
+                            {
+                                ImageURL = Path.GetFileName(photoRequest.PhotoURL),
+                                UploadedDate = DateTime.Now,
+                                UploadedBy = CurrentUserID,
+                                FolderID = archiveDayFolder.ID
+                            };
+
+                            await _context.ArchiveImages.AddAsync(archiveImage);
+                        }
+
+                        var versionPhoto = new NewsVersionsPhoto
+                        {
+                            NewsID = news.ID,
+                            VersionID = newsVersion.ID,
+                            PhotoTypeID = photoRequest.PhotoTypeID,
+                            PhotoUrl = resultUrl
+                        };
+
+                        await _context.NewsVersionsPhotos.AddAsync(versionPhoto);
+                    }
+                }
+
+                news.AuthorID = request.AuthorID;
+                news.CategoryID = request.CategoryID;
+                news.Slug = request.Slug;
+                news.Title = request.Title;
+                news.SubHeading = request.SubHeading;
+                news.UpHeadline = request.UpHeadline;
+                news.UpSubHeading = request.UpSubHeading;
+                news.ShowUpHeadline = request.ShowUpHeadline;
+                news.ShowSubHeading = request.ShowSubHeading;
+                news.ShowUpSubHeading = request.ShowUpSubHeading;
+                news.RedirectLink = request.RedirectLink;
+                news.UpSubtitle = request.UpSubtitle;
+                news.Subtitle = request.Subtitle;
+                news.Content = request.Content;
+                news.UpdatedBy = CurrentUserID;
+                news.UpdateDate = DateTime.Now;
+                news.Video = request.Video;
+                news.StatusID = (int)NewsStatusEnum.Draft;
+                news.PressNo = request.PressNo;
+                news.Headline = request.Headline;
+                news.AllowAds = request.AllowAds;
+                news.AllowToSendRSS = request.AllowToSendRSS;
+                news.ShowHeadline = request.ShowHeadline;
+                news.AllowToSendGoogleSideMap = request.AllowToSendGoogleSideMap;
+                news.AllowGoogleIndex = request.AllowGoogleIndex;
+                news.SourceIDs = request.SourceIDs?.Any() == true ? string.Join(",", request.SourceIDs) : null;
+                news.SeoDescription = request.SeoDescription;
+                news.SeoTitle = request.SeoTitle.IsNullOrEmtpy() ? request.Title : request.SeoTitle;
+                news.CategoryMap = request.CategoryIDMap;
+                news.SecondaryCategoryMap = request.SecondaryCategoryIDMaps;
+                news.VideoPlayerID = request.Video.IsNullOrEmtpy() ? null : request.SelectedVideoPlayer;
+                news.PublishDate = request.PublishDate;
+                news.PublishEndDate = request.PublishEndDate;
+                news.ManuelUpdatedDate = request.ManuelUpdatedDate != news.ManuelUpdatedDate
+                    ? request.ManuelUpdatedDate
+                    : DateTime.Now;
+                news.LockedBy = null;
+                news.IsLocked = false;
+                news.LockedTime = null;
+                news.BoxCount = request.BoxCount;
+
+                if (!request.SecondaryCategoryIDMaps.IsNullOrEmtpy() &&
+                    request.NewsTypeID != (int)NewsTypesEnum.ZodiacSigns)
+                {
+                    List<int> secondaryCategoryIds = request.SecondaryCategoryIDMaps
+                        .Split(new[] { "|-|" }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => s.Trim('|'))
+                        .Where(s => int.TryParse(s, out _))
+                        .Select(int.Parse)
+                        .ToList();
+
+                    var newsSecondaryCategories =
+                        await _context.NewsSecondaryCategories.Where(x => x.NewsID == news.ID).ToListAsync();
+
+                    if (newsSecondaryCategories.Any())
+                    {
+                        _context.NewsSecondaryCategories.RemoveRange(newsSecondaryCategories);
+                    }
+
+                    foreach (int id in secondaryCategoryIds)
+                    {
+                        var secondaryCategory = new NewsSecondaryCategory
+                        {
+                            NewsID = news.ID,
+                            SecondaryCategoryID = id
+                        };
+                        await _context.NewsSecondaryCategories.AddAsync(secondaryCategory);
+                    }
+                }
+
+                if (request.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+                {
+                    news.SecondaryCategoryMap = request.SelectedZodiacSignID;
+                }
+
+                _context.News.Update(news);
+
+                var author = await _context.Authors.FirstOrDefaultAsync(x => x.ID == news.AuthorID);
+                if (author != null)
+                {
+                    author.LastNewsTitle = news.Title;
+                    _context.Authors.Update(author);
+                }
+
+                var log = new SystemLog
+                {
+                    UserID = CurrentUserID,
+                    IpAddress = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    LogTypeID = (int)LogTypesEnum.News,
+                    IsSuccess = true,
+                    Message = news.Title + " güncellendi.",
+                    ObjectID = news.ID
+                };
+                await _context.SystemLogs.AddAsync(log);
+
+                await _context.SaveChangesAsync();
+                await tx.CommitAsync();
+                await anomalyService.CheckNewsAnomaly(news);
+            }
+            catch (Exception e)
+            {
+                await tx.RollbackAsync();
+
+                var prompts = await promptCachingService.GetPrompts();
+                request.TitlePrompts = FilterPrompts(prompts.Data, (int)PromptTypesEnum.Title);
+                request.SubtitlePrompts = FilterPrompts(prompts.Data, (int)PromptTypesEnum.Subtitle);
+
+                await FillRequest(request);
+                response.Data = request;
+
+                response.SetError(_localizer["Error"] + e.Message);
+                LogError(e, request);
+                return response;
+            }
+
+            return response;
+        }
+
+        public async Task<ServiceResult<DetailsNewsResponse>> Details(long id)
+        {
+            var result = new ServiceResult<DetailsNewsResponse>();
+
+            var news = await (from n in _context.News
+                              join t in _context.NewsTypes on n.NewsTypeID equals t.ID
+                              join u in _context.Users on n.UpdatedBy equals u.ID into users
+                              from user in users.DefaultIfEmpty()
+                              join c in _context.Categories on n.CategoryID equals c.ID into categories
+                              from category in categories.DefaultIfEmpty()
+                              join st in _context.NewsStatus on n.StatusID equals st.ID
+                              where n.ID == id
+                              select new DetailsNewsResponse
+                              {
+                                  NewsID = id,
+                                  Title = n.Title,
+                                  SubHeading = n.SubHeading,
+                                  UpHeadline = n.UpHeadline,
+                                  UpSubHeading = n.UpSubHeading,
+                                  ShowHeadline = n.ShowHeadline,
+                                  ShowUpHeadline = n.ShowUpHeadline,
+                                  ShowSubHeading = n.ShowSubHeading,
+                                  ShowUpSubHeading = n.ShowUpSubHeading,
+                                  RedirectLink = n.RedirectLink,
+                                  UpSubTitle = n.UpSubtitle,
+                                  SubTitle = n.Subtitle,
+                                  Content = n.Content,
+                                  StatusID = n.StatusID,
+                                  StatusName = st.Name,
+                                  Type = t.Name,
+                                  IsLocked = n.IsLocked,
+                                  IsLockedByCurrentUser = n.LockedBy == CurrentUserID,
+                                  ScheduledDate = n.PublishDate.ToFormattedDateTime(),
+                                  UpdateDate = n.UpdateDate.ToFormattedDateTime(),
+                                  UpdatedBy = user != null ? user.FullName : string.Empty,
+                                  ViewCount = n.ViewCount,
+                                  Slug = n.Slug,
+                                  LockedTime = n.LockedTime,
+                                  Video = n.Video,
+                                  IsPublished = n.IsPublished,
+                                  NewsTypeID = n.NewsTypeID,
+                                  PressNo = n.PressNo,
+                                  Headline = n.Headline,
+                                  AllowAds = n.AllowAds,
+                                  CreatedBy = n.CreatedBy,
+                                  SourceIDs = n.SourceIDs,
+                                  SeoDescription = n.SeoDescription,
+                                  SeoTitle = n.SeoTitle,
+                                  MainCategory = category != null ? category.Name : string.Empty,
+                                  SecondaryCategoryMap = n.SecondaryCategoryMap,
+                                  AuthorID = n.AuthorID,
+                                  VideoPlayerID = n.VideoPlayerID,
+                                  LockedByID = n.LockedBy ?? 0,
+                                  ManuelUpdatedDate = n.ManuelUpdatedDate != null ? n.ManuelUpdatedDate.ToFormattedDateTime() : "--",
+                                  PublishDate = n.PublishDate != null ? n.PublishDate.ToFormattedDateTime() : "--",
+                                  PublishEndDate = n.PublishEndDate != null ? n.PublishEndDate.ToFormattedDateTime() : "--",
+                              }).FirstOrDefaultAsync();
+
+            if (news == null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            if (news.LockedByID > 0)
+            {
+                var lockedUser = await _context.Users.FirstOrDefaultAsync(x => x.ID == news.LockedByID);
+                if (lockedUser != null)
+                {
+                    news.LockedBy = lockedUser.FullName;
+                }
+            }
+
+            var tagIDList = await _context.NewsTags.Where(x => x.NewsID == id).Select(x => x.TagID).ToListAsync();
+            if (tagIDList != null && tagIDList.Any())
+            {
+                var tagNameList = await _context.Tags.Where(x => tagIDList.Contains((int)x.ID)).Select(x => x.Text)
+                    .ToListAsync();
+                news.TagsList = string.Join(",", tagNameList).Split(",").ToArray();
+            }
+
+            if (!HasRight("NEWS_VIEW_ALL") && news.CreatedBy != CurrentUserID)
+            {
+                result.SetError(_localizer["NonAuth"]);
+                return result;
+            }
+
+            if (news == null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var socialMedias = await _context.NewsSocialMedias.Where(x => x.NewsID == id)
+                .Select(x => new SocialMediaRequest
+                {
+                    FacebookTitle = x.FacebookTitle,
+                    FacebookContent = x.FacebookContent,
+                    FacebookPhotoUrl = x.FacebookPhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                    XTitle = x.XTitle,
+                    XContent = x.XContent,
+                    XPhotoUrl = x.XPhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                    InstagramTitle = x.InstagramTitle,
+                    InstagramContent = x.InstagramContent,
+                    InstagramPhotoUrl = x.InstagramPhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder)
+                })
+                .FirstOrDefaultAsync();
+            news.SocialMedias = socialMedias;
+
+            var versions = await (from v in _context.NewsVersions
+                                  join u in _context.Users on v.CreatedBy equals u.ID
+                                  where v.NewsID == id
+                                  orderby v.ID descending
+                                  select new Version
+                                  {
+                                      VersionID = v.ID,
+                                      CreatedDate = v.CreatedDate.ToFormattedDateTime(),
+                                      UserName = u.FullName,
+                                      UserPhotoURL = u.ProfilePhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                          _appSettingsKeys.CDN_UsersImageFolder)
+                                  }).ToListAsync();
+
+            news.Versions = versions;
+
+
+            //news.RedirectURL = news.NewsTypeID == (int)NewsTypesEnum.Ad
+            //? news.Slug
+            //: _appSettingsKeys.Common_ClientWebSite + (news.Slug.StartsWith("/") ? news.Slug.TrimStart('/') : news.Slug);
+
+
+            news.RedirectURL = _appSettingsKeys.Common_ClientWebSite + (news.Slug?.StartsWith("/") == true
+                ? news.Slug.TrimStart('/')
+                : news.Slug ?? string.Empty);
+
+            var tagsNews = await _context.NewsTags.Where(x => x.NewsID == news.NewsID).ToListAsync();
+            var sourcesNews = await _context.NewsSources.Where(x => x.NewsID == news.NewsID).ToListAsync();
+
+            if (tagsNews?.Any() == true)
+            {
+                var tagIds = tagsNews.Select(x => (long)x.TagID).ToList();
+                var tags = await _context.Tags.Where(x => tagIds.Contains(x.ID)).ToListAsync();
+                news.Tags = string.Join(", ", tags?.Select(x => x.Text).ToList() ?? new List<string>());
+            }
+
+            if (sourcesNews?.Any() == true)
+            {
+                var sourceIds = sourcesNews.Select(x => x.SourceID).ToList();
+                var sourceNames = await _context.Sources.Where(x => sourceIds.Contains(x.ID)).ToListAsync();
+                news.SourceName = string.Join(", ", sourceNames?.Select(x => x.Name).ToList() ?? new List<string>());
+            }
+
+            if (news.AuthorID.HasValue)
+            {
+                var author = await _context.Authors.FirstOrDefaultAsync(x => x.ID == news.AuthorID);
+                var caricaturist = await _context.Caricaturists.FirstOrDefaultAsync(x => x.ID == news.AuthorID);
+                news.AuthorName = author?.FullName ?? caricaturist?.Name ?? string.Empty;
+            }
+            else
+            {
+                news.AuthorName = string.Empty;
+            }
+
+            var photos = new List<Photo>();
+            var photosData = await (from p in _context.NewsPhotos
+                                    join pt in _context.NewsPhotoTypes on p.PhotoTypeID equals pt.ID
+                                    where p.NewsID == id
+                                    select new
+                                    {
+                                        PhotoURL = p.PhotoUrl,
+                                        PhotoTypeName = pt.Name,
+                                        PhotoTypeID = pt.ID,
+                                        Description = pt.Description,
+                                        Height = pt.Height,
+                                        Width = pt.Width
+                                    }).ToListAsync();
+
+            foreach (var photo in photosData)
+            {
+                var newsPhoto = new Photo
+                {
+                    PhotoTypeName = photo.PhotoTypeName,
+                    PhotoTypeID = photo.PhotoTypeID,
+                    Description = photo.Description,
+                    Height = photo.Height,
+                    Width = photo.Width
+                };
+                if (photo.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto
+                    && news.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+                {
+                    newsPhoto.PhotoURL = photo.PhotoURL.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_AuthorPhotos);
+                }
+                else
+                {
+                    newsPhoto.PhotoURL = photo.PhotoURL.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder);
+                }
+
+                photos.Add(newsPhoto);
+            }
+
+            news.Photos = photos;
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.Survey)
+            {
+                var lastVersionID = versions.First().VersionID;
+
+                SurveyItemRequest surveyItemRequest = null;
+
+                foreach (var version in versions.OrderByDescending(v => v.VersionID))
+                {
+                    surveyItemRequest = await _context.Surveys
+                        .Where(x => x.NewsVersionID == version.VersionID)
+                        .Select(x => new SurveyItemRequest
+                        {
+                            ID = x.ID,
+                            Question = x.Question,
+                            StartDate = x.StartDate,
+                            EndDate = x.EndDate,
+                            CreatedBy = x.CreatedBy,
+                        }).FirstOrDefaultAsync();
+
+                    if (surveyItemRequest != null)
+                    {
+                        break;
+                    }
+                }
+
+                var surveyOptionsQuery = _context.SurveyOptions.Where(x => x.SurveyID == surveyItemRequest.ID);
+
+                var totalAnswerCount = await surveyOptionsQuery.SumAsync(x => x.AnswerCount);
+
+                var surveyOptions = await surveyOptionsQuery
+                    .GroupBy(x => x.Option)
+                    .Select(g => g.OrderByDescending(x => x.NewsVersionID).First())
+                    .ToDictionaryAsync(x => x.Option, x => x.AnswerCount);
+
+                news.SurveyItemRequest = surveyItemRequest;
+                news.SurveyItemRequest.TotalCount = totalAnswerCount;
+                news.SurveyItemRequest.OptionWithAnswerCount = surveyOptions;
+            }
+
+            if (news.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+            {
+                var newsPhotoGalleryItems = await _context.NewsPhotoGalleryItems.Where(x => x.NewsID == news.NewsID)
+                    .OrderBy(x => x.Order).Select(x => new PhotoGalleryItemRequest
+                    {
+                        Content = x.Content,
+                        ID = x.ID,
+                        PhotoURL = x.PhotoUrl,
+                        Order = x.Order
+                    }).ToListAsync();
+
+                news.PhotoGalleryItems = newsPhotoGalleryItems;
+            }
+
+            var rights = new Rights
+            {
+                Publish = HasRight("NEWS_PUBLISH"),
+                UnPublish = HasRight("NEWS_UNPUBLISH"),
+                Unlock = HasRight("NEWS_UNLOCK"),
+                NewsCreateUpdate = HasRight("NEWS_CREATE_UPDATE")
+            };
+
+            news.HasRights = rights;
+            result.Data = news;
+
+            return result;
+        }
+
+        public async Task<ServiceResult<SocialMediaRequest>> UpdateSocialMedias(long id)
+        {
+            var result = new ServiceResult<SocialMediaRequest>();
+
+            var socialMedias = await _context.NewsSocialMedias.Where(x => x.NewsID == id).FirstOrDefaultAsync();
+
+            if (socialMedias is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var request = new SocialMediaRequest
+            {
+                ID = id,
+                FacebookTitle = socialMedias.FacebookTitle,
+                FacebookContent = socialMedias.FacebookContent,
+                FacebookPhotoUrl = socialMedias.FacebookPhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                    _appSettingsKeys.CDN_MediaGalleryFolder),
+                XTitle = socialMedias.XTitle,
+                XContent = socialMedias.XContent,
+                XPhotoUrl = socialMedias.XPhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                    _appSettingsKeys.CDN_MediaGalleryFolder),
+                InstagramTitle = socialMedias.InstagramTitle,
+                InstagramContent = socialMedias.InstagramContent,
+                InstagramPhotoUrl = socialMedias.InstagramPhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                    _appSettingsKeys.CDN_MediaGalleryFolder)
+            };
+
+            result.Data = request;
+
+            return result;
+        }
+
+        public async Task<ServiceResult<SocialMediaRequest>> UpdateSocialMedias(SocialMediaRequest request)
+        {
+            var result = new ServiceResult<SocialMediaRequest>();
+
+            var socialMedias = await _context.NewsSocialMedias.Where(x => x.NewsID == request.ID).FirstOrDefaultAsync();
+
+            if (socialMedias is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == request.ID);
+
+            if (request.FacebookPhoto != null)
+            {
+                var uploadResult = fileUpload.Upload(request.FacebookPhoto, _appSettingsKeys.CDN_MediaGalleryFolder);
+                if (uploadResult.IsSuccess)
+                {
+                    request.FacebookPhotoUrl = uploadResult.FileName;
+                    socialMedias.FacebookPhotoUrl = Path.GetFileName(request.FacebookPhotoUrl);
+                }
+            }
+
+            if (request.XPhoto != null)
+            {
+                var uploadResult = fileUpload.Upload(request.XPhoto, _appSettingsKeys.CDN_MediaGalleryFolder);
+                if (uploadResult.IsSuccess)
+                {
+                    request.XPhotoUrl = uploadResult.FileName;
+                    socialMedias.XPhotoUrl = Path.GetFileName(request.XPhotoUrl);
+                }
+            }
+
+            if (request.InstagramPhoto != null)
+            {
+                var uploadResult = fileUpload.Upload(request.InstagramPhoto, _appSettingsKeys.CDN_MediaGalleryFolder);
+                if (uploadResult.IsSuccess)
+                {
+                    request.InstagramPhotoUrl = uploadResult.FileName;
+                    socialMedias.InstagramPhotoUrl = Path.GetFileName(request.InstagramPhotoUrl);
+                }
+            }
+
+            socialMedias.FacebookTitle = request.FacebookTitle.IsNullOrEmtpy() ? news.Title : request.FacebookTitle;
+            socialMedias.FacebookContent =
+                request.FacebookContent.IsNullOrEmtpy() ? news.Subtitle : request.FacebookContent;
+            socialMedias.XTitle = request.XTitle.IsNullOrEmtpy() ? news.Title : request.XTitle;
+            socialMedias.XContent = request.XContent.IsNullOrEmtpy() ? news.Subtitle : request.XContent;
+            socialMedias.InstagramTitle = request.InstagramTitle.IsNullOrEmtpy() ? news.Title : request.InstagramTitle;
+            socialMedias.InstagramContent =
+                request.InstagramContent.IsNullOrEmtpy() ? news.Subtitle : request.InstagramContent;
+
+            _context.NewsSocialMedias.Update(socialMedias);
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
+
+        private async Task<ServiceResult> PublishNow(News news)
+        {
+            var result = new ServiceResult();
+
+            await using var tx = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var publishDate = news.PublishDate ?? DateTime.Now;
+                var publishedNews = await _context.NewsPublished.FirstOrDefaultAsync(x => x.NewsID == news.ID);
+
+                if (publishedNews != null)
+                {
+                    if (news.IsPublished && news.StatusID == (int)NewsStatusEnum.Draft)
+                    {
+                        news.UpdateDate = DateTime.Now;
+                        news.UpdatedBy = CurrentUserID;
+                        news.ManuelUpdatedDate = DateTime.Now;
+                        _context.News.Update(news);
+
+                        publishedNews.PublishedBy = CurrentUserID;
+                        publishedNews.PublishedDate = publishDate;
+                        publishedNews.PublishEndDate = news.PublishEndDate;
+                        publishedNews.CategoryID = news.CategoryID;
+                        publishedNews.AuthorID = news.AuthorID;
+                        publishedNews.Slug = news.Slug;
+                        publishedNews.Title = news.Title;
+                        publishedNews.SubHeading = news.SubHeading;
+                        publishedNews.UpHeadline = news.UpHeadline;
+                        publishedNews.UpSubHeading = news.UpSubHeading;
+                        publishedNews.ShowUpHeadline = news.ShowUpHeadline;
+                        publishedNews.ShowSubHeading = news.ShowSubHeading;
+                        publishedNews.ShowUpSubHeading = news.ShowUpSubHeading;
+                        publishedNews.RedirectLink = news.RedirectLink;
+                        publishedNews.UpSubtitle = news.UpSubtitle;
+                        publishedNews.Subtitle = news.Subtitle;
+                        publishedNews.Content = news.Content;
+                        publishedNews.Video = news.Video;
+                        publishedNews.PressNo = news.PressNo;
+                        publishedNews.Headline = news.Headline;
+                        publishedNews.AllowAds = news.AllowAds;
+                        publishedNews.SourceIDs = news.SourceIDs;
+                        publishedNews.SeoDescription = news.SeoDescription;
+                        publishedNews.SeoTitle = news.SeoTitle;
+                        publishedNews.CategoryMap = news.CategoryMap;
+                        publishedNews.SecondaryCategoryMap = news.SecondaryCategoryMap;
+                        publishedNews.VideoPlayerID = news.VideoPlayerID;
+                        publishedNews.BoxCount = news.BoxCount;
+                        publishedNews.AllowGoogleIndex = news.AllowGoogleIndex;
+                        publishedNews.AllowToSendGoogleSideMap = news.AllowToSendGoogleSideMap;
+                        publishedNews.AllowToSendRSS = news.AllowToSendRSS;
+                        publishedNews.ShowHeadline = news.ShowHeadline;
+                        publishedNews.ManuelUpdatedDate = DateTime.Now;
+
+                        _context.NewsPublished.Update(publishedNews);
+
+                        var publishedNewsPhotos =
+                            await _context.NewsPublishedPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+                        _context.NewsPublishedPhotos.RemoveRange(publishedNewsPhotos);
+                    }
+                    else if (!news.IsPublished && news.StatusID == (int)NewsStatusEnum.Draft)
+                    {
+                        news.UpdateDate = DateTime.Now;
+                        news.UpdatedBy = CurrentUserID;
+                        news.ManuelUpdatedDate = DateTime.Now;
+                        news.IsPublished = true;
+                        _context.News.Update(news);
+
+                        publishedNews.PublishedBy = CurrentUserID;
+                        publishedNews.PublishedDate = publishDate;
+                        publishedNews.PublishEndDate = news.PublishEndDate;
+                        publishedNews.CategoryID = news.CategoryID;
+                        publishedNews.AuthorID = news.AuthorID;
+                        publishedNews.Slug = news.Slug;
+                        publishedNews.Title = news.Title;
+                        publishedNews.SubHeading = news.SubHeading;
+                        publishedNews.UpHeadline = news.UpHeadline;
+                        publishedNews.UpSubHeading = news.UpSubHeading;
+                        publishedNews.ShowUpHeadline = news.ShowUpHeadline;
+                        publishedNews.ShowSubHeading = news.ShowSubHeading;
+                        publishedNews.ShowUpSubHeading = news.ShowUpSubHeading;
+                        publishedNews.RedirectLink = news.RedirectLink;
+                        publishedNews.UpSubtitle = news.UpSubtitle;
+                        publishedNews.Subtitle = news.Subtitle;
+                        publishedNews.Content = news.Content;
+                        publishedNews.Video = news.Video;
+                        publishedNews.PressNo = news.PressNo;
+                        publishedNews.Headline = news.Headline;
+                        publishedNews.AllowAds = news.AllowAds;
+                        publishedNews.SourceIDs = news.SourceIDs;
+                        publishedNews.SeoDescription = news.SeoDescription;
+                        publishedNews.SeoTitle = news.SeoTitle;
+                        publishedNews.CategoryMap = news.CategoryMap;
+                        publishedNews.SecondaryCategoryMap = news.SecondaryCategoryMap;
+                        publishedNews.VideoPlayerID = news.VideoPlayerID;
+                        publishedNews.BoxCount = news.BoxCount;
+                        publishedNews.AllowGoogleIndex = news.AllowGoogleIndex;
+                        publishedNews.AllowToSendGoogleSideMap = news.AllowToSendGoogleSideMap;
+                        publishedNews.AllowToSendRSS = news.AllowToSendRSS;
+                        publishedNews.ShowHeadline = news.ShowHeadline;
+                        publishedNews.ManuelUpdatedDate = DateTime.Now;
+
+                        _context.NewsPublished.Update(publishedNews);
+
+                        var publishedNewsPhotos =
+                            await _context.NewsPublishedPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+                        _context.NewsPublishedPhotos.RemoveRange(publishedNewsPhotos);
+                    }
+                }
+                else
+                {
+                    if (publishedNews != null)
+                    {
+                        result.SetError(_localizer["PublishMessage"]);
+                        return result;
+                    }
+
+                    var newsPublished = new NewsPublished
+                    {
+                        NewsID = news.ID,
+                        PublishedBy = CurrentUserID,
+                        PublishedDate = publishDate,
+                        PublishEndDate = news.PublishEndDate,
+                        NewsTypeID = news.NewsTypeID,
+                        CategoryID = news.CategoryID,
+                        AuthorID = news.AuthorID,
+                        Slug = news.Slug,
+                        Title = news.Title,
+                        SubHeading = news.SubHeading,
+                        UpHeadline = news.UpHeadline,
+                        UpSubHeading = news.UpSubHeading,
+                        ShowUpHeadline = news.ShowUpHeadline,
+                        ShowSubHeading = news.ShowSubHeading,
+                        ShowUpSubHeading = news.ShowUpSubHeading,
+                        RedirectLink = news.RedirectLink,
+                        UpSubtitle = news.UpSubtitle,
+                        Subtitle = news.Subtitle,
+                        Content = news.Content,
+                        Tags = news.Tags,
+                        Video = news.Video,
+                        PressNo = news.PressNo,
+                        Headline = news.Headline,
+                        AllowAds = news.AllowAds,
+                        SourceIDs = news.SourceIDs,
+                        SeoDescription = news.SeoDescription,
+                        SeoTitle = news.SeoTitle,
+                        CategoryMap = news.CategoryMap,
+                        SecondaryCategoryMap = news.SecondaryCategoryMap,
+                        VideoPlayerID = news.VideoPlayerID,
+                        AllowToSendRSS = news.AllowToSendRSS,
+                        ShowHeadline = news.ShowHeadline,
+                        AllowGoogleIndex = news.AllowGoogleIndex,
+                        AllowToSendGoogleSideMap = news.AllowToSendGoogleSideMap,
+                        BoxCount = news.BoxCount,
+                        ManuelUpdatedDate = news.ManuelUpdatedDate
+                    };
+
+                    if (news.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews)
+                    {
+                        var publishedCaricaturistNews =
+                            await _context.NewsPublished.FirstOrDefaultAsync(x => x.AuthorID == news.AuthorID);
+                        await UnPublish(publishedCaricaturistNews.NewsID,
+                            "Bu çizere ait yeni bir çizer haberi yayına alındığından bu haber yayından kaldırılmıştır.");
+                    }
+
+                    await _context.NewsPublished.AddAsync(newsPublished);
+                }
+
+                await _context.SaveChangesAsync();
+
+                var newsPhotos = await _context.NewsPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+                var oldNewsPublishedPhotos = await _context.NewsPublishedPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+
+                if (oldNewsPublishedPhotos.Any())
+                {
+                    _context.NewsPublishedPhotos.RemoveRange(oldNewsPublishedPhotos);
+                }
+
+                foreach (var photo in newsPhotos)
+                {
+                    var publishedNewsPhoto = new NewsPublishedPhoto
+                    {
+                        NewsID = photo.NewsID,
+                        PhotoTypeID = photo.PhotoTypeID,
+                        PhotoUrl = photo.PhotoUrl
+                    };
+
+                    await _context.NewsPublishedPhotos.AddAsync(publishedNewsPhoto);
+                }
+
+                if (news.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+                {
+                    if (news.StatusID == (int)NewsStatusEnum.Draft && news.IsPublished)
+                    {
+                        var publishedNewsPhotoGalleryItems = await _context.NewsPublishedPhotoGalleryItems
+                            .Where(x => x.NewsID == news.ID).ToListAsync();
+                        _context.NewsPublishedPhotoGalleryItems.RemoveRange(publishedNewsPhotoGalleryItems);
+                    }
+
+                    var newsPhotoGalleryItems =
+                        await _context.NewsPhotoGalleryItems.Where(x => x.NewsID == news.ID).ToListAsync();
+
+                    foreach (var item in newsPhotoGalleryItems)
+                    {
+
+                        var publishedNewsPhotoGalleryItem = new NewsPublishedPhotoGalleryItem
+                        {
+                            NewsID = news.ID,
+                            PhotoUrl = item.PhotoUrl,
+                            Order = item.Order,
+                            Content = item.Content,
+                        };
+
+                        await _context.NewsPublishedPhotoGalleryItems.AddAsync(publishedNewsPhotoGalleryItem);
+                    }
+                }
+
+                news.StatusID = (int)NewsStatusEnum.Published;
+                news.IsPublished = true;
+                news.PublishDate = publishDate;
+
+                _context.News.Update(news);
+
+                var log = new SystemLog
+                {
+                    UserID = CurrentUserID,
+                    IpAddress = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    LogTypeID = (int)LogTypesEnum.News,
+                    IsSuccess = true,
+                    Message = news.Title + " yayına alındı.",
+                    ObjectID = news.ID
+                };
+                await _context.SystemLogs.AddAsync(log);
+                await _context.SaveChangesAsync();
+                await tx.CommitAsync();
+
+                result.SetSuccess(_localizer["PublishMessage"]);
+            }
+            catch (Exception e)
+            {
+                await tx.RollbackAsync();
+                result.SetError(_localizer["Error"]);
+                LogError(e, news);
+                return result;
+            }
+
+            result.SetSuccess(_localizer["RecordUpdated"]);
+            return result;
+        }
+
+        private async Task<ServiceResult> PublishScheduled(News news, string date)
+        {
+            var result = new ServiceResult();
+
+            var formattedDate = DateTime.ParseExact(date, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
+
+            var isExistPublished = await _context.NewsPublished.AnyAsync(x => x.NewsID == news.ID);
+            if (news.IsPublished || isExistPublished)
+            {
+                await UnPublish(news.ID,
+                    "Bu haberin yayına alınma tarihi değiştirildiği için yayından kaldırılmıştır.");
+            }
+
+            news.StatusID = (int)NewsStatusEnum.Scheduled;
+            news.PublishDate = formattedDate;
+            news.ScheduledBy = CurrentUserID;
+
+            _context.News.Update(news);
+
+            var log = new SystemLog
+            {
+                UserID = CurrentUserID,
+                IpAddress = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString(),
+                LogTypeID = (int)LogTypesEnum.News,
+                IsSuccess = true,
+                Message = news.Title + " yayın zamanı belirlendi.",
+                ObjectID = news.ID
+            };
+            await _context.SystemLogs.AddAsync(log);
+
+            await _context.SaveChangesAsync();
+            await anomalyService.CheckNewsAnomaly(news);
+            result.SetSuccess(_localizer["ScheduleMessage"] + " " + date);
+            return result;
+        }
+
+        public async Task<ServiceResult> PublishNowOrScheduled(long id)
+        {
+            var result = new ServiceResult();
+
+            if (!HasRight("NEWS_PUBLISH"))
+            {
+                result.SetError(_localizer["NonAuth"]);
+                return result;
+            }
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+
+            if (news is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            if (!news.PublishDate.HasValue)
+            {
+                result = await PublishNow(news);
+                if (result.IsSuccess)
+                {
+                    await newsCachingService.HandlePublishCacheOperations(news);
+                    return result;
+                }
+            }
+            else if (news.PublishDate.HasValue && news.PublishDate <= DateTime.Now)
+            {
+                result = await PublishNow(news);
+                if (result.IsSuccess)
+                {
+                    await newsCachingService.HandlePublishCacheOperations(news);
+                    return result;
+                }
+            }
+            else if (news.PublishDate.HasValue && news.PublishDate > DateTime.Now)
+            {
+                result = await PublishScheduled(news, news.PublishDate.ToFormattedDateTime());
+                if (!result.IsSuccess)
+                {
+                    result.SetError("Haber zamanlanamadı.");
+                    return result;
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> UnPublish(long id, string description)
+        {
+            var result = new ServiceResult();
+
+            if (!HasRight("NEWS_UNPUBLISH"))
+            {
+                result.SetError(_localizer["NonAuth"]);
+                return result;
+            }
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+
+            if (news.IsPublished == false)
+            {
+                result.SetError(_localizer["Error"]);
+                return result;
+            }
+
+            news.StatusID = (int)NewsStatusEnum.Unpublished;
+            news.IsPublished = false;
+
+            _context.News.Update(news);
+
+            var publishedNew = await _context.NewsPublished.FirstOrDefaultAsync(x => x.NewsID == id);
+
+            _context.NewsPublished.Remove(publishedNew);
+            await _context.SaveChangesAsync();
+
+            var publishedPhotos = await _context.NewsPublishedPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+            _context.NewsPublishedPhotos.RemoveRange(publishedPhotos);
+
+            var blockItem = await _context.BlockItems.FirstOrDefaultAsync(x => x.NewsID == id);
+            if (blockItem != null)
+            {
+                _context.BlockItems.Remove(blockItem);
+            }
+
+            var relatedNews = await _context.RelatedNews.Where(x => x.RelatedNewsID == id).ToListAsync();
+            if (relatedNews.Any())
+            {
+                _context.RelatedNews.RemoveRange(relatedNews);
+            }
+
+            var author = await _context.Authors.FirstOrDefaultAsync(x => x.ID == news.AuthorID);
+            if (author != null)
+            {
+                author.TotalNewsCount -= 1;
+                _context.Authors.Update(author);
+            }
+
+            var log = new SystemLog
+            {
+                UserID = CurrentUserID,
+                IpAddress = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString(),
+                LogTypeID = (int)LogTypesEnum.News,
+                IsSuccess = true,
+                Message = news.Title + " yayından kaldırıldı.",
+                ObjectID = news.ID
+            };
+            await _context.SystemLogs.AddAsync(log);
+            await _context.SaveChangesAsync();
+            await newsCachingService.HandleUnPublishCacheOperations(news);
+            result.SetSuccess(_localizer["UnPublishMessage"]);
+            return result;
+        }
+
+        public async Task<ServiceResult> UnSchedule(long id)
+        {
+            var result = new ServiceResult();
+
+            if (!HasRight("NEWS_PUBLISH"))
+            {
+                result.SetError(_localizer["NonAuth"]);
+                return result;
+            }
+
+            var isExist = await _context.News.AnyAsync(x => x.ID == id);
+            if (!isExist)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+
+            news.StatusID = (int)NewsStatusEnum.Draft;
+            news.ScheduledBy = null;
+
+            _context.News.Update(news);
+
+            var log = new SystemLog
+            {
+                UserID = CurrentUserID,
+                IpAddress = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString(),
+                LogTypeID = (int)LogTypesEnum.News,
+                IsSuccess = true,
+                Message = news.Title + " zamanlanmış yayın iptal edildi.",
+                ObjectID = news.ID
+            };
+            await _context.SystemLogs.AddAsync(log);
+
+            await _context.SaveChangesAsync();
+            await _systemLogCachingService.RefreshAll();
+
+            result.SetSuccess(_localizer["UnScheduleMessage"]);
+            return result;
+        }
+
+        public async Task<ServiceResult> Lock(long id)
+        {
+            var result = new ServiceResult();
+
+            var isExist = await _context.News.AnyAsync(x => x.ID == id);
+            if (!isExist)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+
+            news.IsLocked = true;
+            news.LockedBy = CurrentUserID;
+            news.LockedTime = DateTime.Now;
+
+            _context.News.Update(news);
+            await _context.SaveChangesAsync();
+
+            result.SetSuccess(_localizer["LockMessage"]);
+            return result;
+        }
+
+        public async Task<ServiceResult> UnLock(long id)
+        {
+            var result = new ServiceResult();
+
+            var isExist = await _context.News.AnyAsync(x => x.ID == id);
+            if (!isExist)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+
+            if (!news.IsLocked)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            if (!HasRight("NEWS_UNLOCK") && news.LockedBy != CurrentUserID)
+            {
+                result.SetError(_localizer["NonAuth"]);
+                return result;
+            }
+
+            news.IsLocked = false;
+            news.LockedBy = null;
+            news.LockedTime = null;
+
+            _context.News.Update(news);
+            await _context.SaveChangesAsync();
+
+            result.SetSuccess(_localizer["UnLockMessage"]);
+            return result;
+        }
+
+        public async Task<ServiceResult<NewsVersionLiveResponse>> Version(long id)
+        {
+            var result = new ServiceResult<NewsVersionLiveResponse>();
+
+            var version = await (from v in _context.NewsVersions
+                                 join u in _context.Users on v.CreatedBy equals u.ID
+                                 join n in _context.News on v.NewsID equals n.ID
+                                 where v.ID == id
+                                 select new NewsVersionLiveResponse
+                                 {
+                                     News = new NewsVersionResponseComparable
+                                     {
+                                         ID = v.NewsID,
+                                         Title = n.Title,
+                                         SubHeading = n.SubHeading,
+                                         UpHeadline = n.UpHeadline,
+                                         UpSubHeading = n.UpSubHeading,
+                                         ShowUpHeadline = n.ShowUpHeadline,
+                                         ShowSubHeading = n.ShowSubHeading,
+                                         ShowUpSubHeading = n.ShowUpSubHeading,
+                                         RedirectLink = n.RedirectLink,
+                                         UpSubtitle = n.UpSubtitle,
+                                         Subtitle = n.Subtitle,
+                                         Content = n.Content,
+                                         Tags = n.Tags,
+                                         Slug = n.Slug,
+                                         Video = n.Video,
+                                         PressNo = n.PressNo,
+                                         Headline = n.Headline,
+                                         AllowAds = n.AllowAds,
+                                         SourceIDs = n.SourceIDs,
+                                         SeoDescription = n.SeoDescription,
+                                         SeoTitle = n.SeoTitle,
+                                         SecondaryCategoryMap = n.SecondaryCategoryMap,
+                                         CategoryID = n.CategoryID,
+                                         AuthorID = n.AuthorID,
+                                         VideoPlayerID = n.VideoPlayerID,
+                                         IsVersion = false
+                                     },
+                                     Version = new NewsVersionResponseComparable
+                                     {
+                                         ID = v.ID,
+                                         Title = v.Title,
+                                         UpSubtitle = v.UpSubtitle,
+                                         SubHeading = v.SubHeading,
+                                         UpHeadline = v.UpHeadline,
+                                         UpSubHeading = v.UpSubHeading,
+                                         ShowUpHeadline = v.ShowUpHeadline,
+                                         ShowSubHeading = v.ShowSubHeading,
+                                         ShowUpSubHeading = v.ShowUpSubHeading,
+                                         RedirectLink = v.RedirectLink,
+                                         Subtitle = v.Subtitle,
+                                         Content = v.Content,
+                                         Tags = v.Tags,
+                                         Slug = v.Slug,
+                                         Video = v.Video,
+                                         PressNo = v.PressNo,
+                                         Headline = v.Headline,
+                                         AllowAds = v.AllowAds,
+                                         SourceIDs = v.SourceIDs,
+                                         SeoDescription = v.SeoDescription,
+                                         SeoTitle = v.SeoTitle,
+                                         SecondaryCategoryMap = v.SecondaryCategoryMap,
+                                         CategoryID = v.CategoryID,
+                                         AuthorID = v.AuthorID,
+                                         VideoPlayerID = v.VideoPlayerID,
+                                         IsVersion = true
+                                     },
+                                     StatusID = v.StatusID,
+                                     VersionCreatedDate = v.CreatedDate.ToFormattedDateTime(),
+                                     VersionCreatedBy = u.FullName,
+                                     IsLockedByCurrentUser = n.LockedBy == CurrentUserID,
+                                     IsLocked = n.IsLocked,
+                                     LockedTime = n.LockedTime,
+                                     NewsCategoryID = n.CategoryID,
+                                     LockedBy = n.LockedBy.ToString(),
+                                     NewsTypeID = v.NewsTypeID,
+                                     Description = v.Description,
+                                     ManuelUpdatedDate = v.ManuelUpdatedDate
+                                 }).FirstOrDefaultAsync();
+
+            if (version == null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            if (version.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+            {
+                var versionAuthorName = await _context.Authors.Where(x => x.ID == version.Version.AuthorID)
+                    .Select(x => x.FullName).FirstOrDefaultAsync();
+                version.Version.AuthorName = versionAuthorName;
+
+                var newsAuthorName = await _context.Authors.Where(x => x.ID == version.News.AuthorID)
+                    .Select(x => x.FullName).FirstOrDefaultAsync();
+                version.News.AuthorName = newsAuthorName;
+            }
+
+            if (version.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews)
+            {
+                var versionCaricaturistName = await _context.Caricaturists.Where(x => x.ID == version.Version.AuthorID)
+                    .Select(x => x.Name).FirstOrDefaultAsync();
+                version.Version.CaricaturistName = versionCaricaturistName;
+
+                var newsCaricaturistName = await _context.Caricaturists.Where(x => x.ID == version.News.AuthorID)
+                    .Select(x => x.Name).FirstOrDefaultAsync();
+                version.News.CaricaturistName = newsCaricaturistName;
+            }
+
+            if (version.IsLocked)
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == int.Parse(version.LockedBy));
+
+                version.LockedBy = user.FullName;
+            }
+
+            if (version.News.SourceIDs != null)
+            {
+                var newsSourceIds = await _context.NewsSources.Where(x => x.NewsID == version.News.ID)
+                    .Select(x => x.SourceID).ToListAsync();
+                var newsSourceName = await _context.Sources
+                    .Where(x => newsSourceIds.Contains(x.ID))
+                    .Select(x => x.Name)
+                    .ToListAsync();
+                version.News.SourceName = string.Join(",", newsSourceName);
+                version.Version.SourceName = string.Join(",", newsSourceName);
+            }
+
+            var newsMainCategory = await _context.Categories.Where(x => x.ID == version.News.CategoryID)
+                .Select(x => x.Name).FirstOrDefaultAsync();
+
+            version.News.MainCategory = newsMainCategory;
+
+            if (!version.News.SecondaryCategoryMap.IsNullOrEmtpy())
+            {
+                var newsMaps = version.News.SecondaryCategoryMap.Split("-");
+
+                var newsSecondaryCategories =
+                    await _context.Categories.Where(x => newsMaps.Contains(x.Map)).Select(x => x.Name).ToArrayAsync();
+
+                version.News.SecondaryCategories = newsSecondaryCategories;
+            }
+
+            var versionMainCategory = await _context.Categories.Where(x => x.ID == version.Version.CategoryID)
+                .Select(x => x.Name).FirstOrDefaultAsync();
+
+            version.Version.MainCategory = versionMainCategory;
+
+            if (!version.Version.SecondaryCategoryMap.IsNullOrEmtpy())
+            {
+                var versionMaps = version.Version.SecondaryCategoryMap.Split("-");
+
+                var versionSecondaryCategories =
+                    await _context.Categories.Where(x => versionMaps.Contains(x.Map)).Select(x => x.Name)
+                        .ToArrayAsync();
+
+                version.Version.SecondaryCategories = versionSecondaryCategories;
+            }
+
+            var newsPhotos = await (from p in _context.NewsPhotos
+                                    join pt in _context.NewsPhotoTypes on p.PhotoTypeID equals pt.ID
+                                    where p.NewsID == version.News.ID
+                                    select new Photo
+                                    {
+                                        PhotoURL = p.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                            _appSettingsKeys.CDN_MediaGalleryFolder),
+                                        PhotoTypeName = pt.Name,
+                                        PhotoTypeID = pt.ID,
+                                        Description = pt.Description,
+                                        Height = pt.Height,
+                                        Width = pt.Width
+                                    }).ToListAsync();
+
+            var versionPhotos = await (from p in _context.NewsVersionsPhotos
+                                       join pt in _context.NewsPhotoTypes on p.PhotoTypeID equals pt.ID
+                                       where p.VersionID == version.Version.ID
+                                       select new Photo
+                                       {
+                                           PhotoURL = p.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                               _appSettingsKeys.CDN_MediaGalleryFolder),
+                                           PhotoTypeName = pt.Name,
+                                           PhotoTypeID = pt.ID,
+                                           Description = pt.Description,
+                                           Height = pt.Height,
+                                           Width = pt.Width
+                                       }).ToListAsync();
+
+            if (version.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+            {
+                var versionPhotoGalleryItems = await _context.NewsVersionsPhotoGalleryItems
+                    .Where(x => x.VersionID == version.Version.ID).OrderBy(x => x.Order).Select(x =>
+                        new PhotoGalleryItemRequest
+                        {
+                            Content = x.Content,
+                            PhotoURL = x.PhotoUrl,
+                            Order = x.Order
+                        }).ToListAsync();
+
+                var newsPhotoGalleryItems = await _context.NewsPhotoGalleryItems.Where(x => x.NewsID == version.News.ID)
+                    .OrderBy(x => x.Order).Select(x => new PhotoGalleryItemRequest
+                    {
+                        Content = x.Content,
+                        PhotoURL = x.PhotoUrl,
+                        Order = x.Order
+                    }).ToListAsync();
+
+                version.Version.PhotoGalleryItems = versionPhotoGalleryItems;
+                version.News.PhotoGalleryItems = newsPhotoGalleryItems;
+            }
+
+            if (!version.Version.Tags.IsNullOrEmtpy())
+            {
+                var versionTagsList = version.Version.Tags.Split(',').ToArray();
+                version.Version.TagsList = versionTagsList;
+            }
+
+            if (!version.News.Tags.IsNullOrEmtpy())
+            {
+                var newsTagsList = version.News.Tags.Split(',').ToArray();
+                version.News.TagsList = newsTagsList;
+            }
+
+            version.Version.Photos = versionPhotos;
+            version.News.Photos = newsPhotos;
+
+            result.Data = version;
+
+            return result;
+        }
+
+        public async Task<ServiceResult> ChangeVersion(long id)
+        {
+            var result = new ServiceResult();
+
+            var version = await _context.NewsVersions.FirstOrDefaultAsync(x => x.ID == id);
+
+            if (version is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == version.NewsID);
+
+            if (news is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            await using var tx = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                news.Title = version.Title;
+                news.SubHeading = version.SubHeading;
+                news.UpHeadline = version.UpHeadline;
+                news.UpSubHeading = version.UpSubHeading;
+                news.ShowUpHeadline = version.ShowUpHeadline;
+                news.ShowSubHeading = version.ShowSubHeading;
+                news.ShowUpSubHeading = version.ShowUpSubHeading;
+                news.RedirectLink = version.RedirectLink;
+                news.UpSubtitle = version.UpSubtitle;
+                news.Subtitle = version.Subtitle;
+                news.Content = version.Content;
+                news.Tags = version.Tags;
+                news.CategoryID = version.CategoryID;
+                news.UpdatedBy = CurrentUserID;
+                news.UpdateDate = DateTime.Now;
+                news.Video = version.Video;
+                news.Slug = version.Slug;
+                news.PressNo = version.PressNo;
+                news.Headline = version.Headline;
+                news.AllowAds = version.AllowAds;
+                news.SourceIDs = version.SourceIDs;
+                news.SeoDescription = version.SeoDescription;
+                news.SeoTitle = version.SeoTitle;
+                news.CategoryMap = version.CategoryMap;
+                news.SecondaryCategoryMap = version.SecondaryCategoryMap;
+                news.VideoPlayerID = version.VideoPlayerID;
+
+                if (news.StatusID == (int)NewsStatusEnum.Published)
+                {
+                    news.StatusID = (int)NewsStatusEnum.Draft;
+                }
+
+                _context.News.Update(news);
+
+                var newsVersion = new NewsVersion
+                {
+                    NewsID = version.NewsID,
+                    Content = version.Content,
+                    Tags = version.Tags,
+                    CreatedBy = CurrentUserID,
+                    CreatedDate = DateTime.Now,
+                    NewsTypeID = version.NewsTypeID,
+                    StatusID = news.StatusID,
+                    CategoryID = version.CategoryID,
+                    AuthorID = version.AuthorID,
+                    Slug = version.Slug,
+                    Subtitle = version.Subtitle,
+                    UpSubtitle = version.UpSubtitle,
+                    Title = version.Title,
+                    SubHeading = version.SubHeading,
+                    UpHeadline = version.UpHeadline,
+                    UpSubHeading = version.UpSubHeading,
+                    ShowUpHeadline = version.ShowUpHeadline,
+                    ShowSubHeading = version.ShowSubHeading,
+                    ShowUpSubHeading = version.ShowUpSubHeading,
+                    RedirectLink = version.RedirectLink,
+                    Video = version.Video,
+                    PressNo = version.PressNo,
+                    Headline = version.Headline,
+                    AllowAds = version.AllowAds,
+                    SourceIDs = version.SourceIDs,
+                    SeoDescription = version.SeoDescription,
+                    SeoTitle = version.SeoTitle,
+                    CategoryMap = version.CategoryMap,
+                    SecondaryCategoryMap = version.SecondaryCategoryMap,
+                    VideoPlayerID = version.VideoPlayerID,
+                    ManuelUpdatedDate = version.ManuelUpdatedDate
+                };
+
+                await _context.NewsVersions.AddAsync(newsVersion);
+
+                var tags = await _context.NewsTags.Where(x => x.NewsID == news.ID).ToListAsync();
+
+                _context.NewsTags.RemoveRange(tags);
+                await _context.SaveChangesAsync();
+
+                if (!version.Tags.IsNullOrEmtpy())
+                {
+                    var tagsList = version.Tags.Split(',').ToArray();
+
+                    foreach (var tag in tagsList)
+                    {
+                        var newsTag = new NewsTag
+                        {
+                            NewsID = news.ID
+                        };
+                        var tagFromDb = await _context.Tags.FirstOrDefaultAsync(x => x.Text == tag);
+
+                        if (tagFromDb is null)
+                        {
+                            var newTag = new Tag { Text = tag };
+
+                            await _context.Tags.AddAsync(newTag);
+                            await _context.SaveChangesAsync();
+
+
+                            newsTag.TagID = (int)newTag.ID;
+                        }
+                        else
+                        {
+                            newsTag.TagID = (int)tagFromDb.ID;
+                        }
+
+                        await _context.NewsTags.AddAsync(newsTag);
+                    }
+                }
+
+                var newsPhotos = await _context.NewsPhotos.Where(x => x.NewsID == news.ID).ToListAsync();
+                _context.NewsPhotos.RemoveRange(newsPhotos);
+
+                var versionPhotos =
+                    await _context.NewsVersionsPhotos.Where(x => x.VersionID == version.ID).ToListAsync();
+
+                foreach (var photo in versionPhotos)
+                {
+                    var newsPhoto = new NewsPhoto
+                    {
+                        NewsID = news.ID,
+                        PhotoTypeID = photo.PhotoTypeID,
+                        PhotoUrl = photo.PhotoUrl
+                    };
+
+                    await _context.NewsPhotos.AddAsync(newsPhoto);
+
+                    var versionPhoto = new NewsVersionsPhoto
+                    {
+                        NewsID = news.ID,
+                        VersionID = newsVersion.ID,
+                        PhotoTypeID = photo.PhotoTypeID,
+                        PhotoUrl = photo.PhotoUrl
+                    };
+
+                    await _context.NewsVersionsPhotos.AddAsync(versionPhoto);
+                }
+
+                if (news.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+                {
+                    var newsPhotoGalleryItems =
+                        await _context.NewsPhotoGalleryItems.Where(x => x.NewsID == news.ID).ToListAsync();
+                    _context.NewsPhotoGalleryItems.RemoveRange(newsPhotoGalleryItems);
+
+                    var versionPhotoGalleryItems = await _context.NewsVersionsPhotoGalleryItems
+                        .Where(x => x.VersionID == version.ID).ToListAsync();
+
+                    foreach (var item in versionPhotoGalleryItems)
+                    {
+                        var newsPhotoGalleryItem = new NewsPhotoGalleryItem
+                        {
+                            NewsID = news.ID,
+                            PhotoUrl = item.PhotoUrl,
+                            Order = item.Order,
+                            Content = item.Content
+                        };
+
+                        await _context.NewsPhotoGalleryItems.AddAsync(newsPhotoGalleryItem);
+
+                        var versionPhotoGalleryItem = new NewsVersionsPhotoGalleryItem
+                        {
+                            NewsID = news.ID,
+                            VersionID = newsVersion.ID,
+                            PhotoUrl = item.PhotoUrl,
+                            Order = item.Order,
+                            Content = item.Content
+                        };
+
+                        await _context.NewsVersionsPhotoGalleryItems.AddAsync(versionPhotoGalleryItem);
+                    }
+                }
+
+                var log = new SystemLog
+                {
+                    UserID = CurrentUserID,
+                    IpAddress = _httpContext.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    LogTypeID = (int)LogTypesEnum.News,
+                    IsSuccess = true,
+                    Message = news.Title + " versiyon değiştirildi.",
+                    ObjectID = news.ID
+                };
+                await _context.SystemLogs.AddAsync(log);
+
+                await _context.SaveChangesAsync();
+                await tx.CommitAsync();
+                await anomalyService.CheckNewsAnomaly(news);
+            }
+            catch (Exception e)
+            {
+                await tx.RollbackAsync();
+                result.SetError(_localizer["Error"]);
+                return result;
+            }
+
+            result.SetSuccess(_localizer["RecordUpdated"]);
+            return result;
+        }
+
+        public async Task<ServiceResult<List<ListEditTemplateResponse>>> GetTemplateList()
+        {
+            var result = new ServiceResult<List<ListEditTemplateResponse>>();
+
+            var templates = await _context.Templates.Select(
+                x => new ListEditTemplateResponse
+                {
+                    Id = x.ID,
+                    Name = x.Name
+                }).ToListAsync();
+
+            result.Data = templates;
+
+            return result;
+        }
+
+        public async Task<ServiceResult<PrepareEditModalResponse>> PreparePhotoAsync(PrepareEditModalRequest request)
+        {
+            var result = new ServiceResult<PrepareEditModalResponse>();
+            var baseImage = GetImageFromUrl(request.PhotoUrl);
+
+            var isHaveThema2 = false;
+
+            if (request.Text1 == null || request.Text1.IsNullOrEmtpy() || request.LocationId == 0 ||
+                request.Thema1Id == 0)
+            {
+                var emptyReturn = new PrepareEditModalResponse
+                {
+                    Base64Image = ImageToBase64(baseImage)
+                };
+                result.Data = emptyReturn;
+                return result;
+            }
+
+            var textLocation = await _context.LocationPaddings.Where(x => x.ID == request.LocationId)
+                .FirstOrDefaultAsync();
+
+            #region Thema1 and Text1
+
+            var thema1 = await _context.Templates.Where(x => x.ID == request.Thema1Id).FirstOrDefaultAsync();
+
+            var font = SystemFonts.CreateFont("Arial", thema1.TextFontSize > 0 ? thema1.TextFontSize : 100);
+            var textSize = TextMeasurer.MeasureSize(request.Text1, new TextOptions(font));
+
+            var backgroundColor = Rgba32.ParseHex(thema1.BackgroundColor);
+            var backgroundImage = new Image<Rgba32>(baseImage.Width,
+                (int)((textSize.Height > 0 ? textSize.Height : 1) * 2), backgroundColor);
+
+            var textColor = Color.ParseHex(thema1.TextColor ?? "#000000");
+
+            #endregion
+
+            if (request.Text2 != null && !request.Text2.IsNullOrEmtpy() && request.Thema2Id != 0)
+            {
+                isHaveThema2 = true;
+            }
+
+            if (!isHaveThema2)
+            {
+                var bgLocationX = 0;
+                var bgLocationY = textLocation.IsUpper ? 0 : baseImage.Height - backgroundImage.Height;
+
+                var textLocationX = GetTextLocationX(textLocation, baseImage.Width, (int)textSize.Width);
+                var textLocationY = bgLocationY + ((backgroundImage.Height - textSize.Height) / 2);
+
+                baseImage.Mutate(x =>
+                    x.DrawImage(backgroundImage, new Point(bgLocationX, bgLocationY),
+                        thema1.BackgroundOpacity / 100f));
+
+                baseImage.Mutate(x => x.DrawText(
+                    request.Text1,
+                    font,
+                    Brushes.Solid(textColor),
+                    new Point((int)textLocationX, (int)textLocationY)));
+            }
+            else
+            {
+                #region Create Thema2
+
+                var thema2 = await _context.Templates.Where(x => x.ID == request.Thema2Id).FirstOrDefaultAsync();
+
+                var font2 = SystemFonts.CreateFont("Arial", thema2.TextFontSize > 0 ? thema2.TextFontSize : 100);
+                var textSize2 = TextMeasurer.MeasureSize(request.Text2, new TextOptions(font2));
+
+                var backgroundColor2 = Color.ParseHex(thema2.BackgroundColor);
+                var backgroundImage2 = new Image<Rgba32>(baseImage.Width,
+                    (int)((textSize2.Height > 0 ? textSize2.Height : 1) * 2), backgroundColor2);
+
+                var textColor2 = Color.ParseHex(thema2.TextColor ?? "#000000");
+
+                #endregion
+
+                #region Mutate Thema 1
+
+                var bgLocationX = 0;
+                var bgLocationY = textLocation.IsUpper
+                    ? 0
+                    : baseImage.Height - backgroundImage.Height - backgroundImage2.Height;
+
+                var textLocationX = GetTextLocationX(textLocation, baseImage.Width, (int)textSize.Width);
+                var textLocationY = bgLocationY + ((backgroundImage.Height - textSize.Height) / 2);
+
+                baseImage.Mutate(x =>
+                    x.DrawImage(backgroundImage, new Point(bgLocationX, bgLocationY),
+                        thema1.BackgroundOpacity / 100f));
+
+                baseImage.Mutate(x => x.DrawText(
+                    request.Text1,
+                    font,
+                    Brushes.Solid(textColor),
+                    new Point((int)textLocationX, (int)textLocationY)));
+
+                #endregion
+
+                #region Mutate Thema 2
+
+                var bgLocationX2 = 0;
+                var bgLocationY2 = textLocation.IsUpper
+                    ? backgroundImage.Height
+                    : baseImage.Height - backgroundImage2.Height;
+
+                var textLocationX2 = GetTextLocationX(textLocation, baseImage.Width, (int)textSize2.Width);
+                var textLocationY2 = bgLocationY2 + ((backgroundImage2.Height - textSize2.Height) / 2);
+
+                baseImage.Mutate(x =>
+                    x.DrawImage(backgroundImage2, new Point(bgLocationX2, bgLocationY2),
+                        thema2.BackgroundOpacity / 100f));
+
+                baseImage.Mutate(x => x.DrawText(
+                    request.Text2,
+                    font2,
+                    Brushes.Solid(textColor2),
+                    new Point((int)textLocationX2, (int)textLocationY2)));
+
+                #endregion
+            }
+
+            var prepareEditResponse = new PrepareEditModalResponse
+            {
+                Base64Image = ImageToBase64(baseImage)
+            };
+
+            result.Data = prepareEditResponse;
+            return result;
+        }
+
+        public async Task<ServiceResult<SaveEditedPhotoResponse>> SaveEditedPhotoAsync(SaveEditedPhotoRequest request)
+        {
+            var result = new ServiceResult<SaveEditedPhotoResponse>();
+
+            var image = ConvertBase64ToIFormFile(request.Base64Photo);
+            var uploadResult = fileUpload.Upload(image, _appSettingsKeys.CDN_MediaGalleryFolder);
+            if (uploadResult == null)
+            {
+                result.SetError(_localizer["Error"]);
+                return result;
+            }
+
+            var response = new SaveEditedPhotoResponse
+            {
+                PhotoUrl = _appSettingsKeys.CDN_BaseUrl + _appSettingsKeys.CDN_MediaGalleryFolder +
+                           uploadResult.FileName
+            };
+            result.Data = response;
+            return result;
+        }
+
+        public async Task<BaseDataTableResponse<List<ListResponseNewsItem>>> GetRelatedNewsPaged(
+            BaseDataTableRequest tableRequest, long newsID)
+        {
+            var result = new BaseDataTableResponse<List<ListResponseNewsItem>>();
+
+            result.Data = await (from rn in _context.RelatedNews
+                                 join np in _context.NewsPublished on rn.RelatedNewsID equals np.NewsID
+                                 join c in _context.Categories on np.CategoryID equals c.ID into category
+                                 from c in category.DefaultIfEmpty()
+                                 join t in _context.NewsTypes on np.NewsTypeID equals t.ID into newsType
+                                 from t in newsType.DefaultIfEmpty()
+                                 let photo = (from ph in _context.NewsPhotos
+                                              where ph.NewsID == np.NewsID &&
+                                                    (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                                                     ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                                              orderby
+                                                  ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                      ? 0
+                                                      :
+                                                      ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                          ?
+                                                          1
+                                                          : 2
+                                              select ph).FirstOrDefault()
+                                 where rn.NewsID == newsID
+                                 orderby rn.Order
+                                 select new ListResponseNewsItem
+                                 {
+                                     ID = rn.ID,
+                                     NewsID = np.NewsID,
+                                     Title = np.Title,
+                                     PhotoUrl = (photo != null
+                                         ? photo.PhotoUrl.PrepareCDNUrl(
+                                             _appSettingsKeys.CDN_BaseUrl,
+                                             _appSettingsKeys.CDN_MediaGalleryFolder)
+                                         : _appSettingsKeys.URL_EmptyPhoto.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                             _appSettingsKeys.CDN_MediaGalleryFolder)),
+                                     Category = c != null ? c.Name : string.Empty,
+                                     Type = t != null ? t.Name : string.Empty,
+                                     PublishedDate = np.PublishedDate
+                                         .ToFormattedDateTime()
+                                         .ToEmptyStringIndicator()
+                                 }).AsNoTracking().ToListAsync();
+
+
+            result.RecordsTotal = result.Data.Count;
+            result.RecordsFiltered = result.Data.Count;
+            return result;
+        }
+
+        public async Task<BaseDataTableResponse<List<ListResponseNewsItem>>> GetAllPublishedNewsPaged(
+            BaseDataTableRequest tableRequest, long newsID)
+        {
+            var result = new BaseDataTableResponse<List<ListResponseNewsItem>>();
+
+            var relatedNewsIds = await _context.RelatedNews.Where(x => x.NewsID == newsID).Select(x => x.RelatedNewsID)
+                .ToListAsync();
+
+            result.RecordsTotal = await _context.NewsPublished.CountAsync() - relatedNewsIds.Count();
+
+            var newsQuery = (from np in _context.NewsPublished
+                             let photo = (from ph in _context.NewsPhotos
+                                          where ph.NewsID == np.NewsID &&
+                                                (ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto ||
+                                                 ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto)
+                                          orderby
+                                              ph.PhotoTypeID == (int)NewsPhotoTypesEnum.MainPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                  ? 0
+                                                  :
+                                                  ph.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto && !string.IsNullOrEmpty(ph.PhotoUrl)
+                                                      ?
+                                                      1
+                                                      : 2
+                                          select ph).FirstOrDefault()
+                             join c in _context.Categories on np.CategoryID equals c.ID into category
+                             from c in category.DefaultIfEmpty()
+                             join t in _context.NewsTypes on np.NewsTypeID equals t.ID
+                             where !relatedNewsIds.Contains(np.NewsID)
+                             orderby np.PublishedDate descending
+                             select new
+                             {
+                                 ID = np.NewsID,
+                                 Title = np.Title,
+                                 PhotoUrl = photo.PhotoUrl ?? string.Empty,
+                                 Category = c.Name ?? "--",
+                                 Type = t.Name,
+                                 PublishedDate = np.PublishedDate,
+                                 UpdatedDate = np.ManuelUpdatedDate,
+                             }).AsNoTracking().AsQueryable();
+
+
+            if (!string.IsNullOrEmpty(tableRequest.SearchValue))
+            {
+                newsQuery = newsQuery.Where(x =>
+                    x.Title.ToUpper().Contains(tableRequest.SearchValue.ToUpper()) ||
+                    x.Category.ToUpper().Contains(tableRequest.SearchValue.ToUpper()));
+            }
+
+            result.RecordsFiltered = await newsQuery.CountAsync();
+
+            newsQuery = newsQuery.SortSkipTake(tableRequest);
+
+            result.Data = await newsQuery.Select(f => new ListResponseNewsItem
+            {
+                ID = f.ID,
+                Title = f.Title,
+                PhotoUrl = f.PhotoUrl != null
+                    ? f.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder)
+                    : _appSettingsKeys.URL_EmptyPhoto.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                        _appSettingsKeys.CDN_MediaGalleryFolder),
+                Category = f.Category,
+                PublishedDate = f.PublishedDate.ToFormattedDateTime(),
+                UpdatedDate = f.UpdatedDate.ToFormattedDateTime(),
+                Type = f.Type
+            }).ToListAsync();
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RemoveRelatedNews(long id)
+        {
+            var result = new ServiceResult();
+
+            var newsRelation = await _context.RelatedNews.FirstOrDefaultAsync(x => x.ID == id);
+            if (newsRelation is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            _context.RelatedNews.Remove(newsRelation);
+            await _context.SaveChangesAsync();
+
+            await newsCachingService.RefreshNewsDetails((int)newsRelation.NewsID);
+
+            return result;
+        }
+
+        public async Task<ServiceResult> RemoveRelatedNewsByNewsID(long newsID, long relatedNewsID)
+        {
+            var result = new ServiceResult();
+
+            var newsRelation = await _context.RelatedNews.Where(x => x.NewsID == newsID)
+                .FirstOrDefaultAsync(x => x.RelatedNewsID == relatedNewsID);
+            if (newsRelation is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            _context.RelatedNews.Remove(newsRelation);
+            await _context.SaveChangesAsync();
+
+            await newsCachingService.RefreshNewsDetails((int)newsRelation.NewsID);
+
+            return result;
+        }
+
+        public async Task<ServiceResult> SelectRelatedNews(SelectRelatedNewsRequest request)
+        {
+            var result = new ServiceResult();
+            var relatedNewsList = await _context.RelatedNews.Where(x => x.NewsID == request.NewsID).ToListAsync();
+            if (relatedNewsList.Count >= _appSettingsKeys.NewsRelations_Count)
+            {
+                result.SetError(_localizer["MaxRelatedNewsCount"]);
+                return result;
+            }
+
+            var relatedNew = new RelatedNews
+            {
+                NewsID = request.NewsID,
+                RelatedNewsID = request.RelatedNewsID,
+                Order = _context.RelatedNews.Count(x => x.NewsID == request.NewsID) + 1
+            };
+            await _context.RelatedNews.AddAsync(relatedNew);
+            await _context.SaveChangesAsync();
+            await newsCachingService.RefreshNewsDetails((int)request.NewsID);
+
+            return result;
+        }
+
+        public async Task<ServiceResult<int>> GetNewsTypeID(long id)
+        {
+            var result = new ServiceResult<int>();
+
+            var newsTypeID = await _context.News.Where(x => x.ID == id).Select(x => x.NewsTypeID).FirstOrDefaultAsync();
+
+            if (newsTypeID == 0)
+            {
+                //result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            result.Data = newsTypeID;
+            return result;
+        }
+
+        public async Task<ServiceResult<NewsVersionLiveResponse>> Live(long id)
+        {
+            var result = new ServiceResult<NewsVersionLiveResponse>();
+
+            var live = await (from np in _context.NewsPublished
+                              join n in _context.News on np.NewsID equals n.ID
+                              join u in _context.Users on np.PublishedBy equals u.ID
+                              where np.NewsID == id
+                              select new NewsVersionLiveResponse
+                              {
+                                  News = new NewsVersionResponseComparable
+                                  {
+                                      ID = n.ID,
+                                      Subtitle = n.Subtitle,
+                                      Content = n.Content,
+                                      Title = n.Title,
+                                      UpSubtitle = n.UpSubtitle,
+                                      SubHeading = n.SubHeading,
+                                      UpHeadline = n.UpHeadline,
+                                      UpSubHeading = n.UpSubHeading,
+                                      ShowUpHeadline = n.ShowUpHeadline,
+                                      ShowSubHeading = n.ShowSubHeading,
+                                      ShowUpSubHeading = n.ShowUpSubHeading,
+                                      RedirectLink = n.RedirectLink,
+                                      Tags = n.Tags,
+                                      Slug = n.Slug,
+                                      Video = n.Video,
+                                      PressNo = n.PressNo,
+                                      Headline = n.Headline,
+                                      AllowAds = n.AllowAds,
+                                      SourceIDs = n.SourceIDs,
+                                      SeoDescription = n.SeoDescription,
+                                      SeoTitle = n.SeoTitle,
+                                      CategoryID = n.CategoryID,
+                                      SecondaryCategoryMap = n.SecondaryCategoryMap,
+                                      AuthorID = n.AuthorID,
+                                      VideoPlayerID = n.VideoPlayerID,
+                                      IsVersion = false
+                                  },
+                                  Live = new NewsVersionResponseComparable
+                                  {
+                                      Title = np.Title,
+                                      SubHeading = np.SubHeading,
+                                      UpHeadline = np.UpHeadline,
+                                      UpSubHeading = np.UpSubHeading,
+                                      ShowUpHeadline = np.ShowUpHeadline,
+                                      ShowSubHeading = np.ShowSubHeading,
+                                      ShowUpSubHeading = np.ShowUpSubHeading,
+                                      RedirectLink = n.RedirectLink,
+                                      UpSubtitle = np.UpSubtitle,
+                                      Subtitle = np.Subtitle,
+                                      Content = np.Content,
+                                      Tags = np.Tags,
+                                      Slug = np.Slug,
+                                      Video = np.Video,
+                                      PressNo = np.PressNo,
+                                      Headline = np.Headline,
+                                      AllowAds = np.AllowAds,
+                                      SourceIDs = np.SourceIDs,
+                                      SeoDescription = np.SeoDescription,
+                                      SeoTitle = np.SeoTitle,
+                                      CategoryID = np.CategoryID ?? -1,
+                                      SecondaryCategoryMap = np.SecondaryCategoryMap,
+                                      AuthorID = np.AuthorID,
+                                      VideoPlayerID = np.VideoPlayerID,
+                                      IsVersion = true
+                                  },
+                                  StatusID = n.StatusID,
+                                  PublishedDate = np.PublishedDate.ToFormattedDateTime(),
+                                  PublishedBy = u.FullName,
+                                  IsLockedByCurrentUser = n.LockedBy == CurrentUserID,
+                                  IsLocked = n.IsLocked,
+                                  LockedTime = n.LockedTime,
+                                  NewsCategoryID = n.CategoryID,
+                                  LockedBy = n.LockedBy.ToString(),
+                                  NewsTypeID = n.NewsTypeID
+                              }).FirstOrDefaultAsync();
+
+            if (live == null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            if (live.IsLocked)
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.ID == int.Parse(live.LockedBy));
+
+                live.LockedBy = user.FullName;
+            }
+
+            if (live.NewsTypeID == (int)NewsTypesEnum.ColumnArticles)
+            {
+                var liveAuthorName = await _context.Authors.Where(x => x.ID == live.Live.AuthorID)
+                    .Select(x => x.FullName).FirstOrDefaultAsync();
+                live.Live.AuthorName = liveAuthorName;
+
+                var newsAuthorName = await _context.Authors.Where(x => x.ID == live.News.AuthorID)
+                    .Select(x => x.FullName).FirstOrDefaultAsync();
+                live.News.AuthorName = newsAuthorName;
+            }
+
+            if (live.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews)
+            {
+                var liveCaricaturistName = await _context.Caricaturists.Where(x => x.ID == live.Live.AuthorID)
+                    .Select(x => x.Name).FirstOrDefaultAsync();
+                live.Live.CaricaturistName = liveCaricaturistName;
+
+                var newsCaricaturistName = await _context.Caricaturists.Where(x => x.ID == live.News.AuthorID)
+                    .Select(x => x.Name).FirstOrDefaultAsync();
+                live.News.CaricaturistName = newsCaricaturistName;
+            }
+
+            if (live.News.SourceIDs != null)
+            {
+                var newsSourceIds = await _context.NewsSources.Where(x => x.NewsID == live.News.ID)
+                    .Select(x => x.SourceID).ToListAsync();
+                var newsSourceName = await _context.Sources
+                    .Where(x => newsSourceIds.Contains(x.ID))
+                    .Select(x => x.Name)
+                    .ToListAsync();
+                live.News.SourceName = string.Join(",", newsSourceName);
+                live.Version.SourceName = string.Join(",", newsSourceName);
+            }
+
+            var newsMainCategory = await _context.Categories.Where(x => x.ID == live.News.CategoryID)
+                .Select(x => x.Name).FirstOrDefaultAsync();
+
+            live.News.MainCategory = newsMainCategory;
+
+            if (!live.News.SecondaryCategoryMap.IsNullOrEmtpy())
+            {
+                var newsMaps = live.News.SecondaryCategoryMap.Split("-");
+
+                var newsSecondaryCategories =
+                    await _context.Categories.Where(x => newsMaps.Contains(x.Map)).Select(x => x.Name).ToArrayAsync();
+
+                live.News.SecondaryCategories = newsSecondaryCategories;
+            }
+
+            var versionMainCategory = await _context.Categories.Where(x => x.ID == live.Live.CategoryID)
+                .Select(x => x.Name).FirstOrDefaultAsync();
+
+            live.Live.MainCategory = versionMainCategory;
+
+            if (!live.Live.SecondaryCategoryMap.IsNullOrEmtpy())
+            {
+                var versionMaps = live.Live.SecondaryCategoryMap.Split("-");
+
+                var versionSecondaryCategories =
+                    await _context.Categories.Where(x => versionMaps.Contains(x.Map)).Select(x => x.Name)
+                        .ToArrayAsync();
+
+                live.Live.SecondaryCategories = versionSecondaryCategories;
+            }
+
+            var newsPhotos = await (from p in _context.NewsPhotos
+                                    join pt in _context.NewsPhotoTypes on p.PhotoTypeID equals pt.ID
+                                    where p.NewsID == live.News.ID
+                                    select new Photo
+                                    {
+                                        PhotoURL = p.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                            _appSettingsKeys.CDN_MediaGalleryFolder),
+                                        PhotoTypeName = pt.Name,
+                                        PhotoTypeID = pt.ID,
+                                        Description = pt.Description,
+                                        Height = pt.Height,
+                                        Width = pt.Width
+                                    }).ToListAsync();
+
+            var livePhotos = await (from p in _context.NewsPublishedPhotos
+                                    join pt in _context.NewsPhotoTypes on p.PhotoTypeID equals pt.ID
+                                    where p.NewsID == live.News.ID
+                                    select new Photo
+                                    {
+                                        PhotoURL = p.PhotoUrl.PrepareCDNUrl(_appSettingsKeys.CDN_BaseUrl,
+                                            _appSettingsKeys.CDN_MediaGalleryFolder),
+                                        PhotoTypeName = pt.Name,
+                                        PhotoTypeID = pt.ID,
+                                        Description = pt.Description,
+                                        Height = pt.Height,
+                                        Width = pt.Width
+                                    }).ToListAsync();
+
+            if (live.NewsTypeID == (int)NewsTypesEnum.PhotoGallery)
+            {
+                var livePhotoGalleryItems = await _context.NewsPublishedPhotoGalleryItems
+                    .Where(x => x.NewsID == live.News.ID).OrderBy(x => x.Order).Select(x =>
+                        new PhotoGalleryItemRequest
+                        {
+                            Content = x.Content,
+                            PhotoURL = x.PhotoUrl,
+                            Order = x.Order,
+                        }).ToListAsync();
+
+                var newsPhotoGalleryItems = await _context.NewsPhotoGalleryItems.Where(x => x.NewsID == live.News.ID)
+                    .OrderBy(x => x.Order).Select(x => new PhotoGalleryItemRequest
+                    {
+                        Content = x.Content,
+                        PhotoURL = x.PhotoUrl,
+                        Order = x.Order
+                    }).ToListAsync();
+
+                live.Live.PhotoGalleryItems = livePhotoGalleryItems;
+                live.News.PhotoGalleryItems = newsPhotoGalleryItems;
+            }
+
+            if (live.Live.Tags != null && live.Live.Tags.Count() > 0)
+            {
+                var liveTagsList = live.Live.Tags.Split(',').ToArray();
+                live.Live.TagsList = liveTagsList;
+            }
+
+            if (live.News.Tags != null && live.News.Tags.Count() > 0)
+            {
+                var newsTagsList = live.News.Tags.Split(',').ToArray();
+                live.News.TagsList = newsTagsList;
+            }
+
+            live.Live.Photos = livePhotos;
+            live.News.Photos = newsPhotos;
+
+            result.Data = live;
+
+            return result;
+        }
+
+        public async Task<ServiceResult> ChangePhotoGalleryItemOrder(long id, string[] orders)
+        {
+            var result = new ServiceResult();
+
+            var news = await _context.News.FirstOrDefaultAsync(x => x.ID == id);
+
+            if (news is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var ordersList = orders.ToList();
+
+            var photoGalleryItems = await _context.NewsPhotoGalleryItems.Where(x => x.NewsID == id).ToListAsync();
+
+            foreach (var itemOrder in ordersList)
+            {
+                var item = photoGalleryItems.FirstOrDefault(x => x.ID.ToString() == itemOrder);
+
+                item.Order = ordersList.IndexOf(itemOrder) + 1;
+
+                _context.NewsPhotoGalleryItems.Update(item);
+            }
+
+            news.StatusID = (int)NewsStatusEnum.Draft;
+            _context.News.Update(news);
+
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
+
+        public async Task<ServiceResult<DetailsImpressionsResponse>> GetDetailsImpressions(long id)
+        {
+            var result = new ServiceResult<DetailsImpressionsResponse> { Data = new DetailsImpressionsResponse() };
+
+            var minutelyViews = await statisticsContext.NewsViewsMinutelies
+                .Where(x => x.NewsID == id && x.ViewsDate >= DateTime.Now.AddMinutes(-60))
+                .ToListAsync();
+            var hourlyViews = await statisticsContext.NewsViewsHourlies
+                .Where(x => x.NewsID == id && x.ViewsDate >= DateTime.Now.AddHours(-24))
+                .ToListAsync();
+            var dailyViews = await statisticsContext.NewsViewsDailies
+                .Where(x => x.NewsID == id && x.ViewsDate >= DateTime.Now.AddDays(-14))
+                .ToListAsync();
+
+            if (minutelyViews != null && minutelyViews.Count > 0)
+            {
+                var endTime = DateTime.Now;
+                var startTime = minutelyViews.First().ViewsDate;
+
+                var allMinutes = Enumerable.Range(0, (int)(endTime - startTime).TotalMinutes + 1)
+                    .Select(offset => startTime.AddMinutes(offset))
+                    .ToList();
+
+                var completeData = allMinutes.Select(time => new
+                {
+                    ViewsDate = time,
+                    ViewCount = minutelyViews.FirstOrDefault(v => v.ViewsDate == time)?.ViewCount ?? 0
+                }).ToList();
+
+                result.Data.LabelsMinute = completeData.Select(x => x.ViewsDate.ToString("HH:mm")).ToList();
+                result.Data.MinData = completeData.Select(x => x.ViewCount).ToList();
+            }
+            else
+            {
+                result.Data.LabelsMinute = Enumerable.Range(0, 60)
+                    .Select(offset => DateTime.Now.AddMinutes(-60 + offset).ToString("HH:mm"))
+                    .ToList();
+                result.Data.MinData = Enumerable.Repeat(0, 60).ToList();
+            }
+
+            if (hourlyViews != null && hourlyViews.Count > 0)
+            {
+                var endTime = DateTime.Now;
+                var startTime = hourlyViews.First().ViewsDate;
+
+                var allHours = Enumerable.Range(0, (int)(endTime - startTime).TotalHours + 1)
+                    .Select(offset => startTime.AddHours(offset))
+                    .ToList();
+
+                var completeData = allHours.Select(time => new
+                {
+                    ViewsDate = time,
+                    ViewCount = hourlyViews.FirstOrDefault(v => v.ViewsDate == time)?.ViewCount ?? 0
+                }).ToList();
+
+                result.Data.LabelsHour = completeData.Select(x => x.ViewsDate.ToString("HH:mm")).ToList();
+                result.Data.HourData = completeData.Select(x => x.ViewCount).ToList();
+            }
+            else
+            {
+                result.Data.LabelsHour = Enumerable.Range(0, 24)
+                    .Select(offset => DateTime.Now.AddHours(-24 + offset).ToString("HH:mm"))
+                    .ToList();
+                result.Data.HourData = Enumerable.Repeat(0, 24).ToList();
+            }
+
+            if (dailyViews != null && dailyViews.Count > 0)
+            {
+                var endTime = DateTime.Now;
+                var startTime = dailyViews.First().ViewsDate;
+
+                var allDays = Enumerable.Range(0, (int)(endTime - startTime).TotalDays + 1)
+                    .Select(offset => startTime.AddDays(offset))
+                    .ToList();
+
+                var completeData = allDays.Select(time => new
+                {
+                    ViewsDate = time,
+                    ViewCount = dailyViews.FirstOrDefault(v => v.ViewsDate == time)?.ViewCount ?? 0
+                }).ToList();
+
+                result.Data.LabelsDay = completeData.Select(x => x.ViewsDate.ToString("dd.MM.yyyy")).ToList();
+                result.Data.DayData = completeData.Select(x => x.ViewCount).ToList();
+            }
+            else
+            {
+                result.Data.LabelsDay = Enumerable.Range(0, 14)
+                    .Select(offset => DateTime.Now.AddDays(-14 + offset).ToString("dd.MM.yyyy"))
+                    .ToList();
+                result.Data.DayData = Enumerable.Repeat(0, 14).ToList();
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> CreatePhotoGalleryItem(long newsID, string subtitle, string content,
+            IFormFile photo)
+        {
+            var result = new ServiceResult();
+
+            var isExist = await _context.News.AnyAsync(x => x.ID == newsID);
+            if (!isExist)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            var order = await _context.NewsPhotoGalleryItems.OrderByDescending(x => x.Order)
+                .Where(x => x.NewsID == newsID).Select(x => x.Order).FirstOrDefaultAsync();
+
+
+            var photoGalleryItem = new NewsPhotoGalleryItem
+            {
+                NewsID = newsID,
+                Order = order + 1
+            };
+
+            if (photo != null)
+            {
+                var photoTypes = await newsPhotoTypeCachingService.Get();
+                var photoType =
+                    photoTypes.Data.FirstOrDefault(x => x.ID == (int)NewsPhotoTypesEnum.PhotoGalleryItemPhoto);
+
+                using (var stream = photo.OpenReadStream())
+                {
+                    using (Image<Rgba32> image = Image.Load<Rgba32>(stream))
+                    {
+                        if (image.Width != photoType.Width || image.Height != photoType.Height)
+                        {
+                            result.SetError(_localizer["Error_PhotoSize"]);
+                            return result;
+                        }
+                    }
+                }
+
+                var uploadResult = _fileUpload.Upload(photo, _appSettingsKeys.CDN_MediaGalleryFolder);
+                if (uploadResult.IsSuccess)
+                {
+                    photoGalleryItem.PhotoUrl = Path.GetFileName(uploadResult.FileName);
+                }
+            }
+
+            await _context.NewsPhotoGalleryItems.AddAsync(photoGalleryItem);
+            await _context.SaveChangesAsync();
+
+            await newsCachingService.RefreshNewsDetails((int)newsID);
+
+            return result;
+        }
+
+        public async Task<ServiceResult> UpdatePhotoGalleryItem(long itemID, string subtitle, string content,
+            IFormFile photo)
+        {
+            var result = new ServiceResult();
+
+            var photoGalleryItem = await _context.NewsPhotoGalleryItems.FirstOrDefaultAsync(x => x.ID == itemID);
+
+            if (photoGalleryItem is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            if (photo != null)
+            {
+                var photoTypes = await newsPhotoTypeCachingService.Get();
+                var photoType =
+                    photoTypes.Data.FirstOrDefault(x => x.ID == (int)NewsPhotoTypesEnum.PhotoGalleryItemPhoto);
+
+                using (var stream = photo.OpenReadStream())
+                {
+                    using (Image<Rgba32> image = Image.Load<Rgba32>(stream))
+                    {
+                        if (image.Width != photoType.Width || image.Height != photoType.Height)
+                        {
+                            result.SetError(_localizer["Error_PhotoSize"]);
+                            return result;
+                        }
+                    }
+                }
+
+                var uploadResult = _fileUpload.Upload(photo, _appSettingsKeys.CDN_MediaGalleryFolder);
+                if (uploadResult.IsSuccess)
+                {
+                    photoGalleryItem.PhotoUrl = Path.GetFileName(uploadResult.FileName);
+                }
+            }
+
+            _context.NewsPhotoGalleryItems.Update(photoGalleryItem);
+            await _context.SaveChangesAsync();
+
+            await newsCachingService.RefreshNewsDetails((int)photoGalleryItem.NewsID);
+
+            return result;
+        }
+
+        public async Task<ServiceResult> DeletePhotoGalleryItem(long itemID)
+        {
+            var result = new ServiceResult();
+
+            var photoGalleryItem = await _context.NewsPhotoGalleryItems.FirstOrDefaultAsync(x => x.ID == itemID);
+
+            if (photoGalleryItem is null)
+            {
+                result.SetError(_localizer["RecordNotFound"]);
+                return result;
+            }
+
+            _context.Remove(photoGalleryItem);
+            await _context.SaveChangesAsync();
+
+            await newsCachingService.RefreshNewsDetails((int)photoGalleryItem.NewsID);
+
+            return result;
+        }
+
+        #region Helpers
+
+        private IFormFile ConvertBase64ToIFormFile(string base64String)
+        {
+            var bytes = Convert.FromBase64String(base64String);
+            var stream = new MemoryStream(bytes);
+            var fileName = "edited-photo" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".png";
+            var file = new FormFile(stream, 0, bytes.Length, "name", fileName);
+            return file;
+        }
+
+        private int GetTextLocationX(LocationPadding locationPadding, int baseImageWidth, int textSizeWidth)
+        {
+            if (locationPadding.IsCenter)
+            {
+                return (baseImageWidth - textSizeWidth) / 2;
+            }
+            else if (locationPadding.IsStartLeft)
+            {
+                return locationPadding.Padding;
+            }
+            else
+            {
+                return baseImageWidth - textSizeWidth - locationPadding.Padding;
+            }
+        }
+
+        private string ImageToBase64(Image image)
+        {
+            using var ms = new MemoryStream();
+            image.SaveAsPng(ms);
+            var imageBytes = ms.ToArray();
+            var base64String = Convert.ToBase64String(imageBytes);
+
+            ms.Close();
+
+            return base64String;
+        }
+
+        private Image Base64ToImage(string base64String)
+        {
+            var imageBytes = Convert.FromBase64String(base64String);
+            var image = Image.Load(imageBytes);
+            return image;
+        }
+
+        private Image LoadImageWithPath(string path)
+        {
+            var imagePath = Path.Combine(path);
+            return Image.Load(imagePath);
+        }
+
+        private Image GetImageFromUrl(string url)
+        {
+            var imageBytes = DownloadImageWithUrl(url);
+            if (imageBytes == null)
+            {
+                return null;
+            }
+
+            var image = Image.Load(imageBytes);
+            return image;
+        }
+
+        private static byte[] DownloadImageWithUrl(string imageUrl)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    var response = client.GetAsync(imageUrl).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return response.Content.ReadAsByteArrayAsync().Result;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"HTTP Hata Kodu: {response.StatusCode}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Hata: {ex.Message}");
+                }
+
+                return null;
+            }
+        }
+
+        private List<PromptResponseItem> FilterPrompts(List<PromptCachingResponse> promptsList, int promptTypeID)
+        {
+            var filteredPrompts = promptsList.Where(x => x.PromptTypeID == promptTypeID).Select(x =>
+                new PromptResponseItem
+                {
+                    ID = x.ID,
+                    Name = x.Name,
+                    RequestType = x.RequestType
+                }).ToList();
+
+            return filteredPrompts;
+        }
+
+        private async Task<ServiceResult> FillRequest(NewsRequest request, int agencyNewsID = 0)
+        {
+            var result = new ServiceResult();
+            if (request == null)
+            {
+                result.SetError(_localizer["RequestCannotBeNull"]);
+                return result;
+            }
+
+            if (request.NewsTypeID == (int)NewsTypesEnum.ZodiacSigns)
+            {
+                request.CategoryID = (int)CategoryEnum.Astrologie;
+                request.CategoryIDMap = "|" + (int)CategoryEnum.Astrologie + "|";
+
+                var zodiacSigns = await _context.Categories.Where(x => x.ParentID == (int)CategoryEnum.Astrologie)
+                    .Select(x => new SelectListItem
+                    {
+                        Text = x.Name,
+                        Value = x.Map
+                    }).ToListAsync();
+                zodiacSigns.AddSELECTOption();
+
+                request.ZodiacSigns = zodiacSigns;
+            }
+
+            var newAuthorList = await authorCachingService.GetAsSelectList();
+            if (newAuthorList?.Data == null)
+            {
+                newAuthorList = new ServiceResult<List<SelectListItem>> { Data = new List<SelectListItem>() };
+            }
+
+            newAuthorList.Data.AddSELECTOption();
+
+            var photoTypes = await newsPhotoTypeCachingService.Get();
+
+            var photos = (from photoType in photoTypes.Data
+                          orderby photoType.Order
+                          where photoType.IsEnabled
+                          join photo in (request.Photos ?? new List<PhotoRequest>()) // Null kontrolü yapılıyor
+                              on photoType.ID equals photo.PhotoTypeID into photoGroup
+                          from matchedPhoto in photoGroup.DefaultIfEmpty()
+                          select new PhotoRequest
+                          {
+                              Name = photoType.Name,
+                              IsRequired = photoType.IsRequired,
+                              Height = photoType.Height,
+                              Width = photoType.Width,
+                              Order = photoType.Order,
+                              Description = photoType.Description,
+                              PhotoTypeID = photoType.ID,
+                              Key = photoType.Key,
+                              PhotoURL = matchedPhoto?.PhotoURL // matchedPhoto null olabilir
+                          }).ToList();
+
+            if (request.NewsTypeID == (int)NewsTypesEnum.CaricaturistNews)
+            {
+                var caricaturistList = await _context.Caricaturists
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.ID.ToString(),
+                        Text = x.Name
+                    })
+                    .ToListAsync();
+                caricaturistList.AddSELECTOption();
+
+                request.CaricaturistIDs = caricaturistList;
+            }
+
+            var photoGalleryItemPhoto = photoTypes.Data.Where(x => x.ID == (int)NewsPhotoTypesEnum.MainPhoto).Select(
+                x =>
+                    new PhotoRequest
+                    {
+                        Name = x.Name,
+                        IsRequired = x.IsRequired,
+                        Height = x.Height,
+                        Width = x.Width,
+                        Description = x.Description,
+                        PhotoTypeID = x.ID,
+                        Key = x.Key
+                    }).FirstOrDefault();
+
+            var prompts = await promptCachingService.GetPrompts();
+
+            request.AuthorIDs = newAuthorList.Data;
+            request.Photos = photos;
+            request.TitlePrompts = FilterPrompts(prompts.Data, (int)PromptTypesEnum.Title);
+            request.SubtitlePrompts = FilterPrompts(prompts.Data, (int)PromptTypesEnum.Subtitle);
+            request.PhotoGalleryItemPhotoInfos = photoGalleryItemPhoto;
+            request.ShowHeadline = request.ShowHeadline != null ? request.ShowHeadline : true;
+            request.ShowSubHeading = request.ShowSubHeading != null ? request.ShowSubHeading : true;
+            request.ShowUpHeadline = request.ShowUpHeadline != null ? request.ShowUpHeadline : true;
+            request.ShowUpSubHeading = request.ShowUpSubHeading != null ? request.ShowUpSubHeading : true;
+            request.AllowAds = request.AllowAds != null ? request.AllowAds : true;
+            request.AllowToSendRSS = request.AllowToSendRSS != null ? request.AllowToSendRSS : true;
+            request.AllowToSendGoogleSideMap =
+                request.AllowToSendGoogleSideMap != null ? request.AllowToSendGoogleSideMap : true;
+            request.AllowGoogleIndex = request.AllowGoogleIndex != null ? request.AllowGoogleIndex : true;
+            request.IsURLEditable = _appSettingsKeys.News_URL_Editable;
+            request.BaseURL = _appSettingsKeys.Common_ClientWebSite;
+            request.IsYoutubeEnabled = _appSettingsKeys.Youtube_Enabled;
+            request.IsDailymotionEnabled = _appSettingsKeys.Dailymotion_Enabled;
+            request.NewsTypeName = await _context.NewsTypes.Where(x => x.ID == request.NewsTypeID)
+                .Select(x => x.Name).FirstOrDefaultAsync();
+            request.ManuelUpdatedDate =
+                request.ManuelUpdatedDate == null || request.ManuelUpdatedDate == DateTime.MinValue
+                    ? DateTime.Now
+                    : request.ManuelUpdatedDate;
+
+            //request.Sources = _newsTypeCachingService.GetNewsSourcesAsSelectListItems().Result.Data;
+            //request.Sources.AddALLOption();
+
+            if (request.NewsTypeID == (int)NewsTypesEnum.Survey)
+            {
+                if (request.SurveyItemRequest == null)
+                {
+                    request.SurveyItemRequest = new SurveyItemRequest();
+                }
+
+                request.SurveyItemRequest.Question = request.SurveyItemRequest.Question;
+                request.SurveyItemRequest.StartDate = request.SurveyItemRequest.StartDate != null
+                    ? request.SurveyItemRequest.StartDate
+                    : DateTime.Now;
+                request.SurveyItemRequest.EndDate = request.SurveyItemRequest.EndDate != null
+                    ? request.SurveyItemRequest.EndDate
+                    : DateTime.Now;
+                request.SurveyItemRequest.CreatedBy = CurrentUserID;
+                request.CategoryID = (int)CategoryEnum.Survey;
+                request.CategoryIDMap = "|" + (int)CategoryEnum.Survey + "|";
+                request.CategoryName = await _context.Categories.Where(x => x.ID == (int)CategoryEnum.Survey)
+                    .Select(x => x.Name).FirstOrDefaultAsync();
+            }
+
+            if (request.NewsTypeID == (int)NewsTypesEnum.GovernmentAnnouncement)
+            {
+                request.CategoryID = (int)CategoryEnum.GovernmentAnnouncement;
+                request.CategoryIDMap = "|" + (int)CategoryEnum.GovernmentAnnouncement + "|";
+                request.CategoryName = await _context.Categories
+                    .Where(x => x.ID == (int)CategoryEnum.GovernmentAnnouncement)
+                    .Select(x => x.Name).FirstOrDefaultAsync();
+                request.Photos = photos.Where(x => x.PhotoTypeID == (int)NewsPhotoTypesEnum.CoverPhoto).ToList();
+            }
+            if (agencyNewsID != 0)
+            {
+                var agencyNews = await _context.AgencyNews.FindAsync(agencyNewsID);
+                request.CategoryID = agencyNews.CategoryID;
+                request.CategoryName = _context.Categories.FirstOrDefault(x => x.ID == agencyNews.CategoryID).Name;
+                request.CategoryIDMap = agencyNews.CategoryID.ToString();
+                request.Title = agencyNews.Title;
+                request.Content = agencyNews.Content;
+                request.SourceIDs = agencyNews.AgencyID.ToString().Split(",").ToList();
+                request.Subtitle = agencyNews.Subtitle;
+                request.NewsTypeID = (int)NewsTypesEnum.News;
+            }
+            return result;
+        }
+
+        private static string RearrangeString(string input)
+        {
+            string[] segments = input.Split(new string[] { "|-|" }, StringSplitOptions.None);
+
+            for (int i = 0; i < segments.Length; i++)
+            {
+                string[] parts = segments[i].Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                Array.Reverse(parts);
+                segments[i] = "|" + string.Join("|", parts) + "|";
+            }
+
+            string result = string.Join("-", segments);
+            return result;
+        }
+
+        public async Task<ServiceResult> SavePhotoGalleryItems(PhotoGalleryItemsSaveRequest request)
+        {
+            var result = new ServiceResult();
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var news = await _context.News.FirstOrDefaultAsync(x => x.ID == request.NewsID);
+                    var existingLastVersion = await _context.NewsVersions.Where(x => x.NewsID == request.NewsID)
+                        .OrderByDescending(x => x.ID)
+                        .FirstOrDefaultAsync();
+
+                    news.StatusID = (int)NewsStatusEnum.Draft;
+
+                    _context.News.Update(news);
+
+                    var newVersion = new NewsVersion
+                    {
+                        AllowAds = existingLastVersion.AllowAds,
+                        AllowGoogleIndex = existingLastVersion.AllowGoogleIndex,
+                        Headline = existingLastVersion.Headline,
+                        AllowToSendGoogleSideMap = existingLastVersion.AllowToSendGoogleSideMap,
+                        AllowToSendRSS = existingLastVersion.AllowToSendRSS,
+                        AuthorID = existingLastVersion.AuthorID,
+                        BoxCount = existingLastVersion.BoxCount,
+                        CategoryID = existingLastVersion.CategoryID,
+                        CategoryMap = existingLastVersion.CategoryMap,
+                        Content = existingLastVersion.Content,
+                        CreatedBy = existingLastVersion.CreatedBy,
+                        CreatedDate = existingLastVersion.CreatedDate,
+                        ManuelUpdatedDate = existingLastVersion.ManuelUpdatedDate,
+                        NewsID = existingLastVersion.NewsID,
+                        NewsTypeID = existingLastVersion.NewsTypeID,
+                        PressNo = existingLastVersion.PressNo,
+                        RedirectLink = existingLastVersion.RedirectLink,
+                        SecondaryCategoryMap = existingLastVersion.SecondaryCategoryMap,
+                        SeoDescription = existingLastVersion.SeoDescription,
+                        SeoTitle = existingLastVersion.SeoTitle,
+                        ShowHeadline = existingLastVersion.ShowHeadline,
+                        ShowSubHeading = existingLastVersion.ShowSubHeading,
+                        ShowUpHeadline = existingLastVersion.ShowUpHeadline,
+                        ShowUpSubHeading = existingLastVersion.ShowUpSubHeading,
+                        Slug = existingLastVersion.Slug,
+                        SourceIDs = existingLastVersion.SourceIDs,
+                        StatusID = existingLastVersion.StatusID,
+                        SubHeading = existingLastVersion.SubHeading,
+                        Subtitle = existingLastVersion.Subtitle,
+                        Tags = existingLastVersion.Tags,
+                        Title = existingLastVersion.Title,
+                        UpHeadline = existingLastVersion.UpHeadline,
+                        UpSubHeading = existingLastVersion.UpSubHeading,
+                        Video = existingLastVersion.Video,
+                        VideoPlayerID = existingLastVersion.VideoPlayerID,
+                    };
+
+                    await _context.NewsVersions.AddAsync(newVersion);
+                    await _context.SaveChangesAsync();
+
+                    var newsPhotos = await _context.NewsPhotos.Where(x => x.NewsID == request.NewsID).ToListAsync();
+
+                    foreach (var photo in newsPhotos)
+                    {
+                        var versionPhoto = new NewsVersionsPhoto
+                        {
+                            NewsID = request.NewsID,
+                            VersionID = newVersion.ID,
+                            PhotoTypeID = photo.PhotoTypeID,
+                            PhotoUrl = photo.PhotoUrl
+                        };
+
+                        await _context.NewsVersionsPhotos.AddAsync(versionPhoto);
+                    }
+
+                    var existingPhotoGalleryItems = await _context.NewsPhotoGalleryItems
+                        .Where(x => x.NewsID == request.NewsID).ToListAsync();
+
+                    if (existingPhotoGalleryItems != null)
+                    {
+                        _context.NewsPhotoGalleryItems.RemoveRange(existingPhotoGalleryItems);
+                    }
+
+                    foreach (var galleryItem in request.Items)
+                    {
+                        var newPhotoGalleryItem = new NewsPhotoGalleryItem
+                        {
+                            NewsID = request.NewsID,
+                            Order = galleryItem.Order,
+                            PhotoUrl = galleryItem.ImageURL,
+                            Content = galleryItem.Content
+                        };
+
+                        var newsPhotoGalleryVersionItem = new NewsVersionsPhotoGalleryItem
+                        {
+                            Content = galleryItem.Content,
+                            Order = galleryItem.Order,
+                            NewsID = request.NewsID,
+                            PhotoUrl = galleryItem.ImageURL,
+                            VersionID = newVersion.ID
+                        };
+
+                        await _context.NewsPhotoGalleryItems.AddAsync(newPhotoGalleryItem);
+                        await _context.NewsVersionsPhotoGalleryItems.AddAsync(newsPhotoGalleryVersionItem);
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    result.Message = "Bir hata oluştu: " + ex.Message;
+                    return result;
+                }
+            }
+        }
+
+        public async Task<ServiceResult> ClearCloudflareCache(string url)
+        {
+            var result = new ServiceResult();
+
+            var purgeResponse = _cloudflareAdapter.Purge(url);
+
+            if (purgeResponse)
+            {
+                result.SetSuccess(_localizer["CacheCleared"]);
+                return result;
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        private void LogError<T>(Exception ex, T request)
+        {
+            try
+            {
+                var jsonRequest = JsonConvert.SerializeObject(request);
+                string message =
+                    $"Service\n[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Error: {ex.Message}\nStackTrace: {ex.StackTrace}\nRequest: {jsonRequest}\n\n";
+
+                var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                var logFilePath = Path.Combine(wwwrootPath, "errors.txt");
+
+                File.AppendAllText(logFilePath, message);
+            }
+            catch (Exception fileEx)
+            {
+                Console.WriteLine("LogErrorToFile hatası: " + fileEx.Message);
+            }
+        }
+    }
+}

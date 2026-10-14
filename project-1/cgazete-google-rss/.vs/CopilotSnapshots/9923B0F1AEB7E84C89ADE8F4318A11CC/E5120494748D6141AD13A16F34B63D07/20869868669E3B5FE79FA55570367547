@@ -1,0 +1,159 @@
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Quark.Resources;
+using Microsoft.Extensions.Localization;
+using Quark.Data.Models;
+
+namespace Quark.CMS.Business.Models.Requests.NewsRequests;
+
+public class NewsRequest
+{
+    public long ID { get; set; }
+    public int NewsTypeID { get; set; }
+    public string NewsTypeName { get; set; }
+    public string CategoryIDMap { get; set; }
+    public int CategoryID { get; set; }
+    public string CategoryName { get; set; }
+    public string SecondaryCategoryIDMaps { get; set; }
+    public List<SelectListItem> AuthorIDs { get; set; }
+    public int? AuthorID { get; set; }
+    public List<SelectListItem> CaricaturistIDs { get; set; }
+    public int? CaricaturistID { get; set; }
+    public string Slug { get; set; }
+    public string Title { get; set; }
+    public string UpSubtitle { get; set; }
+    public string Subtitle { get; set; }
+    public string Content { get; set; }
+    public List<SelectListItem> Tags { get; set; }
+    public List<int> SelectedTagIDs { get; set; }
+    public string BaseURL { get; set; }
+    public string ScheduleDate { get; set; }
+    public List<PhotoRequest> Photos { get; set; }
+    public PhotoRequest PhotoGalleryItemPhotoInfos { get; set; }
+    public bool IsLockedByCurrentUser { get; set; }
+    public string Video { get; set; }
+    public List<PromptResponseItem> TitlePrompts { get; set; }
+    public List<PromptResponseItem> SubtitlePrompts { get; set; }
+    public List<PhotoGalleryItemRequest> PhotoGalleryItems { get; set; }
+    public string PressNo { get; set; }
+    public string Headline { get; set; }
+    public bool ShowHeadline { get; set; } = true;
+    public bool AllowAds { get; set; } = true;
+    public bool AllowGoogleIndex { get; set; } = true;
+    public bool AllowToSendRSS { get; set; } = true;
+    public bool ExcludeFromGoogleAiFeed { get; set; } = true;
+    public bool AllowToSendGoogleSideMap { get; set; } = true;
+    public bool IsURLEditable { get; set; }
+    public List<SelectListItem> Sources { get; set; }
+    public List<string> SourceIDs { get; set; }
+    public int BoxCount { get; set; }
+    public string SeoTitle { get; set; }
+    public string SeoDescription { get; set; }
+    public List<SelectListItem> ZodiacSigns { get; set; }
+    public string SelectedZodiacSignID { get; set; }
+    public bool IsYoutubeEnabled { get; set; }
+    public bool IsDailymotionEnabled { get; set; }
+    public int? SelectedVideoPlayer { get; set; }
+    public string UpHeadline { get; set; }
+    public string SubHeading { get; set; }
+    public string UpSubHeading { get; set; }
+    public bool ShowUpHeadline { get; set; } = true;
+    public bool ShowSubHeading { get; set; } = true;
+    public bool ShowUpSubHeading { get; set; } = true;
+    public string RedirectLink { get; set; }
+    public DateTime? PublishDate { get; set; }
+    public DateTime? PublishEndDate { get; set; }
+    public bool PublishNow { get; set; }
+    public SurveyItemRequest SurveyItemRequest { get; set; }
+    public DateTime ManuelUpdatedDate { get; set; }
+    public List<string> SurveyOptions { get; set; }
+    public bool IsChangeSlug { get; set; } = false;
+}
+
+public class PhotoRequest
+{
+    public int PhotoTypeID { get; set; }
+    public string Key { get; set; }
+    public string Name { get; set; }
+    public string PhotoURL { get; set; }
+    public string Description { get; set; }
+    public int Height { get; set; }
+    public int Width { get; set; }
+    public bool IsRequired { get; set; }
+    public int Order { get; set; }
+}
+
+public class PromptResponseItem
+{
+    public int ID { get; set; }
+    public string Name { get; set; }
+    public string RequestType { get; set; }
+}
+
+public class PhotoGalleryItemRequest
+{
+    public long ID { get; set; }
+    public string Content { get; set; }
+    public string PhotoURL { get; set; }
+    public int Order { get; set; }
+}
+
+public class NewsRequestValidator : AbstractValidator<NewsRequest>
+{
+    public NewsRequestValidator(IStringLocalizer<CommonResource> _localizer)
+    {
+        RuleFor(x => x.Title)
+            .NotEmpty().WithMessage(_localizer["ValidationForRequired"])
+            .MaximumLength(500).WithMessage(_localizer["ValidationForMaxLength"]);
+
+        RuleFor(x => x.Subtitle)
+            .NotEmpty().WithMessage(_localizer["ValidationForRequired"])
+            .MaximumLength(1000).WithMessage(_localizer["ValidationForMaxLength"]);
+
+        RuleFor(x => x.NewsTypeID)
+            .NotEmpty().WithMessage(_localizer["ValidationForRequired"]);
+
+        RuleFor(x => x.Content)
+            .NotEmpty().WithMessage(_localizer["ValidationForRequired"]);
+
+        RuleFor(x => x.CategoryID)
+            .GreaterThanOrEqualTo(0).WithMessage(_localizer["ValidationForRequired"]);
+
+        RuleFor(x => x.AuthorID)
+            .GreaterThanOrEqualTo(0).WithMessage(_localizer["ValidationForRequired"]);
+
+        RuleFor(x => x.RedirectLink)
+            .NotEmpty().WithMessage(_localizer["ValidationForRequired"]);
+
+        RuleFor(x => x.BoxCount)
+            .NotEmpty().WithMessage(_localizer["ValidationForRequired"])
+            .GreaterThan(0).WithMessage(_localizer["ValidationForRequired"]);
+
+        RuleFor(x => x.SelectedTagIDs)
+            .NotNull().WithMessage(_localizer["ValidationForRequired"])
+            .Must(tags => tags != null && tags.Any())
+            .WithMessage(_localizer["ValidationForRequired"]);
+
+        RuleFor(x => x.SourceIDs)
+          .NotNull().WithMessage(_localizer["ValidationForRequired"])
+          .Must(source => source != null && source.Any())
+          .WithMessage(_localizer["ValidationForRequired"]);
+
+        RuleFor(x => x.AuthorID)
+            .NotNull().WithMessage(_localizer["ValidationForRequired"])
+            .GreaterThan(0).WithMessage(_localizer["ValidationForRequired"]);  
+        
+        // RuleFor(x => x.Video)
+        //     .NotEmpty().WithMessage(_localizer["ValidationForRequired"])
+        //     .MaximumLength(250).WithMessage(_localizer["ValidationForMaxLength"]);
+
+        RuleFor(x => x.PressNo)
+            .NotEmpty().WithMessage(_localizer["ValidationForRequired"])
+            .MaximumLength(30).WithMessage(_localizer["ValidationForMaxLength"]);
+
+        RuleFor(x => x.Headline)
+            .NotEmpty().WithMessage(_localizer["ValidationForRequired"])
+            .MaximumLength(500).WithMessage(_localizer["ValidationForMaxLength"]);
+
+    }
+}

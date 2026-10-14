@@ -1,0 +1,9 @@
+﻿@model List<Quark.Web.Models.ViewComponentResponses.MenuItems>
+
+
+<ul class="grid grid-cols-2 xs:grid-cols-3 xs:grid-rows-5 xs:grid-flow-col gap-3" >
+    @foreach(var menu in Model)
+    {
+        <li> <a href="@menu.URL" class="text-zinc-400 hover:text-white transition-all text-sm font-semibold">@menu.Name</a> </li>
+    }
+</ul>

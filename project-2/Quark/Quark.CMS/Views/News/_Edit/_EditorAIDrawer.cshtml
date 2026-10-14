@@ -1,0 +1,43 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div id="drawerEditorAI" class="bg-white" data-kt-drawer="true" data-kt-drawer-activate="true" data-kt-drawer-close="#drawerEditorAIClose" data-kt-drawer-width="600px">
+    <div class="card shadow-none border-0 rounded-0 col-12">
+        <div class="card-header">
+            <h3 class="card-title fw-bold text-gray-900">
+                @_localizer["AskToAI"]
+            </h3>
+            <div class="card-toolbar">
+                <button type="button" class="btn btn-sm btn-icon btn-active-light-primary me-n5" id="drawerEditorAIClose">
+                    <i class="ki-duotone ki-cross-circle fs-1">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body position-relative">
+            <div class="d-flex">
+                <input id="txtcontentAI" type="text" class="form-control form-control-solid" placeholder="Ne tür bir içerik istersin?"/>
+            </div>
+            <div class="menu menu-rounded menu-column menu-title-gray-700 menu-icon-gray-500 menu-arrow-gray-500 menu-bullet-gray-500 menu-arrow-gray-500 menu-state-bg fw-semibold w-400px mt-5" data-kt-menu="true">
+                @* @foreach (var contentPrompt in Model.ContentPrompts) *@
+                @* { *@
+                @*     <div class="menu-item"> *@
+                @*         <a class="menu-link py-3"> *@
+                @*             <span class="menu-icon"> *@
+                @*                 <i class="bi bi-pen fs-3"></i> *@
+                @*             </span> *@
+                @*             <span class="menu-title">@contentPrompt.Name</span> *@
+                @*             <input id="contentRequestType" type="hidden" asp-for="@contentPrompt.RequestType" value="@contentPrompt.RequestType"/> *@
+                @*         </a> *@
+                @*     </div> *@
+                @* } *@
+            </div>
+            <div class="separator separator-dashed my-6"></div>
+            <div id="generatedContent">
+                <p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);">Cumhuriyet Halk Partisi’nden (CHP) 31 Mart yerel seçimleri için yeniden aday gösterilen&nbsp;<strong style="overflow-wrap: break-word; word-break: break-word;">İstanbul Büyükşehir Belediye (İBB) Başkanı&nbsp;<a title="Ekrem İmamoğlu haberleri" target="_blank" href="https://www.cumhuriyet.com.tr/haberleri/ekrem-imamoglu" style="color: rgb(161, 33, 33); text-decoration: none; overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif !important;">Ekrem&nbsp;</a><a title="İmamoğlu haberleri" target="_blank" href="https://www.cumhuriyet.com.tr/haberleri/imamoglu" style="color: rgb(161, 33, 33); text-decoration: none; overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif !important;">İmamoğlu</a></strong>,&nbsp;<a title="mal varlığı haberleri" target="_blank" href="https://www.cumhuriyet.com.tr/haberleri/mal-varligi" style="color: rgb(161, 33, 33); text-decoration: none; overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif !important;">mal varlığı</a>&nbsp;bildiriminde bulundu.</p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);">İmamoğlu, kendisinin ve eşi Dilek Kaya İmamoğlu'nun mal varlığını açıkladı.</p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);"><strong style="overflow-wrap: break-word; word-break: break-word;">İmamoğlu'nun Beylikdüzü'nde 2 dükkan ve 1 mesken, Büyükçekmece'de 2 dükkan, Beylikdüzü'nde 2 arsa, Çanakkale'de ev, Balıkesir'de arsa, Trabzon'da ofis ve dükkan, Çanakkale'de tarla, Balıkesir'de arası olduğu görüldü.</strong></p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);">Dilek Kaya İmamoğlu'nun ise Beylikdüzü'nde 1 arsa ve dükkan, Muğla'da mesken, Trabzon'da kargir ev ve arsa ile Trabzon'da tarlası bulunduğu kaydedildi.</p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);"><strong style="overflow-wrap: break-word; word-break: break-word;">Dilek Kaya İmamoğlu'nun 2013 tarihinde alınan 'Wolsvagen' marak JİP'i olduğu belirtildi.</strong></p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);">Ekrem İmamoğlu'nun ise 2008 tarihinde alınan 8 bin TL değerinde silahı olduğu kaydedildi.</p><h3 style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; color: rgb(34, 34, 34);">BANKA HESAPLARI</h3><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);"><strong style="overflow-wrap: break-word; word-break: break-word;">Ekrem İmamoğlu ile Dilek Kaya İmamoğlu'nun banka hesaplarında bulunan mal varlıklarına da yer verildi.</strong></p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);">Buna göre Ekrem İmamoğlu'nun bir bankada 8 milyon 166 bin 645 TL, diğer banka hesabında ise 562 bin TL'si olduğu görüldü.</p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);"><strong style="overflow-wrap: break-word; word-break: break-word;"></strong></p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);">Dilek Kaya İmamoğlu'nun ise bir banka hesabında 395 bin 737 dolar, diğer banka hesabında 52 gram altını olduğu kaydedildi.</p><p style="overflow-wrap: break-word; word-break: break-word; font-family: Montserrat, sans-serif; font-size: 1.2rem; margin-right: 0px; margin-bottom: 1.5rem; margin-left: 0px; line-height: 1.6; text-rendering: optimizelegibility; color: rgb(34, 34, 34);"><strong style="overflow-wrap: break-word; word-break: break-word; font-size: 19.2px;">Dilek Kaya İmamoğlu'nun 8 adet 279 bin 584 TL değerinde pırlanta seti, 35 adet 204 bin TL değerinde altın bilezik, 68 adet 92 bin TL değerinde cumhuriyet ve tam altın, 227 bin TL değerinde muhtelif altını olduğu görüldü.</strong><br></p>
+            </div>
+            <div class="separator separator-dashed my-6"></div>
+            <button onclick="applyGeneratedContent()" class="btn btn-primary d-block">@_localizer["Save"]</button>
+        </div>
+    </div>
+</div>

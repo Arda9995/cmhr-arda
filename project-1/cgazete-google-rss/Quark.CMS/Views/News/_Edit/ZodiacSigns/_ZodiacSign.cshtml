@@ -1,0 +1,10 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+
+
+
+<div class="mb-10 fv-row">
+    <label class="form-label required">@_localizer["ZodiacSign"]</label>
+    <select asp-items="@Model.ZodiacSigns" asp-for="@Model.SelectedZodiacSignID" class="form-select mb-2" data-control="select2"></select>
+    <span asp-validation-for="@Model.SelectedZodiacSignID" class="fv-plugins-message-container invalid-feedback ZodiacSignValidationMessage"></span>
+</div>

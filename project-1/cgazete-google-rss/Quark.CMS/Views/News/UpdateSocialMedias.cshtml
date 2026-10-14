@@ -1,0 +1,153 @@
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataNames.Title] = _localizer["SocialMedias"] + " " + _localizer["Update"];
+    ViewData[ViewDataNames.AsideMenu] = "News";
+    ViewData[ViewDataNames.AsideSubMenu] = "News";
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Haberler", "/News/List")
+    };
+}
+
+@model Quark.CMS.Business.Models.Requests.NewsRequests.SocialMediaRequest
+
+<form class="form row g-10" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="ID"/>
+    
+    <div class="row justify-content-between mt-5">
+        <div class="col-auto">
+            <a onclick="history.back()" class="btn btn-sm btn-secondary">
+                <i class="ki-outline ki-left"></i> @_localizer["GoBack"]
+            </a>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">@_localizer["Save"]</button>
+            <a href="/News/Details/@Model.ID" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </div>
+    
+    <div class="card col-9">
+        <div class="card-header border-0">
+            <div class="card-title">
+                <h2>Facebook</h2>
+            </div>
+        </div>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Title2"]</label>
+                <div class="col-lg-9">
+                    <input asp-for="@Model.FacebookTitle" type="text" class="form-control maxlength" maxlength="500" autocomplete="off"/>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="FacebookTitle"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label required fw-bold fs-6">@_localizer["Photo"]</label>
+                <div class="col-lg-9">
+                    <div class="image-input image-input-outline" data-kt-image-input="true">
+                        <div id="backgroundFacebookPhoto" class="image-input-wrapper w-125px h-125px bgi-position-center" style="background-size: 75%;
+                            background-image: url('@(Model.FacebookPhotoUrl)')"></div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="@_localizer["Update"]">
+                            <i class="bi bi-pencil-fill fs-7"></i>
+                            <input type="file" name="FacebookPhoto" accept=".png, .jpg, .jpeg"/>
+                            <input type="hidden" name="avatar_remove"/>
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="@_localizer["Cancel"]">
+                            <i class="bi bi-x fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">@_localizer["UploadImageHelpText"]</div>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Content"]</label>
+                <div class="col-lg-9">
+                    <textarea asp-for="@Model.FacebookContent" type="text" class="form-control maxlength" maxlength="1000" rows="6"></textarea>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="FacebookContent"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card col-9">
+        <div class="card-header border-0">
+            <div class="card-title">
+                <h2>X</h2>
+            </div>
+        </div>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Title2"]</label>
+                <div class="col-lg-9">
+                    <input asp-for="@Model.XTitle" type="text" class="form-control maxlength" maxlength="500" autocomplete="off"/>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="XTitle"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label required fw-bold fs-6">@_localizer["Photo"]</label>
+                <div class="col-lg-9">
+                    <div class="image-input image-input-outline" data-kt-image-input="true">
+                        <div id="backgroundTwitterPhotoUrl" class="image-input-wrapper w-125px h-125px bgi-position-center" style="background-size: 75%;
+                            background-image: url('@(Model.XPhotoUrl)')"></div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="@_localizer["Update"]">
+                            <i class="bi bi-pencil-fill fs-7"></i>
+                            <input type="file" name="XPhoto" accept=".png, .jpg, .jpeg"/>
+                            <input type="hidden" name="avatar_remove"/>
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="@_localizer["Cancel"]">
+                            <i class="bi bi-x fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">@_localizer["UploadImageHelpText"]</div>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Content"]</label>
+                <div class="col-lg-9">
+                    <textarea asp-for="@Model.XContent" type="text" class="form-control maxlength" maxlength="1000" rows="6"></textarea>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="XContent"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card col-9">
+        <div class="card-header border-0">
+            <div class="card-title">
+                <h2>Instagram</h2>
+            </div>
+        </div>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Title2"]</label>
+                <div class="col-lg-9">
+                    <input asp-for="@Model.InstagramTitle" type="text" class="form-control maxlength" maxlength="500" autocomplete="off"/>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="InstagramTitle"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label required fw-bold fs-6">@_localizer["Photo"]</label>
+                <div class="col-lg-9">
+                    <div class="image-input image-input-outline" data-kt-image-input="true">
+                        <div id="backgroundInstagramPhoto" class="image-input-wrapper w-125px h-125px bgi-position-center" style="background-size: 75%;
+                            background-image: url('@(Model.InstagramPhotoUrl)')"></div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="@_localizer["Update"]">
+                            <i class="bi bi-pencil-fill fs-7"></i>
+                            <input type="file" name="InstagramPhoto" accept=".png, .jpg, .jpeg"/>
+                            <input type="hidden" name="avatar_remove"/>
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="@_localizer["Cancel"]">
+                            <i class="bi bi-x fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">@_localizer["UploadImageHelpText"]</div>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label fw-bold fs-6 required">@_localizer["Content"]</label>
+                <div class="col-lg-9">
+                    <textarea asp-for="@Model.InstagramContent" type="text" class="form-control maxlength" maxlength="1000" rows="6"></textarea>
+                    <span class="fv-plugins-message-container invalid-feedback" asp-validation-for="InstagramContent"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>

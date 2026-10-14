@@ -1,0 +1,26 @@
+@{
+	var hasPremiumMembership = "False";
+
+	var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+	if (id !=  null)
+	{
+		hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+	}
+}
+<div data-astro-cid-j7pv25f6>
+	@if (hasPremiumMembership == "True")
+	{
+		
+	}
+	else
+	{
+		<!-- Ad Start -->
+		<div class="ads-box">
+			<div class="flex justify-center items-center" style="max-height:250px; min-height:250px;">
+				<cmh-ads data-adunit="/cumhuriyet.com.tr/anasayfa_banner_970x250_1"
+				         data-sizes="[[970, 250], [970, 90], [1000, 250], [500, 250], [600, 250], 'fluid']"
+				         data-device="desktop"></cmh-ads>
+			</div>
+		</div> <!-- Ad End -->
+	}
+</div>

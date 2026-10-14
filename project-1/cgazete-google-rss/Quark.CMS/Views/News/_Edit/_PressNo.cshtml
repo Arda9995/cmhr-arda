@@ -1,0 +1,7 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="mb-10 fv-row w-100">
+    <label class="required form-label">@_localizer["PressNo"]</label>
+    <input asp-for="@Model.PressNo" type="text" class="form-control maxlength" maxlength="30" />
+    <span asp-validation-for="@Model.PressNo" class="fv-plugins-message-container invalid-feedback"></span>
+</div>

@@ -1,0 +1,110 @@
+﻿-- Google AI Feed
+-- Production tabloları: dbo schema, tablo adları "News.*" (EF [Table("News.News")] ile birebir).
+-- Deploy sonrası CMS'de NewsPhotoTypes cache'inin yenilenmesi gerekir (veya ilk CMS istekte otomatik yenilenir).
+
+IF COL_LENGTH(N'dbo.[News.News]', 'ExcludeFromGoogleAiFeed') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.News]
+    ADD [ExcludeFromGoogleAiFeed] BIT NOT NULL
+        CONSTRAINT DF_News_ExcludeFromGoogleAiFeed DEFAULT (0);
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPublished]', 'ExcludeFromGoogleAiFeed') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPublished]
+    ADD [ExcludeFromGoogleAiFeed] BIT NOT NULL
+        CONSTRAINT DF_NewsPublished_ExcludeFromGoogleAiFeed DEFAULT (0);
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsVersions]', 'ExcludeFromGoogleAiFeed') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsVersions]
+    ADD [ExcludeFromGoogleAiFeed] BIT NOT NULL
+        CONSTRAINT DF_NewsVersions_ExcludeFromGoogleAiFeed DEFAULT (0);
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPhotos]', 'Width') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPhotos] ADD [Width] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPhotos]', 'Height') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPhotos] ADD [Height] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsVersionsPhotos]', 'Width') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsVersionsPhotos] ADD [Width] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsVersionsPhotos]', 'Height') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsVersionsPhotos] ADD [Height] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPublishedPhotos]', 'Width') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPublishedPhotos] ADD [Width] INT NULL;
+END
+GO
+
+IF COL_LENGTH(N'dbo.[News.NewsPublishedPhotos]', 'Height') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[News.NewsPublishedPhotos] ADD [Height] INT NULL;
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM [dbo].[News.NewsPhotoTypes]
+    WHERE [ID] = 10
+)
+BEGIN
+    SET IDENTITY_INSERT [dbo].[News.NewsPhotoTypes] ON;
+
+    INSERT INTO [dbo].[News.NewsPhotoTypes] (
+        [ID],
+        [Key],
+        [Name],
+        [Description],
+        [Width],
+        [Height],
+        [IsEnabled],
+        [IsRequired],
+        [Order]
+    )
+    VALUES (
+        10,
+        'GoogleAiHighResPhoto',
+        N'Google AI Yüksek Çözünürlüklü Görsel',
+        N'Google AI Feed için yüksek çözünürlüklü görsel. Minimum 1600x1200, maksimum 3200x3200.',
+        1600,
+        1200,
+        1,
+        0,
+        50
+    );
+
+    SET IDENTITY_INSERT [dbo].[News.NewsPhotoTypes] OFF;
+END
+ELSE
+BEGIN
+    UPDATE [dbo].[News.NewsPhotoTypes]
+    SET [Key] = 'GoogleAiHighResPhoto',
+        [Name] = N'Google AI Yüksek Çözünürlüklü Görsel',
+        [Description] = N'Google AI Feed için yüksek çözünürlüklü görsel. Minimum 1600x1200, maksimum 3200x3200.',
+        [Width] = 1600,
+        [Height] = 1200,
+        [IsEnabled] = 1,
+        [IsRequired] = 0
+    WHERE [ID] = 10;
+END
+GO

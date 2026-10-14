@@ -1,0 +1,95 @@
+﻿@{
+    ViewData[ViewDataNames.Title] = _localizer["AgencyNews"];
+    ViewData[ViewDataNames.AsideMenu] = "AgencyNews";
+    ViewData[ViewDataNames.AsideSubMenu] = "AgencyNews";
+    ViewData["ShowBackButton"] = true;
+    ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem(@_localizer["AgencyNews"], "/AgencyNews/List")
+    };
+}
+
+@section Scripts {
+    <script src="/Scripts/AgencyNews/List.js" asp-append-version="true"></script>
+}
+
+<partial name="_ListFilterPartial" model="Model" />
+
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+        </div>
+        <div class="card-toolbar">           
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <table id="datatable">
+            <thead>
+                <tr>
+                    <th class="w-100px">@_localizer["Date"]</th>
+                    <th class="w-450px">@_localizer["Title2"]</th>
+                    <th class="w-100px">@_localizer["Agency"]</th>
+                    <th class="w-100px">@_localizer["Category"]</th>
+                    <th class="w-100px text-center">@_localizer["WasItReported"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <div style="display:none">
+                    <div id="Col1">
+                        {0}
+                    </div>
+                    <div id="Col2">
+                        <a href="javascript:void(0);"
+                           class="news-detail"
+                           data-id={1}>
+                            {0}
+                        </a>
+                    </div>
+                    <div id="Col3">
+                        {0}
+                    </div>
+                    <div id="Col4">
+                        {0}
+                    </div>
+                    <div id="Col5">
+                        <span class="badge fw-bolder badge-{0}">
+                            {1}
+                        </span>
+                    </div>
+                    @* <div class="text-center" id="Col12">
+                        <a href="/News/Create/1?agencyNewsID={1}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="@_localizer["Update"]">
+                           Haberleştir
+                        </a>
+                    </div>*@
+                </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="newsDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newsTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Ajans:</strong> <span id="newsAgency"></span></p>
+                <p><strong>Kategori:</strong> <span id="newsCategory"></span></p>
+                <p><strong>Tür:</strong> <span id="newsType"></span></p>
+                <p><strong>Tarih:</strong> <span id="newsDate"></span></p>
+                <p><strong>Alt Başlık:</strong> <span id="newsSubtitle"></span></p>
+                <hr />
+                <div id="newsContent"></div>
+            </div>
+            <div class="modal-footer">
+                <a id="btnHaberlestir"
+                   href="#"
+                   class="btn btn-primary" target="_blank">
+                    Haberleştir
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+

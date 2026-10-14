@@ -1,0 +1,108 @@
+@{
+    ViewData["Title"] = "Web Push Bildirimleri";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card mb-10">
+    <div class="card-body">
+        <h2 class="mb-5">Web Push Notification Test Ortamıdır</h2>
+        <p class="mb-4">Bu sayfadan web push bildirimleri gönderebilirsiniz. Bildirimler Netmera servisi aracılığıyla gönderilir ve abonelik kayıtları olan tarayıcılarda görüntülenir.</p>
+        
+        <div class="alert alert-info mb-5">
+            <div class="d-flex">
+                <div class="me-3">
+                    <i class="ki-duotone ki-information-5 fs-2x text-info">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                </div>
+                <div>
+                    <h4 class="mb-1">Önemli Notlar</h4>
+                    <ul class="mb-0">
+                        <li>Bildirimler, sadece daha önce izin vermiş kullanıcılara gösterilir.</li>
+                        <li>Gönderilen bildirimler, abonelik kaydı olan tüm kullanıcılara veya hedef segmentindeki kullanıcılara iletilir.</li>
+                        <li>Bildirimlerin görüntülenmesi için kullanıcının tarayıcısının açık olması gerekmez.</li>
+                        <li>Localhost'ta test ederken bildirimler görüntülenemeyebilir, canlı ortamda test etmek daha doğru sonuç verecektir.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div id="notification-form-container"></div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/notification.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Notification manager'ı başlat
+            window.notificationManager = new NetmeraNotification({
+                endpointUrl: '/Notification/SendWebPushNotification',
+                onSuccess: function(response) {
+                    toastr.success('Bildirim başarıyla gönderildi');
+                },
+                onError: function(error) {
+                    toastr.error('Bildirim gönderilirken hata oluştu: ' + error.message);
+                },
+                debug: true,
+                defaultValues: {
+                    iconUrl: 'https://cumhuriyetreklam.com/wp-content/uploads/2019/02/cumhuriyet-logo-icon-512-512.jpg',
+                    url: 'https://www.cumhuriyet.com.tr/',
+                    title : 'Cumhuriyet Gazetesi',
+                    message : 'Cumhuriyet Gazetesi, Türkiye’nin en köklü gazetelerinden biridir. Güncel haberler, analizler ve yorumlarla dolu bir platform sunar.',
+                }
+            });
+            
+            // UI'ı oluştur
+            notificationManager.createUI('#notification-form-container');
+            
+            // Gelişmiş bildirim gönderme
+            $('#advanced-notification-btn').on('click', function() {
+                // Form elementlerinden değerleri al
+                const form = $('#notification-form-container form');
+                const title = $('#netmera-title').val();
+                const message = $('#netmera-message').val();
+                const iconUrl = $('#netmera-icon-url').val();
+                const url = $('#netmera-url').val();
+                
+                // Gelişmiş seçenekleri al
+                const personalizedTitle = $('#personalized-title').val();
+                const chromeImage = $('#chrome-image').val();
+                const interactionRequired = $('#interaction-required').is(':checked');
+                
+                // Zorunlu alanları kontrol et
+                if (!title || !message || !iconUrl) {
+                    toastr.warning('Lütfen bildirim başlığı, mesajı ve ikon URL\'ini doldurun');
+                    return;
+                }
+                
+                // Gelişmiş bildirimi gönder
+                notificationManager.sendNotification({
+                    title: title,
+                    message: message,
+                    iconUrl: iconUrl,
+                    url: url,
+                    wpChromeImage: chromeImage || null,
+                    interactionRequired: interactionRequired
+                }).then(response => {
+                    const resultDiv = $('#advanced-notification-result');
+                    const alertDiv = resultDiv.find('.alert');
+                    
+                    resultDiv.removeClass('d-none');
+                    alertDiv.removeClass('alert-danger').addClass('alert-success');
+                    alertDiv.text('Bildirim başarıyla gönderildi' + (response.notificationKey ? ` (Bildirim anahtarı: ${response.notificationKey})` : ''));
+                }).catch(error => {
+                    const resultDiv = $('#advanced-notification-result');
+                    const alertDiv = resultDiv.find('.alert');
+                    
+                    resultDiv.removeClass('d-none');
+                    alertDiv.removeClass('alert-success').addClass('alert-danger');
+                    alertDiv.text(error.message || 'Bildirim gönderilirken bir hata oluştu');
+                });
+            });
+        });
+    </script>
+} 

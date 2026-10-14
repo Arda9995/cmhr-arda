@@ -1,0 +1,86 @@
+﻿@using Quark.Core.Extentions
+@using Quark.Web.ViewComponents.Models
+<!-- MAIN START -->
+@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsListResponse
+
+@section Metatags {
+    <meta name="title" itemprop="title" content="@Model.SeoTitle.Replace("\"", "" )" />
+
+    <meta name="description" content="@Model.SeoDescription.Replace("\"", "" )">
+
+    <title>
+        @Model.SeoTitle.Replace("\"", "")
+    </title>
+
+    <meta name="keywords" content="@Model.CategoryName" />
+    <meta property="fb:admins" content="619332001" />
+    <meta property="fb:app_id" content="168546753348847" />
+    <link rel="canonical" href="@Model.CategorySlug" />
+    <link rel="alternate" type="application/rss+xml" href="https://www.cumhuriyet.com.tr/rss" />
+}
+@{
+    var hasPremiumMembership = "False";
+
+    var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    if (id != null)
+    {
+        hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+    }
+}
+@if (hasPremiumMembership == "False")
+{
+
+    @section AdScripts {
+        <!-- Google -->
+        <!-- Start GPT Tag -->
+        <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+        <script data-cfasync="false" async src="https://media.cumhuriyet.com.tr/assets/js/cmhads.js?v=1.01"></script>
+    }
+}
+@section Scripts {
+    <script src="~/js/Scripts/Category/newsList.js"></script>
+    <script type="application/ld+json">
+        {
+        "@@context": "https://schema.org",
+        "@@type": "BreadcrumbList",
+        "itemListElement": [{
+        "@@type": "ListItem",
+        "position": 1,
+        "item": {
+            "@@id": "https://www.cumhuriyet.com.tr/",
+            "name": "Cumhuriyet"
+            }
+        },{
+        "@@type": "ListItem",
+        "position": 2,
+        "item": {
+            "@@id": "@Model.CategorySlug",
+            "name": "@Model.CategoryName"
+            }
+        }]
+        }
+    </script>
+}
+
+<partial name="~/Views/Shared/_Header.cshtml" />
+<partial name="~/Views/Shared/AdContainers/_GeneralFloatingAdArea.cshtml" />
+<input type="hidden" asp-for="@Model.CategoryName"/>
+
+<main id="main" class="my-4 px-5 tablet:px-0">
+    <partial name="~/Views/Shared/AdContainers/_GeneralHeaderAdArea.cshtml" />
+    <div class="max-w-container mx-auto space-y-6 undefined">
+        <!-- Breadcrumb Start -->
+        <nav class="flex items-center gap-2 text-xs undefined">
+            <a href="/" class="text-gray-500 hover:text-gray-600 transition-all font-medium">Haberleri</a><span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 12L10 8L6 4" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </span><a href="@Model.CategorySlug" class="text-red-600 font-semibold ">@Model.CategoryBreadcrumb</a>
+        </nav> <!-- Breadcrumb End -->
+        <partial name="~/Views/Category/NewsListPartials/_TopAndMidCategoryNews.cshtml" model="Model" />
+        <div class="grid grid-cols-12 gap-8 mt-8">
+            <partial name="~/Views/Category/NewsListPartials/_BottomNews.cshtml" model="Model" />
+            @await Component.InvokeAsync("News", new NewsViewComponentModel { MethodName = "CategoryListMostViewedNews", NewsCount = 8 })
+        </div>
+    </div>
+</main>

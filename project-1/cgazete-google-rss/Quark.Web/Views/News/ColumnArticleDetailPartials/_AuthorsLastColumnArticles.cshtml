@@ -1,0 +1,25 @@
+﻿@model Quark.API.Business.Models.Responses.NewsResponses.GetNewsDetailResponse;
+
+<div class="mt-6">
+    <!-- Title Start -->
+    @if (Model.ColumnArticleDetails.AuthorsLastColumnArticles.Any())
+    {
+        <div class="flex items-center lg:gap-3 mb-4 undefined">
+            <span class="w-6 h-1 rounded-full bg-[#14A41C] lg:bg-[#FF0101] mr-3 lg:mr-0"></span>
+            <h3 class="text-slate-900 text-sm lg:text-xl font-semibold mr-6 lg:mr-0">Yazarın Son Yazıları</h3> <span class="h-0.5 bg-[#E5E5EA] flex-1 mr-3 lg:mr-0"></span>
+        </div> <!-- Title End --> <!-- List Start -->
+        <div class="grid xs:grid-cols-2 md:grid-cols-3 gap-5">
+            @foreach (var article in Model.ColumnArticleDetails.AuthorsLastColumnArticles)
+            {
+                <a href="@article.Slug" class="bg-[#FAFAFA] hover:bg-gray-100 transition-all p-4 flex flex-col gap-y-1">
+                    <div class="font-semibold text-[#080827]">@article.Headline</div>
+                    <p class="text-[#6B6B7D] font-medium line-clamp-3">@article.UpSubtitle</p>
+                    <div class="flex items-center justify-between text-[#080827] text-sm font-medium mt-auto">
+                        <div>Devamını Oku</div>
+                        <div>@article.PublishDate</div>
+                    </div>
+                </a>
+            }
+        </div> <!-- List End -->
+    }
+</div>

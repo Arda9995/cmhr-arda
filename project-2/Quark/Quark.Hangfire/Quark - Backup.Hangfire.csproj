@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire" Version="1.7.31" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.31" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quark.Business.Common\Quark.Business.Common.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,1300 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v8.0
+build_property.EntryPointFilePath = 
+build_property.RootNamespace = Quark.CMS
+build_property.RootNamespace = Quark.CMS
+build_property.ProjectDir = E:\GitHub\cgazete-google-rss\Quark.CMS\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = true
+build_property.MSBuildProjectDirectory = E:\GitHub\cgazete-google-rss\Quark.CMS
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Account/Forbidden.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxGb3JiaWRkZW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Account/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Account/ForgotPassword2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxGb3Jnb3RQYXNzd29yZDIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Account/MyProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxNeVByb2ZpbGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Account/SignIn.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTaWduSW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Account/SignIn2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTaWduSW4yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Account/SignInOTP2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTaWduSW5PVFAyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/AgencyNews/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbmN5TmV3c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/AgencyNews/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbmN5TmV3c1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/AgencyNews/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbmN5TmV3c1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/AgencyNews/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbmN5TmV3c1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/AgencyNews/_ListFilterPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbmN5TmV3c1xfTGlzdEZpbHRlclBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Anomalies/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5vbWFsaWVzXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Anomalies/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5vbWFsaWVzXExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/AppSettings/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXBwU2V0dGluZ3NcVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Astrologers/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXN0cm9sb2dlcnNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Astrologers/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXN0cm9sb2dlcnNcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Astrologers/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXN0cm9sb2dlcnNcTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Astrologers/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXN0cm9sb2dlcnNcVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Authors/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aG9yc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Authors/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aG9yc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Authors/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aG9yc1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Authors/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aG9yc1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Authors/_AuthorNews.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aG9yc1xfQXV0aG9yTmV3cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Blocks/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvY2tzXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Blocks/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvY2tzXExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Blocks/Manage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvY2tzXE1hbmFnZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Blocks/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvY2tzXFVwZGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Blocks/_NewsItems.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvY2tzXF9OZXdzSXRlbXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Blocks/_NewsList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvY2tzXF9OZXdzTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Blocks/_Pagination.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvY2tzXF9QYWdpbmF0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Blocks/_SortList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvY2tzXF9Tb3J0TGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Books/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Books/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Books/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Books/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Books/_ListFilterPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcX0xpc3RGaWx0ZXJQYXJ0aWFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Caches/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FjaGVzXExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Caricaturists/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FyaWNhdHVyaXN0c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Caricaturists/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FyaWNhdHVyaXN0c1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Caricaturists/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FyaWNhdHVyaXN0c1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Caricaturists/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FyaWNhdHVyaXN0c1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Categories/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmllc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Categories/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmllc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Categories/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmllc1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Categories/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmllc1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Cropper/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JvcHBlclxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Home/Error404.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxFcnJvcjQwNC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Home/Error500.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxFcnJvcjUwMC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Home/_LastPublishedAndNewsGraphWidgetGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxfTGFzdFB1Ymxpc2hlZEFuZE5ld3NHcmFwaFdpZGdldEdyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Home/_NewsTypeAndCategoryWidgetGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxfTmV3c1R5cGVBbmRDYXRlZ29yeVdpZGdldEdyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Home/_NewsWidgetGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxfTmV3c1dpZGdldEdyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Home/_SystemLogs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxfU3lzdGVtTG9ncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/MediaGallery/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFHYWxsZXJ5XExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/MediaGallery/_AddFolder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFHYWxsZXJ5XF9BZGRGb2xkZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/MediaGallery/_ArchiveFiles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFHYWxsZXJ5XF9BcmNoaXZlRmlsZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/MediaGallery/_FavouriteFiles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFHYWxsZXJ5XF9GYXZvdXJpdGVGaWxlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/MediaGallery/_FilePath.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFHYWxsZXJ5XF9GaWxlUGF0aC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/MediaGallery/_Files.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFHYWxsZXJ5XF9GaWxlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/MediaGallery/_GalleryActionButton.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWFHYWxsZXJ5XF9HYWxsZXJ5QWN0aW9uQnV0dG9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Members/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVtYmVyc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Members/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVtYmVyc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Members/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVtYmVyc1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Members/SendPushNotification.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVtYmVyc1xTZW5kUHVzaE5vdGlmaWNhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Members/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVtYmVyc1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Members/_MemberListFilterPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVtYmVyc1xfTWVtYmVyTGlzdEZpbHRlclBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Members/_MemberNotificationsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVtYmVyc1xfTWVtYmVyTm90aWZpY2F0aW9uc1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Menus/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudXNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Menus/CreateParentMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudXNcQ3JlYXRlUGFyZW50TWVudS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Menus/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudXNcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Menus/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudXNcTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Menus/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudXNcVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Menus/UpdateParent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudXNcVXBkYXRlUGFyZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/NewsIntegration/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c0ludGVncmF0aW9uXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/NewsIntegration/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c0ludGVncmF0aW9uXExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/NewsIntegration/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c0ludGVncmF0aW9uXFVwZGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/NewsPhotoTypes/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1Bob3RvVHlwZXNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/NewsPhotoTypes/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1Bob3RvVHlwZXNcTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/NewsPhotoTypes/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1Bob3RvVHlwZXNcVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/CaricaturistNewsCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xDYXJpY2F0dXJpc3ROZXdzQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/CaricaturistNewsUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xDYXJpY2F0dXJpc3ROZXdzVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/ColumnArticlesCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xDb2x1bW5BcnRpY2xlc0NyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/ColumnArticlesUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xDb2x1bW5BcnRpY2xlc1VwZGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/GovernmentAnnouncementCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xHb3Zlcm5tZW50QW5ub3VuY2VtZW50Q3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/GovernmentAnnouncementUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xHb3Zlcm5tZW50QW5ub3VuY2VtZW50VXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/Live.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xMaXZlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/NewsCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xOZXdzQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/NewsUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xOZXdzVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/PhotoEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xQaG90b0VkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/PhotoGalleryCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xQaG90b0dhbGxlcnlDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/PhotoGalleryUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xQaG90b0dhbGxlcnlVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/SurveyNewsCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xTdXJ2ZXlOZXdzQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/SurveyNewsUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xTdXJ2ZXlOZXdzVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/UpdateSocialMedias.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xVcGRhdGVTb2NpYWxNZWRpYXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/URLRedirectionCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xVUkxSZWRpcmVjdGlvbkNyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/URLRedirectionUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xVUkxSZWRpcmVjdGlvblVwZGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/Version.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xWZXJzaW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/VideoGalleryCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xWaWRlb0dhbGxlcnlDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/VideoGalleryUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xWaWRlb0dhbGxlcnlVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/ZodiacSignCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xab2RpYWNTaWduQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/ZodiacSignUpdate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xab2RpYWNTaWduVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Cropper.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfQ3JvcHBlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Ads.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQWRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_AlertDraft.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQWxlcnREcmFmdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_AlertLive.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQWxlcnRMaXZlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_AlertLocked.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQWxlcnRMb2NrZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Analytics.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQW5hbHl0aWNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Author.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQXV0aG9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Caricaturist.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQ2FyaWNhdHVyaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Category.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQ2F0ZWdvcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Content.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfQ29udGVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Headline.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfSGVhZGxpbmUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_History.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfSGlzdG9yeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_HistoryDrawer.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfSGlzdG9yeURyYXdlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_ManuelUpdatedDate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfTWFudWVsVXBkYXRlZERhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_NewsRelations.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfTmV3c1JlbGF0aW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_PhotoGalleryItems.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfUGhvdG9HYWxsZXJ5SXRlbXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_PhotoGalleryItemsOrders.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfUGhvdG9HYWxsZXJ5SXRlbXNPcmRlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Photos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfUGhvdG9zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_SendNotification.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfU2VuZE5vdGlmaWNhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Seo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfU2VvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_SocialMedias.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfU29jaWFsTWVkaWFzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Source.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfU291cmNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Status.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfU3RhdHVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_SubHeading.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfU3ViSGVhZGluZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Subtitle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfU3VidGl0bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_SurveyComponents.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfU3VydmV5Q29tcG9uZW50cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Tags.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVGFncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Title.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVGl0bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Toolbar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVG9vbGJhci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_ToolBarLeft.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVG9vbEJhckxlZnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_ToolBarRight.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVG9vbEJhclJpZ2h0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Type.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVHlwZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_UpHeadline.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVXBIZWFkbGluZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_UpSubHeading.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVXBTdWJIZWFkaW5nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_UpSubtitle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVXBTdWJ0aXRsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Url.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVXJsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_VersionBy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVmVyc2lvbkJ5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Details/_Video.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRGV0YWlsc1xfVmlkZW8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/ZodiacSigns/_ZodiacSign.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxab2RpYWNTaWduc1xfWm9kaWFjU2lnbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Ads.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfQWRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Author.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfQXV0aG9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Category.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfQ2F0ZWdvcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_ColumnArticle/_Subtitle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfQ29sdW1uQXJ0aWNsZVxfU3VidGl0bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Content.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfQ29udGVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_EditorAIDrawer.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfRWRpdG9yQUlEcmF3ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_General.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfR2VuZXJhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_GovernmentAnnouncement/_BoxCount.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfR292ZXJubWVudEFubm91bmNlbWVudFxfQm94Q291bnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Headline.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfSGVhZGxpbmUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_MainCategoryJsTree.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfTWFpbkNhdGVnb3J5SnNUcmVlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_ManuelUpdatedDate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfTWFudWVsVXBkYXRlZERhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_MediaGallery.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfTWVkaWFHYWxsZXJ5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_MediaGalleryFiles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfTWVkaWFHYWxsZXJ5RmlsZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Permissions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUGVybWlzc2lvbnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_PhotoEditModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUGhvdG9FZGl0TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_PhotoGallery/_ItemRepeater.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUGhvdG9HYWxsZXJ5XF9JdGVtUmVwZWF0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_PhotoGallery/_Subtitle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUGhvdG9HYWxsZXJ5XF9TdWJ0aXRsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_PhotoTemplateTab.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUGhvdG9UZW1wbGF0ZVRhYi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_PhotoUpload.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUGhvdG9VcGxvYWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_PressNo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUHJlc3NOby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_PublishDate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUHVibGlzaERhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_RedirectLink.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfUmVkaXJlY3RMaW5rLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_SecondaryCategoryJsTree.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfU2Vjb25kYXJ5Q2F0ZWdvcnlKc1RyZWUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Seo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfU2VvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Source.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfU291cmNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_SubHeading.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfU3ViSGVhZGluZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Subtitle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfU3VidGl0bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_SurveyComponents.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfU3VydmV5Q29tcG9uZW50cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_SurveyOptions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfU3VydmV5T3B0aW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Tags.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfVGFncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Title.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfVGl0bGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_UpHeadline.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfVXBIZWFkbGluZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_UpSubHeading.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfVXBTdWJIZWFkaW5nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_UpSubtitle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfVXBTdWJ0aXRsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Url.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfVXJsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_URLRedirection/_Url.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfVVJMUmVkaXJlY3Rpb25cX1VybC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Edit/_Video.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfRWRpdFxfVmlkZW8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_List/_ListFilterPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfTGlzdFxfTGlzdEZpbHRlclBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_List/_NewButton.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfTGlzdFxfTmV3QnV0dG9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_List/_Table.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfTGlzdFxfVGFibGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/Modal/_Video.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxNb2RhbFxfVmlkZW8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/UnpublishDescription.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxVbnB1Ymxpc2hEZXNjcmlwdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Ads.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfQWRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_AlertLocked.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfQWxlcnRMb2NrZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Author.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfQXV0aG9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Caricaturist.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfQ2FyaWNhdHVyaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Category.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfQ2F0ZWdvcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Content.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfQ29udGVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_PhotoGalleryItems.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfUGhvdG9HYWxsZXJ5SXRlbXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Photos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfUGhvdG9zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_PressNo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfUHJlc3NOby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Source.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfU291cmNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Tags.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfVGFncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_VersionBy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfVmVyc2lvbkJ5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/News/_Version/_Video.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xfVmVyc2lvblxfVmlkZW8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Notification/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTm90aWZpY2F0aW9uXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Pages/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZXNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Pages/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZXNcTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Pages/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFnZXNcVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PaymentManagement/CreatePlan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudE1hbmFnZW1lbnRcQ3JlYXRlUGxhbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PaymentManagement/CreateProduct.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudE1hbmFnZW1lbnRcQ3JlYXRlUHJvZHVjdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PaymentManagement/Plans.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudE1hbmFnZW1lbnRcUGxhbnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PaymentManagement/Products.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudE1hbmFnZW1lbnRcUHJvZHVjdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PaymentManagement/SubscriptionDetail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudE1hbmFnZW1lbnRcU3Vic2NyaXB0aW9uRGV0YWlsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PaymentManagement/Subscriptions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudE1hbmFnZW1lbnRcU3Vic2NyaXB0aW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PaymentManagement/SubscriptionsUpgrade.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudE1hbmFnZW1lbnRcU3Vic2NyaXB0aW9uc1VwZ3JhZGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PaymentManagement/UpdatePlan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudE1hbmFnZW1lbnRcVXBkYXRlUGxhbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PhotoEditTemplates/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGhvdG9FZGl0VGVtcGxhdGVzXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PhotoEditTemplates/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGhvdG9FZGl0VGVtcGxhdGVzXExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/PhotoEditTemplates/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGhvdG9FZGl0VGVtcGxhdGVzXFVwZGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Prompts/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvbXB0c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Prompts/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvbXB0c1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Prompts/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvbXB0c1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Roles/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9sZXNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Roles/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9sZXNcTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Roles/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9sZXNcVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Roles/_ListFilterPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUm9sZXNcX0xpc3RGaWx0ZXJQYXJ0aWFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEFkZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/ArrowDown.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEFycm93RG93bi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/ArrowsCircle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEFycm93c0NpcmNsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Block.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEJsb2NrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Calendar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXENhbGVuZGFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Category.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXENhdGVnb3J5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Content.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXENvbnRlbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/DailymotionIMG.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXERhaWx5bW90aW9uSU1HLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXERhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Document.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXERvY3VtZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Email.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEVtYWlsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Exit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEV4aXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Export.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEV4cG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Eye.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEV5ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/EyeSlash.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEV5ZVNsYXNoLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Facebook.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEZhY2Vib29rLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/GovernmentAnnouncement.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEdvdmVybm1lbnRBbm5vdW5jZW1lbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/History.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEhpc3RvcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/History2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEhpc3RvcnkyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/History3.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEhpc3RvcnkzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Home.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEhvbWUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Information.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEluZm9ybWF0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Instagram.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXEluc3RhZ3JhbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Linkedin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXExpbmtlZGluLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Lock.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXExvY2suY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/MediaGallery.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE1lZGlhR2FsbGVyeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Members.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE1lbWJlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Menu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE1lbnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Merge.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE1lcmdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/News.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE5ld3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/News2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE5ld3MyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/NewsAuthor.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE5ld3NBdXRob3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Newspaper.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE5ld3NwYXBlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/NewsPhotoGallery.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE5ld3NQaG90b0dhbGxlcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/NewsVideo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE5ld3NWaWRlby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/OpenLink.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXE9wZW5MaW5rLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Phone.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFBob25lLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Publish.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFB1Ymxpc2guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Reports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFJlcG9ydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Schedule.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFNjaGVkdWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Search.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFNlYXJjaC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Settings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFNldHRpbmdzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Slider.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFNsaWRlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Slider2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFNsaWRlcjIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Tag.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFRhZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/TwitterX.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFR3aXR0ZXJYLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/UnPublish.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFVuUHVibGlzaC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/Youtube.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFlvdXR1YmUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Icons/YoutubeIMG.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEljb25zXFlvdXR1YmVJTUcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Samples/Map.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXFNhbXBsZXNcTWFwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/Samples/ToolbarButton.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXFNhbXBsZXNcVG9vbGJhckJ1dHRvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_AsideMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Bc2lkZU1lbnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_BackButton.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9CYWNrQnV0dG9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_Breadcrumb.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9CcmVhZGNydW1iLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_CKEditorScripts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9DS0VkaXRvclNjcmlwdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_DataTableHeaderButtons.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9EYXRhVGFibGVIZWFkZXJCdXR0b25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_Footer.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Gb290ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_Header.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9IZWFkZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_Language.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYW5ndWFnZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_LayoutError.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRFcnJvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_LayoutNews.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXROZXdzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_LayoutPublic.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRQdWJsaWMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_LiveAlert.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MaXZlQWxlcnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_MessageBox.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9NZXNzYWdlQm94LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_NewsEditScriptFiles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9OZXdzRWRpdFNjcmlwdEZpbGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_QuickMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9RdWlja01lbnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_Sidebar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaWRlYmFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_ThemeMode.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9UaGVtZU1vZGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_TopMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Ub3BNZW51LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Sources/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU291cmNlc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Sources/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU291cmNlc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Sources/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU291cmNlc1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Sources/Merge.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU291cmNlc1xNZXJnZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Sources/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU291cmNlc1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Surveys/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VydmV5c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Surveys/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VydmV5c1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Surveys/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VydmV5c1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Surveys/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3VydmV5c1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/SystemLogs/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3lzdGVtTG9nc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/SystemLogs/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3lzdGVtTG9nc1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Tags/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFnc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Tags/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFnc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Tags/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFnc1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Tags/Merge.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFnc1xNZXJnZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Tags/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFnc1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/UserContracts/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlckNvbnRyYWN0c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/UserContracts/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlckNvbnRyYWN0c1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/UserContracts/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlckNvbnRyYWN0c1xVcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Users/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlcnNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Users/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlcnNcTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Users/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlcnNcVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/GitHub/cgazete-google-rss/Quark.CMS/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-kii8fz358e

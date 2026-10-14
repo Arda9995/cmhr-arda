@@ -1,0 +1,129 @@
+﻿@{
+ViewData[ViewDataNames.Title] = _localizer["New"] + " " + _localizer["Survey"];
+ViewData[ViewDataNames.AsideMenu] = "Content";
+ViewData[ViewDataNames.AsideSubMenu] = "Surveys";
+ViewData["ShowBackButton"] = true;
+ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+{
+new BreadcrumbItem(_localizer["Content"], string.Empty),
+new BreadcrumbItem(_localizer["Surveys"], "/Surveys/List")
+};
+}
+
+@model Quark.CMS.Business.Models.Requests.SurveyRequests.CreateSurveyRequest
+@section Scripts
+{
+    <script src="/Scripts/Surveys/Common.js" asp-append-version="true"></script>
+}
+<form class="form" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="ID" />
+    <input id="url-prefix" type="hidden" value="@_appSettings.News_URLSchema" />
+<div class="card mb-5 mb-xl-10 col-12">
+    <div class="card-header flex-grow-0 border-0">
+        <div class="card-title m-0">
+            <h3 class="fw-bolder m-0">@_localizer["Survey"] @_localizer["Informations"]</h3>
+        </div>
+        <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button type="submit" class="btn btn-primary me-2">@_localizer["Save"]</button>
+            <a href="/Surveys/List" class="btn btn-light btn-light-primary">@_localizer["Cancel"]</a>
+        </div>
+    </div>
+        <div class="card-body border-top p-9">
+            <div class="row mb-6">
+                <label class="col-lg-3 col-form-label required fw-bold fs-6">@_localizer["Photo"]</label>
+                <div class="col-lg-12">
+                    <div class="image-input image-input-outline" data-kt-image-input="true">
+                        <div id="backgroundPhoto" class="image-input-wrapper w-150px h-150px bgi-position-center" style="background-size: 75%;
+                            background-image: url('@(Model.PhotoUrl)')"></div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="@_localizer["Update"]">
+                            <i class="bi bi-pencil-fill fs-7"></i>
+                            <input type="file" name="Photo" accept=".png, .jpg, .jpeg" />
+                            <input type="hidden" name="avatar_remove" />
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="@_localizer["Cancel"]">
+                            <i class="bi bi-x fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="form-text">@_localizer["UploadImageHelpText"]</div>
+                    <span class="fv-plugins-message-container invalid-feedback" id="imageValidation"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="form-label">@_localizer["SurveyQuestion"]</label>
+                <div class="col-lg-12">
+                    <input type="text" asp-for="Question" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Question" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="form-label">@_localizer["Option1"]</label>
+                <div class="col-lg-12">
+                    <input type="text" asp-for="Option1" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Option1" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="form-label">@_localizer["Option2"]</label>
+                <div class="col-lg-12">
+                    <input type="text" asp-for="Option2" class="form-control form-control-lg form-control-solid" />
+                    <span asp-validation-for="@Model.Option2" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="form-label">@_localizer["Option3"]</label>
+            <div class="col-lg-12">
+                    <input type="text" asp-for="Option3" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Option3" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="form-label">@_localizer["Option4"]</label>
+            <div class="col-lg-12">
+                    <input type="text" asp-for="Option4" class="form-control form-control-lg form-control-solid"/>
+                    <span asp-validation-for="@Model.Option4" class="fv-plugins-message-container invalid-feedback"></span>
+                    <span class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+            <div class="row mb-6">
+                <label class="form-label">@_localizer["Slug"]</label>
+            <div class="col-lg-12 fv-row">
+                    <div class="input-group">
+                        <span class="input-group-text" id="slug">@_appSettings.Common_ClientWebSite</span>
+                        <input asp-for="@Model.Slug" type="text" class="form-control maxlength" maxlength="500" id="basic-url" aria-describedby="basic-addon3" readonly style="background-color: #e9ecef; cursor: not-allowed;" />
+                        <span class="input-group-text py-0">
+                            <a role="button" onclick="ToggleSurveyUrlGenerate();" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-inverse" data-bs-placement="top" title="Kitap adına göre oluştur">
+                                <i class="ki-duotone ki-subtitle fs-2x mt-1 text-primary">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                </i>
+                            </a>
+                        </span>
+                    </div>
+
+                    <span asp-validation-for="@Model.Slug" class="fv-plugins-message-container invalid-feedback"></span>
+                    <div id="url-note" class="text-muted fs-7">@_localizer["NewsUrlHint"]</div>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-10 mb-6">
+                <div class="fv-row w-100 flex-md-root fv-plugins-icon-container">
+                    <label class="form-label required">@_localizer["StartDate"]</label>
+                    <input asp-for="@Model.StartDate" type="text" class="form-control form-control-lg form-control-solid datetimepicker"value="@DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")" />                   
+                    <span asp-validation-for="@Model.StartDate" class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+                <div class="fv-row w-100 flex-md-root">
+                    <label class="form-label required">@_localizer["EndDate"]</label>
+                    <input asp-for="@Model.EndDate" type="text" class="form-control form-control-lg form-control-solid datetimepicker"value="@DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")" /> 
+                    <span asp-validation-for="@Model.EndDate" class="fv-plugins-message-container invalid-feedback"></span>
+                </div>
+            </div>
+        </div>
+    
+</div>
+</form>

@@ -1,0 +1,10 @@
+﻿@model List<Quark.Web.Models.ViewComponentResponses.MenuItems>
+
+<div class="px-6 py-2 space-y-2" data-astro-cid-7j4fal7x>
+    @foreach (var menu in Model)
+    {
+        <a href="@menu.URL" 
+        class="flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg p-2 transition-colors duration-200"> 
+        @menu.Name </a>
+    }
+</div>

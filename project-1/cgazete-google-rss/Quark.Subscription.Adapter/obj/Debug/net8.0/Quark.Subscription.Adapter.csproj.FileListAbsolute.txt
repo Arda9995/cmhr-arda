@@ -1,0 +1,15 @@
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\bin\Debug\net8.0\Quark.Subscription.Adapter.deps.json
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\bin\Debug\net8.0\Quark.Subscription.Adapter.dll
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\bin\Debug\net8.0\Quark.Subscription.Adapter.pdb
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\Quark.Subscription.Adapter.csproj.AssemblyReference.cache
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\Quark.Subscription.Adapter.GeneratedMSBuildEditorConfig.editorconfig
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\Quark.Subscription.Adapter.AssemblyInfoInputs.cache
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\Quark.Subscription.Adapter.AssemblyInfo.cs
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\Quark.Subscription.Adapter.csproj.CoreCompileInputs.cache
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\Quark.Subscription.Adapter.dll
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\refint\Quark.Subscription.Adapter.dll
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\Quark.Subscription.Adapter.pdb
+E:\GitHub\cgazete-google-rss\Quark.Subscription.Adapter\obj\Debug\net8.0\ref\Quark.Subscription.Adapter.dll
+C:\Users\tamay.diverjans\AppData\Local\Temp\2\b_Quark.Hangfire.csproj\Quark.Subscription.Adapter.deps.json
+C:\Users\tamay.diverjans\AppData\Local\Temp\2\b_Quark.Hangfire.csproj\Quark.Subscription.Adapter.dll
+C:\Users\tamay.diverjans\AppData\Local\Temp\2\b_Quark.Hangfire.csproj\Quark.Subscription.Adapter.pdb

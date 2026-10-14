@@ -1,0 +1,20 @@
+﻿using Quark.Business.Common.Caching;
+using Quark.Web.Diagnostics;
+
+namespace Quark.Web.RouteConfigs
+{
+	public static class RouteInitializer
+	{
+		public static async Task InitializeRoutes(IEndpointRouteBuilder app, WebApplication application, AppSettingsKeys appSettingsKeys)
+		{
+			AccountRouteConfig.RegisterRoutes(app);
+			AuthorRouteConfig.RegisterRoutes(app);
+			await CommonRouteConfig.RegisterRoutes(app, application);
+			await SourceRouteConfig.RegisterRoutes(app, appSettingsKeys);
+			await TagRouteConfig.RegisterRoutes(app, appSettingsKeys);
+			HomeRouteConfig.RegisterRoutes(app);
+			await CategoryRouteConfig.RegisterRoutes(app, application);
+			NewsRouteConfig.RegisterRoutes(app);
+		}
+	}
+}

@@ -1,0 +1,31 @@
+﻿@model List<Quark.Web.Models.ViewComponentResponses.MenuItems>
+
+<div class="overflow-y-auto h-[calc(100%-200px)] pb-20" data-astro-cid-7j4fal7x>
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var menu in Model)
+        {
+            <partial name="~/Views/Shared/Components/Menu/_MenuItem.cshtml" model="menu" />
+        }
+    }
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const drawerButtons = document.querySelectorAll('.drawer-category');
+        
+        drawerButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const targetId = this.getAttribute('data-drawer-target');
+                const content = document.getElementById(targetId);
+                if (!content) return;
+                content.classList.toggle('hidden');
+                const arrow = this.querySelector('svg');
+                if (arrow) {
+                    arrow.classList.toggle('rotate-180');
+                }
+            });
+        });
+    });
+</script>

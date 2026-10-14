@@ -1,0 +1,30 @@
+﻿@{
+    Layout = "_LayoutError";
+    ViewData[ViewDataNames.Title] = _localizer["Error500Title"];
+}
+
+<div class="d-flex flex-column flex-center flex-column-fluid">
+    <div class="d-flex flex-column flex-center text-center p-10">
+        <div class="card card-flush w-lg-650px py-5">
+            <div class="card-body py-15 py-lg-20">
+                <div class="mb-14">
+                    <a href="/" class="">
+                        <img alt="Logo" src="/img/logo.svg" class="h-40px" />
+                    </a>
+                </div>
+                <h1 class="fw-bolder text-gray-900 mb-5">@_localizer["Error500Title"]</h1>
+                <div class="fw-semibold fs-6 text-gray-500 mb-8">
+                    @Html.Raw(_localizer["Error500Content"])
+                </div>
+                <div class="mb-11">
+                    <a href="/" class="btn btn-sm btn-info me-10">@_localizer["GoToHome"]</a>
+                    <a href="/Account/SignIn" class="btn btn-sm btn-primary">@_localizer["GoToSignIn"]</a>
+                </div>
+                <div class="mb-0">
+                    <img src="https://metronic.avvamobile.com/8.1.5/assets/media/auth/500-error.png" class="mw-100 mh-300px theme-light-show" alt="" />
+                    <img src="https://metronic.avvamobile.com/8.1.5/assets/media/auth/500-error-dark.png" class="mw-100 mh-300px theme-dark-show" alt="" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

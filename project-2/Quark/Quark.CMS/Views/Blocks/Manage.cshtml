@@ -1,0 +1,181 @@
+﻿@{
+ViewData[ViewDataNames.Title] = _localizer["BlockLayout"];
+ViewData[ViewDataNames.AsideMenu] = "BlocksManage";
+ViewData[ViewDataNames.AsideSubMenu] = "BlocksManage";
+ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+{
+new BreadcrumbItem(_localizer["BlockLayout"], "/Blocks/Manage")
+};
+}
+
+@section Styles {
+<style>
+    .sticky-column {
+        position: sticky;
+        top: 60px;
+        height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    .scrollable-content {
+        max-height: calc(100% - 200px);
+        overflow-y: auto;
+    }
+
+    .custom-draggable-zone {
+        min-height: 100px;
+        position: relative;
+    }
+    .draggable {
+        position: relative;
+        z-index: 1;
+        transition: transform 0.1s ease;
+    }
+    .draggable.mirror {
+        z-index: 1000;
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        will-change: transform;
+    }
+    .draggable-source--is-dragging {
+        opacity: 0.5;
+    }
+    .draggable-mirror {
+        position: fixed !important;
+        z-index: 1000;
+        pointer-events: none;
+        will-change: transform;
+        transform: translate3d(0, 0, 0);
+    }
+    .draggable-container--over {
+        background-color: rgba(0,0,0,0.02);
+        border: 2px dashed #3699ff;
+    }
+    .draggable-container--over::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(54, 153, 255, 0.05);
+        pointer-events: none;
+    }
+    .draggable-right {
+        min-height: 200px;
+    }
+
+    .draggable-container {
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+    .draggable-mirror {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+</style>
+}
+
+@section Scripts {
+<script src="@_appSettings.CDN_AssetsFolderFullUrl/assets/plugins/custom/draggable/draggable.bundle.js"></script>
+<script src="https://metronic.avvamobile.com/lib/swappable/swappable.js"></script>
+<script src="/Scripts/Blocks/Manage.js" asp-append-version="true"></script>
+}
+
+<div class="row g-10">
+    <div class="col-5">
+        <div class="card card-bordered mb-10">
+            <div class="card-title">
+                <div class="d-flex align-items-center position-relative m-5 mb-0">
+                    <partial name="Icons/Search" />
+
+                    <input
+                        type="text"
+                        data-kt-filter="datatable-search"
+                        id="search-value"
+                        class="form-control form-control-solid ps-14 me-2"
+                        placeholder="@_localizer["BlockLayoutSearch"]" />
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="getNewsPaged(1, 10)">
+                        Ara
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body pt-0">
+                <div id="newsList" class="row custom-draggable-zone draggable-left min-h-125px">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-7 sticky-column">
+        <div class="card card-bordered h-100">
+            <div class="card-title">
+                <div class="d-flex m-5 mb-0">
+                    <div class="w-50 me-5" id="pagesDropdown">
+                        <select id="pagesList" onchange="getBlocks(); resetSelections();" class="form-select form-select-lg form-select-solid me-5" data-control="select2"></select>
+                    </div>
+                    <div class="w-50" id="blocksDropdown">
+                        <select id="blocksList" onchange="setMinMaxValues(); resetSelections(); getNewsByBlockId();" class="form-select form-select-lg form-select-solid" data-control="select2"></select>
+                    </div>
+                </div>
+                <div class="d-flex m-5 mb-0">
+                    <span class="badge badge-light-success fs-base me-3">
+                        <i class="ki-duotone ki-arrow-down fs-5 text-success ms-n1">
+                            <span class="path1"></span><span class="path2"></span>
+                        </i>
+                        Min: <span class="ms-1 minValue">-</span>
+                    </span>
+                    <span class="badge badge-light-success fs-base">
+                        <i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">
+                            <span class="path1"></span><span class="path2"></span>
+                        </i>
+                        Max: <span class="ms-1 maxValue">-</span>
+                    </span>
+                </div>
+            </div>
+            <div class="card-body scrollable-content">
+                <div class="">
+                    <div id="selectedNews" class="row row-cols-1 g-10 custom-draggable-zone draggable-right">
+                        <div id="minMaxValidationErrorBox" class="d-none justify-content-center align-items-center rounded border-danger border-dashed bg-light-danger min-h-125px">
+                            <span class="d-flex align-items-center text-danger fw-bold fs-5">
+                                <i class="ki-duotone ki-information fs-1 text-danger me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                @_localizer["BlockLayoutSelected"] @_localizer["Min"] <span class="mx-1 minValue">0</span>, @_localizer["Max"] <span class="mx-1 maxValue">0</span> @_localizer["BlockLayoutSelected2"]
+                            </span>
+                        </div>
+                        <div id="chooseBlockHint" class="d-flex justify-content-center align-items-center rounded border-warning border-dashed bg-light-warning min-h-125px">
+                            <span class="d-flex align-items-center text-warning fw-bold fs-5">
+                                <i class="ki-duotone ki-information-5 fs-1 text-warning me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                @_localizer["BlockLayoutWarning"]
+                            </span>
+                        </div>
+                        <div id="howToAddNewsHint" class="d-none justify-content-center align-items-center rounded border-primary border-dashed bg-light-primary min-h-125px">
+                            <span class="d-flex align-items-center text-primary fw-bold fs-5">
+                                <i class="ki-duotone ki-information-5 fs-1 text-primary me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                @_localizer["BlockLayoutWarning2"]
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-end">
+                <button type="button" onclick="saveBlock()" class="btn btn-primary me-3">@_localizer["Save"]</button>
+                @* <button type="submit" onclick="resetChanges()" class="btn btn-light btn-active-light-primary">@_localizer["Reset"]</button> *@
+            </div>
+        </div>
+    </div>
+</div>

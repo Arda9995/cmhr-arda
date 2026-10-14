@@ -1,0 +1,22 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "RouteSettings": {
+    "BaseURL": "http://localhost:7295/"
+  },
+  "AllowedHosts": "*",
+  "XmlSettings": {
+    "StoragePath": "xml",
+    "SiteUrl": "https://www.example.com",
+    "RssFileName": "rss.xml",
+    "SitemapFileName": "sitemap.xml"
+  },
+  "GoogleAiRss": {
+    "Username": "google-ai-rss",
+    "Password": "degistirilmeli"
+  }
+}

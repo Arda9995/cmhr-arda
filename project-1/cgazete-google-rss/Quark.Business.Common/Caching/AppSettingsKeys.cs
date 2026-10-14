@@ -1,0 +1,166 @@
+﻿using System.Collections.Concurrent;
+using AvvaMobile.Core.Caching;
+
+namespace Quark.Business.Common.Caching;
+
+/// <summary>
+/// Always use "Quark.Business.Common.Caching.AppSettingsKeys" instead of "AvvaMobile.Core.Caching.AppSettingsKeys". Because Quark.Business.Common.Caching.AppSettingsKeys extends AvvaMobile.Core.Caching.AppSettingsKeys class. (Murat Yılmaz)
+/// </summary>
+public class AppSettingsKeys(ICacheManager cacheManager) : AvvaMobile.Core.Caching.AppSettingsKeys(cacheManager)
+{
+    private readonly ICacheManager _cacheManager = cacheManager;
+
+    private static readonly TimeSpan LocalCacheDuration = TimeSpan.FromSeconds(60);
+    private static readonly ConcurrentDictionary<string, (object Value, long ExpiresAt)> LocalCache = new();
+
+    private static T Cached<T>(string key, Func<T> factory)
+    {
+        var now = Environment.TickCount64;
+        if (LocalCache.TryGetValue(key, out var entry) && entry.ExpiresAt > now)
+        {
+            return (T)entry.Value;
+        }
+
+        var value = factory();
+        if (IsEmpty(value) && TryRefreshFromDatabase())
+        {
+            value = factory();
+        }
+
+        if (!IsEmpty(value))
+        {
+            LocalCache[key] = (value, now + (long)LocalCacheDuration.TotalMilliseconds);
+        }
+
+        return value;
+    }
+
+    private static readonly TimeSpan DatabaseRefreshInterval = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan DatabaseRefreshTimeout = TimeSpan.FromSeconds(10);
+    private static long _lastDatabaseRefresh;
+
+    /// <summary>
+    /// Redis'te ayar bulunamadığında (Redis yeniden başlatıldı / anahtar silindi) AppSettings tablosunu cache'e tekrar yazan işlem.
+    /// Uygulama açılışında atanır.
+    /// </summary>
+    public static Func<Task>? RefreshFromDatabase { get; set; }
+
+    private static bool IsEmpty<T>(T value) => value is null || (value is string text && text.Length == 0);
+
+    private static bool TryRefreshFromDatabase()
+    {
+        var refresh = RefreshFromDatabase;
+        if (refresh is null)
+        {
+            return false;
+        }
+
+        var now = Environment.TickCount64;
+        var last = Interlocked.Read(ref _lastDatabaseRefresh);
+        if (now - last < (long)DatabaseRefreshInterval.TotalMilliseconds ||
+            Interlocked.CompareExchange(ref _lastDatabaseRefresh, now, last) != last)
+        {
+            return false;
+        }
+
+        try
+        {
+            return Task.Run(refresh).Wait(DatabaseRefreshTimeout);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceError($"AppSettings refresh from database failed: {ex}");
+            return false;
+        }
+    }
+
+    public static void ClearLocalCache() => LocalCache.Clear();
+
+    public string Tags_PrefixUrl => Cached("Tags_PrefixUrl", () => _cacheManager.Get("Tags_PrefixUrl").Result);
+
+    public string CDN_AssetsFolderFullUrl => Cached("CDN_AssetsFolderFullUrl", () => _cacheManager.Get("CDN_AssetsFolderFullUrl").Result);
+    public string CDN_NotificationImagesFolder => Cached("CDN_NotificationImagesFolder", () => _cacheManager.Get("CDN_NotificationImagesFolder").Result);
+    public string Text_Editor => Cached("Text_Editor", () => _cacheManager.Get("Text_Editor").Result);
+    public string CDN_MediaGalleryFolder => Cached("CDN_MediaGalleryFolder", () => _cacheManager.Get("CDN_MediaGalleryFolder").Result);
+    public string CDN_NewsPhotosFolder => Cached("CDN_NewsPhotosFolder", () => _cacheManager.Get("CDN_NewsPhotosFolder").Result);
+    public string CDN_AuthorPhotos => Cached("CDN_AuthorPhotos", () => _cacheManager.Get("CDN_AuthorPhotos").Result);
+    public string CDN_BooksImageFolder => Cached("CDN_BooksImageFolder", () => _cacheManager.Get("CDN_BooksImageFolder").Result);
+    public string CDN_SourcePhotos => Cached("CDN_SourcePhotos", () => _cacheManager.Get("CDN_SourcePhotos").Result);
+    public string CDN_TagPhotos => Cached("CDN_TagPhotos", () => _cacheManager.Get("CDN_TagPhotos").Result);
+    public string CDN_SurveyPhotos => Cached("CDN_SurveyPhotos", () => _cacheManager.Get("CDN_SurveyPhotos").Result);
+    public string CDN_CategoryPhotos => Cached("CDN_CategoryPhotos", () => _cacheManager.Get("CDN_CategoryPhotos").Result);
+    public string ContactUs_WhatsAppNumber => Cached("ContactUs_WhatsAppNumber", () => _cacheManager.Get("ContactUs_WhatsAppNumber").Result);
+    public string ContactUs_LandLineNumber => Cached("ContactUs_LandLineNumber", () => _cacheManager.Get("ContactUs_LandLineNumber").Result);
+    public string ContactUs_Address => Cached("ContactUs_Address", () => _cacheManager.Get("ContactUs_Address").Result);
+    public string Pages_Head_Start => Cached("Pages_Head_Start", () => _cacheManager.Get("Pages_Head_Start").Result);
+    public string Pages_Head_End => Cached("Pages_Head_End", () => _cacheManager.Get("Pages_Head_End").Result);
+    public string Pages_Body_Start => Cached("Pages_Body_Start", () => _cacheManager.Get("Pages_Body_Start").Result);
+    public string Pages_Body_End => Cached("Pages_Body_End", () => _cacheManager.Get("Pages_Body_End").Result);
+    public string VideoTextFieldHintText => Cached("VideoTextFieldHintText", () => _cacheManager.Get("VideoTextFieldHintText").Result);
+    public bool AdManager_Enabled => Cached("AdManager_Enabled", () => _cacheManager.Get<bool>("AdManager_Enabled").Result);
+    public int AdManager_NetworkID => Cached("AdManager_NetworkID", () => _cacheManager.Get<int>("AdManager_NetworkID").Result);
+    public string TCMBApiURL => Cached("TCMBApiURL", () => _cacheManager.Get("TCMBApiURL").Result);
+    public string TCMBApiKey => Cached("TCMBApiKey", () => _cacheManager.Get("TCMBApiKey").Result);
+    public string ReCaptcha_SiteKey => Cached("ReCaptcha_SiteKey", () => _cacheManager.Get("ReCaptcha_SiteKey").Result);
+    public string ReCaptcha_SecretKey => Cached("ReCaptcha_SecretKey", () => _cacheManager.Get("ReCaptcha_SecretKey").Result);
+    public string News_URLSchema => Cached("News_URLSchema", () => _cacheManager.Get("News_URLSchema").Result);
+    public int Anomaly_News_Date => Cached("Anomaly_News_Date", () => _cacheManager.Get<int>("Anomaly_News_Date").Result);
+    public int NewsRelations_Count => Cached("NewsRelations_Count", () => _cacheManager.Get<int>("NewsRelations_Count").Result);
+    public int AuthCookie_Time => Cached("AuthCookie_Time", () => _cacheManager.Get<int>("AuthCookie_Time").Result);
+    public bool News_URL_Editable => Cached("News_URL_Editable", () => _cacheManager.Get<bool>("News_URL_Editable").Result);
+    public int Timeout_Time => Cached("Timeout_Time", () => _cacheManager.Get<int>("Timeout_Time").Result);
+    public bool Youtube_Enabled => Cached("Youtube_Enabled", () => _cacheManager.Get<bool>("Youtube_Enabled").Result);
+    public bool Dailymotion_Enabled => Cached("Dailymotion_Enabled", () => _cacheManager.Get<bool>("Dailymotion_Enabled").Result);
+    public string NosyAPI_ApiKey => Cached("NosyAPI_ApiKey", () => _cacheManager.Get("NosyAPI_ApiKey").Result);
+    public string NosyAPI_CurrencyURL => Cached("NosyAPI_CurrencyURL", () => _cacheManager.Get("NosyAPI_CurrencyURL").Result);
+    public string CoinMarketAPI_Token => Cached("CoinMarketAPI_Token", () => _cacheManager.Get("CoinMarketAPI_Token").Result);
+    public string CoinMarketAPIURL => Cached("CoinMarketAPIURL", () => _cacheManager.Get("CoinMarketAPIURL").Result);
+    public string CoinMarket_ConvertCurrency => Cached("CoinMarket_ConvertCurrency", () => _cacheManager.Get("CoinMarket_ConvertCurrency").Result);
+    public string SlugPrefix_Authors => Cached("SlugPrefix_Authors", () => _cacheManager.Get("SlugPrefix_Authors").Result);
+    public string SlugPrefix_Books => Cached("SlugPrefix_Books", () => _cacheManager.Get("SlugPrefix_Books").Result);
+    public string SlugPrefix_Categories => Cached("SlugPrefix_Categories", () => _cacheManager.Get("SlugPrefix_Categories").Result);
+    public string SlugPrefix_Sources => Cached("SlugPrefix_Sources", () => _cacheManager.Get("SlugPrefix_Sources").Result);
+    public string SlugPrefix_Pages => Cached("SlugPrefix_Pages", () => _cacheManager.Get("SlugPrefix_Pages").Result);
+    public string SlugPrefix_Menus => Cached("SlugPrefix_Menus", () => _cacheManager.Get("SlugPrefix_Menus").Result);
+    public string SlugPrefix_Tags => Cached("SlugPrefix_Tags", () => _cacheManager.Get("SlugPrefix_Tags").Result);
+    public string URL_EmptyPhoto => Cached("URL_EmptyPhoto", () => _cacheManager.Get("URL_EmptyPhoto").Result);
+    public string Social_Facebook_Username => Cached("Social_Facebook_Username", () => _cacheManager.Get("Social_Facebook_Username").Result);
+    public string Social_Instagram_Username => Cached("Social_Instagram_Username", () => _cacheManager.Get("Social_Instagram_Username").Result);
+    public string Social_Linkedin_Username => Cached("Social_Linkedin_Username", () => _cacheManager.Get("Social_Linkedin_Username").Result);
+    public string Social_TikTok_Username => Cached("Social_TikTok_Username", () => _cacheManager.Get("Social_TikTok_Username").Result);
+    public string Social_Twitter_Username => Cached("Social_Twitter_Username", () => _cacheManager.Get("Social_Twitter_Username").Result);
+    public string Social_Youtube_Username => Cached("Social_Youtube_Username", () => _cacheManager.Get("Social_Youtube_Username").Result);
+    public string Social_Facebook => Cached("Social_Facebook", () => _cacheManager.Get("Social_Facebook").Result);
+    public string Social_Instagram => Cached("Social_Instagram", () => _cacheManager.Get("Social_Instagram").Result);
+    public string Social_Linkedin => Cached("Social_Linkedin", () => _cacheManager.Get("Social_Linkedin").Result);
+    public string Social_TikTok => Cached("Social_TikTok", () => _cacheManager.Get("Social_TikTok").Result);
+    public string Social_Twitter => Cached("Social_Twitter", () => _cacheManager.Get("Social_Twitter").Result);
+    public string Social_Youtube => Cached("Social_Youtube", () => _cacheManager.Get("Social_Youtube").Result);
+    public string MobileApp_AppStoreUrl => Cached("MobileApp_AppStoreUrl", () => _cacheManager.Get("MobileApp_AppStoreUrl").Result);
+    public string MobileApp_GooglePlayUrl => Cached("MobileApp_GooglePlayUrl", () => _cacheManager.Get("MobileApp_GooglePlayUrl").Result);
+    public string IyzicoBaseUrl => Cached("IyzicoBaseUrl", () => _cacheManager.Get("IyzicoBaseUrl").Result);
+    // public string IyzicoBaseUrl => "https://sandbox-api.iyzipay.com";
+    public string IyzicoSecretKey => Cached("IyzicoSecretKey", () => _cacheManager.Get("IyzicoSecretKey").Result);
+    // public string IyzicoSecretKey => "sandbox-1FidzHsGPsPr5Q8L1udKFBOrVUxYOxEL";
+    public string IyzipayApiKey => Cached("IyzipayApiKey", () => _cacheManager.Get("IyzipayApiKey").Result);
+    // public string IyzipayApiKey => "sandbox-7Sz5PGRitPODYp1tTgxDKZbmOxoxW4sH";
+
+    // public string Netmera_APIKey => "iDw8eSfb1S4ZvuuMncnVvCRZEK5PPWUAFdszRtq_o8NPM1kENHMJdeaIDfXe-Iapf6ntL0OR8G0";
+    public string Netmera_APIKey => Cached("Netmera_APIKey", () => _cacheManager.Get("Netmera_APIKey").Result);
+    // public string Netmera_APIURL => "https://restapi.netmera.com/rest/3.0";
+    public string Netmera_APIURL => Cached("Netmera_APIURL", () => _cacheManager.Get("Netmera_APIURL").Result);
+    // public string Netmera_Test_APIKey => "iDw8eSfb1S4ZvuuMncnVvCRZEK5PPWUAFdszRtq_o8NPM1kENHMJdeaIDfXe-Iapf6ntL0OR8G0";
+    public string Netmera_Test_APIKey => Cached("Netmera_Test_APIKey", () => _cacheManager.Get("Netmera_Test_APIKey").Result);
+    public string CloudflareCache_APIKey => Cached("CloudflareCache_APIKey", () => _cacheManager.Get("CloudflareCache_APIKey").Result);
+    public string CloudflareCache_ZoneID => Cached("CloudflareCache_ZoneID", () => _cacheManager.Get("CloudflareCache_ZoneID").Result);
+    public string CloudflareCache_Email => Cached("CloudflareCache_Email", () => _cacheManager.Get("CloudflareCache_Email").Result);
+
+    public string AAApiUserName => Cached("AAApiUserName", () => _cacheManager.Get("AAApiUserName").Result);
+    public string AAApiPassword => Cached("AAApiPassword", () => _cacheManager.Get("AAApiPassword").Result);
+    public string AAApiBaseUrl => Cached("AAApiBaseUrl", () => _cacheManager.Get("AAApiBaseUrl").Result);
+    public bool Use_Recaptcha => Cached("Use_Recaptcha", () => _cacheManager.Get<bool>("Use_Recaptcha").Result);
+    public string SETROW_BASE_URL => Cached("SETROW_BASE_URL", () => _cacheManager.Get("SETROW_BASE_URL").Result);
+    public string SETROW_API_KEY => Cached("SETROW_API_KEY", () => _cacheManager.Get("SETROW_API_KEY").Result);
+    public string CollectApi_ApiKey => Cached("CollectApi_ApiKey", () => _cacheManager.Get("CollectApi_ApiKey").Result);
+    public string CollectApi_BaseUrl => Cached("CollectApi_BaseUrl", () => _cacheManager.Get("CollectApi_BaseUrl").Result);
+}

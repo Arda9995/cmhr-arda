@@ -1,0 +1,64 @@
+# IIS 404 Sorunu — Analiz ve Yapılan Değişiklikler
+
+**Tarih:** 2026-02 • **Proje:** Quark.Web (.NET 8) • **Solution:** AvvaMobile.News.sln
+
+## Sorun Tanımı
+- Kategori (`/turkiye`) ve haber detay (`/turkiye/haber-basligi-2543500`) sayfaları **IIS'e publish edilmiş sürümde 404** veriyor.
+- Debug modunda ve domain hosts dosyasıyla makineye yönlendirildiğinde **sorunsuz çalışıyor**.
+- 404 anında adres çubuğundaki URL **değişmiyor** (redirect yok) ve gösterilen sayfa uygulamanın kendi **Page404** görünümü → istek IIS'ten geçip uygulamaya ulaşıyor, 404'ü uygulama üretiyor.
+
+## Elenen Şüpheliler
+1. **`Quark.Cloudflare.Adapter`**: Sadece haber yayınlama/yayından kaldırma sırasında Cloudflare cache purge yapıyor (`CloudflareAdapter.Purge`). Routing'e etkisi yok; hatalar try/catch ile yutuluyor. **Sorunun sebebi değil.**
+2. **Mutlak redirect** (`NewsController.Details` satır 43: `RedirectPermanent($"{Common_ClientWebSite}...")`): URL değişmediği için aktif sorun bu değil; ama hosts'suz ortamda kullanıcıyı canlı siteye gönderme riski taşıyor (not: istenirse göreli path'e çevrilebilir).
+3. **Cloudflare cache/DNS**: URL aynı kaldığı ve 404 uygulamanın kendi sayfası olduğu için birincil şüpheli değil. Gerekirse `cf-cache-status` header'ı ve `curl --resolve` ile doğrulanabilir.
+
+## Tespit Edilen Kök Neden (En Olası)
+Kategori/haber route'ları sabit değil; uygulama açılırken `RouteInitializer.InitializeRoutes` içinde **sırayla** ekleniyor:
+`Account → Author → Common → Source → Tag → Home → Category → News`
+
+- `SourceRouteConfig` ve `TagRouteConfig`, açılış anında **Redis'ten** `SlugPrefix_Sources` / `SlugPrefix_Tags` okuyor (`AppSettingsKeys` → `ICacheManager`).
+- Sunucuda bu okuma hata verirse (Redis `192.168.35.33:6390` erişilemez, timeout, App Pool açılışında ağ hazır değil) exception yukarı çıkıyordu.
+- `Program.cs` içindeki `UseEndpoints` bloğu bu hatayı **sessizce yutuyordu** → zincirin devamındaki **Home, Category ve News route'ları hiç eklenmiyordu**.
+- Uygulama ayakta kalıyor, ama kategori/haber istekleri hiçbir route ile eşleşmiyor → global middleware `/Home/404` (Page404) gösteriyor. App Pool restart'ına kadar sürüyor.
+- **İkincil risk:** Redis'teki prefix değeri boşsa Source/Tag route'u `/{slug}` haline geliyor ve Category route'undan **önce** kaydedildiği için kategori URL'lerini yakalayıp 404 veriyordu.
+
+Debug'da çalışmasının sebebi: geliştirme makinesinden Redis/DB erişilebilir olması.
+
+## Yapılan Kod Değişiklikleri
+| Dosya | Değişiklik |
+|---|---|
+| `Quark.Web\RouteConfigs\RouteInitializer.cs` | Her route grubu ayrı `try/catch` (`Register` helper) ile kaydediliyor. Biri hata verse diğerleri eklenmeye devam ediyor. Hata `Route registration failed for {RouteConfig}` mesajıyla loglanıyor **ve uygulama kök dizinindeki `error.txt` dosyasına (tarih + exception detayı) ekleniyor**. Kayıt sırası korundu. |
+| `Quark.Web\RouteConfigs\SourceRouteConfig.cs` | `SlugPrefix_Sources` boş/null ise `InvalidOperationException` fırlatılıyor (Register yakalayıp logluyor); route eklenmiyor. Prefix `Trim('/')` ile normalize ediliyor. |
+| `Quark.Web\RouteConfigs\TagRouteConfig.cs` | Aynı korumanın `SlugPrefix_Tags` için uygulanması. |
+| `Quark.Web\Diagnostics\EndpointDuplicateDiagnostics.cs` | **Tamamen kaldırıldı** (geçici teşhis aracıydı; "duplicate endpoint" şüphesi çalışma zamanında doğrulandı ve sorun olmadığı görüldü: `ControllerActionEndpointDataSource count=1`, `PageErrorOrNotFound=2` → sadece gerçek Home/404 ve Home/500). Her açılışta ~800 satır warn logu basıp IIS stdout logunu kirletiyordu. **Yedeği:** `docs\backup\EndpointDuplicateDiagnostics.cs.bak`. `Program.cs`'ten `LogAfterAddControllersWithViews` çağrısı, `ApplicationStarted` diagnostics bloğu ve `using Quark.Web.Diagnostics;` kaldırıldı; `RouteInitializer.cs`'ten de using temizlendi. |
+
+## Doğrulama
+- Tüm solution **hatasız derlendi**.
+- Uygulama lokalde `ASPNETCORE_ENVIRONMENT=Production` ile ayağa kaldırıldı, smoke test sonuçları:
+  - `/` → 200
+  - `/turkiye` → 200
+  - `/turkiye/aydin-da-zincirleme-kaza-alkollu-surucu-3-araca-carpti-12-kisi-yaralandi-2543500` → 200
+  - `/yazarlar` → 200
+- Loglarda `Route registration failed` satırı yok (lokalde Redis/DB erişilebilir).
+
+## Sunucuda Yapılacaklar (Bekleyen Adımlar)
+1. Yeni sürümü IIS'e publish et.
+2. `web.config` içinde `stdoutLogEnabled="true"` yap ve `logs` klasörünü oluştur.
+3. App Pool'u yeniden başlat.
+4. Logda `Route registration failed for ...` satırını ara → asıl tetikleyiciyi gösterir (muhtemelen Redis bağlantısı veya eksik `SlugPrefix_*` anahtarı). Kalıcı çözüm için o tetikleyici giderilmeli.
+5. Sorun sürerse log satırını paylaş; analiz oradan devam edecek.
+
+## Mimari Notlar (Hatırlatma)
+- `AppSettingsKeys` tüm değerleri Redis'ten `.Result` ile senkron okuyor (`Quark.Business.Common\Caching\AppSettingsKeys.cs`).
+- Route kaydı `Program.cs` → `UseEndpoints` içinde `RouteInitializer.InitializeRoutes(...).GetAwaiter().GetResult()` ile yapılıyor; dıştaki try/catch hatayı sadece logluyor.
+- 404/500 yönetimi `Program.cs` satır ~264'teki inline middleware'de (`/Home/404`, `/Home/500` rewrite).
+- `SlugController.SlugHandler` kategori/sayfa slug'larını Redis cache (`AllCategories`, `WebPages`) üzerinden çözüyor; bulunamazsa `NotFoundView()`.
+
+## Keycloak Kaldırma — Yerel Kimlik Doğrulamaya Geçiş (2026-02)
+- **İstek:** "keycloak kaldır kendi kullanıcı doğrulama sistemini kullan".
+- **Program.cs:** `AddOpenIdConnect` ve `AddJwtBearer` kaldırıldı; `DefaultChallengeScheme` cookie yapıldı. `GoogleAiRssBasicAuthenticationHandler` korundu. Policy'ler yerel claim'lere uyarlandı: `ActiveSubscription`/`PremiumMember` → `HasPremiumMembership` claim'i, `FreeMember` → authenticated user.
+- **AccountController:** GET `LogIn` artık view döndürüyor; yeni POST `LogIn` `AccountService.EmailLoginAsync` ile DB doğrulaması yapıp `SignInLocalAsync` ile `Quark.Auth` cookie'sini oluşturuyor (claims: NameIdentifier, Name, Email, HasPremiumMembership, subscription_expiry_date). `Callback` silindi. `Register` sonrası yerel sign-in eklendi. `Logout` sadece cookie sign-out + `Authorization` cookie silme.
+- **EmailLoginResponse:** `MemberID`, `FullName`, `Email` alanları eklendi (claim üretimi için).
+- **Payment action:** `ActiveSubscription` policy'si kaldırılıp `[Authorize]` yapıldı (ödeme öncesi premium şartı aranmaz).
+- **csproj/appsettings:** `Microsoft.AspNetCore.Authentication.OpenIdConnect` paketi ve `Keycloak` config bölümü kaldırıldı.
+- **Doğrulama:** Build başarılı. Smoke test: `/uye/giris` → 200, korumalı sayfa → 302 `/uye/giris?ReturnUrl=...`.

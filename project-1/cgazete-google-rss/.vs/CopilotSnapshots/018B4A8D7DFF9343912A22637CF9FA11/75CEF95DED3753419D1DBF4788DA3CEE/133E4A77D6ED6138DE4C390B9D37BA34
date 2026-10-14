@@ -1,0 +1,66 @@
+﻿using AvvaMobile.Core.Caching;
+using AvvaMobile.Core.Utilities.Mail;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
+using Quark.Business.Common.BaseServices;
+using Quark.CMS.Business.Constants;
+using Quark.Data;
+using Quark.Hangfire.Business.Interfaces;
+using Quark.Resources;
+using AppSettingsKeys = Quark.Business.Common.Caching.AppSettingsKeys;
+
+namespace Quark.Hangfire.Business.Services;
+
+public class AnomalyHangfireService(
+    IHttpContextAccessor httpContext,
+    QuarkDataContext context,
+    IStringLocalizer<CommonResource> localizer,
+    AppSettingsKeys appSettingsKeys,
+    ICacheManager cache,
+    IMailService mailService)
+    : BaseService(httpContext, context, localizer, appSettingsKeys, cache), IAnomalyHangfireService
+{
+    public void CheckAnomaliesDaily()
+    {
+        var anomalies = (from a in _context.Anomalies
+            join u in _context.Users on a.CreatedBy equals u.ID
+            where
+                a.CreatedDate.Day == DateTime.Today.AddDays(-1).Day &&
+                a.CreatedDate.Month == DateTime.Today.AddDays(-1).Month &&
+                a.CreatedDate.Year == DateTime.Today.AddDays(-1).Year
+            select new
+            {
+                ID = a.ID,
+                Name = u.FullName,
+                Description = a.Description
+            }).ToList();
+
+        if (anomalies.Any())
+        {
+            var mails = (from u in _context.Users
+                join r in _context.RoleClaims on u.RoleID equals r.RoleID
+                where r.Key == SecurityClaimKeys.ANOMALY
+                select u.Email).ToList();
+
+            var testmail = "gokayyildirim2000@gmail.com";
+
+            var anomalyTableRows = anomalies.Select(a =>
+                    @$"<tr>
+                            <td>{a.Description}</td>
+                            <td><a href='{_appSettingsKeys.Common_CMSAppUrl + "/Anomalies/Details/" + a.ID}'>Detay</a></td>
+                        </tr>")
+                .Aggregate((current, next) => current + next);
+
+            var parameters = new Dictionary<string, string>
+            {
+                { "[AnomaliesTableRows]", anomalyTableRows },
+                { "[ClientName]", _appSettingsKeys.Common_ClientName },
+                { "[ClientWebSite]", _appSettingsKeys.Common_ClientWebSite },
+                { "[ClientLogo]", "Client Logo Eklenecek" }, // TODO : bunu appsettings e taşı.
+            };
+
+            mailService.Send(testmail, "Bir Anomali Oluştu", "Anomaly", parameters)
+                .Wait(); // TODO: Giden mailleri dile göre göndermek için bir çözüm bulunmalı.
+        }
+    }
+}

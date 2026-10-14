@@ -1,0 +1,51 @@
+<style>
+    body.modal-open {
+        overflow: hidden;
+    }
+
+    #media_gallery_modal .modal-dialog {
+        max-width: 1200px;
+        margin: 1.75rem auto;
+    }
+
+    #media_gallery_modal .modal-content {
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #media_gallery_modal .modal-body {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    #media_gallery_modal .modal-header,
+    #media_gallery_modal .modal-footer {
+        flex-shrink: 0;
+    }
+</style>
+
+
+<div class="modal fade" tabindex="-1" id="media_gallery_modal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div id="modal-body-id" class="modal-body">
+                <div id="media-gallery-main" class="row">
+                    <div class="col-lg-3">
+                        <div class="card card-flush card-stretch">
+                            <div class="card-header">
+                                <div class="card-title">@_localizer["Galleries"]</div>
+                            </div>
+                            <div class="card-body hover-scroll pt-0">
+                                <div id="divMediaGalleryTree"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-9">
+                        <partial name="_MediaGalleryFiles.cshtml"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,173 @@
+﻿using AvvaMobile.Core.Caching;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
+using Quark.Business.Caching.Interfaces;
+using Quark.Business.Common.BaseServices;
+using Quark.Data;
+using Quark.Data.Models.Common;
+using Quark.Data.Models.SystemLog;
+using Quark.Hangfire.Business.Interfaces;
+using Quark.Hangfire.Business.Models.Responses.WeatherResponses;
+using Quark.Resources;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Quark.Hangfire.Business.Services
+{
+    public class WeatherHangfireService(
+        IHttpContextAccessor httpContext,
+        QuarkDataContext context,
+        IStringLocalizer<CommonResource> localizer,
+        Quark.Business.Common.Caching.AppSettingsKeys appSettingsKeys,
+        ICacheManager cache,
+        IConfiguration configuration,
+        ICommonCachingService commonCachingService)
+        : BaseService(httpContext, context, localizer, appSettingsKeys, cache), IWeatherHangfireService
+    {
+        private readonly HttpClient _httpClient = new();
+        private readonly IConfiguration _configuration = configuration;
+
+        public void RefreshWeather() 
+        {
+            var cities = _context.Cities.ToList();
+            
+            var startLog = new HangfireLog()
+            {
+                Method = nameof(RefreshWeather),
+                Message = "Weather refresh started.",
+                CreatedDate = DateTime.UtcNow
+            };
+            _context.HangfireLogs.Add(startLog);
+            _context.SaveChanges();
+
+            foreach (var city in cities)
+            {
+                try
+                {
+                    var safeCityName = Uri.EscapeDataString(city.Name);
+                    var currentWeather = GetCurrentWeather(safeCityName).GetAwaiter().GetResult();
+                    if (currentWeather != null && currentWeather.result != null)
+                    {
+                        SaveWeatherData(currentWeather.result, city.ID).GetAwaiter().GetResult();
+                    }
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    var hangfireErrorLog = new HangfireLog()
+                    {
+                        Method = nameof(RefreshWeather),
+                        Message = $"Error refreshing weather for {city.Name}: {ex.Message}",
+                        CreatedDate = DateTime.UtcNow
+                    };
+                    _context.HangfireLogs.Add(hangfireErrorLog);
+                    _context.SaveChanges();
+                }
+            }
+            commonCachingService.RefreshAllWeatherData().GetAwaiter().GetResult();
+        }
+
+        private async Task<WeatherApiResponse> GetCurrentWeather(string city)
+        {
+            //var result = new WeatherApiResponse();
+            try
+            {
+                var requestUrl = $"{_appSettingsKeys.CollectApi_BaseUrl}/getWeather?lang=tr&city={city}";
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("authorization", _appSettingsKeys.CollectApi_ApiKey);
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    // Yeni yapı doğrudan bir liste olduğu için List<WeatherDataResponse> olarak deserialize ediyoruz
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var rawList = JsonSerializer.Deserialize<List<WeatherDataResponse>>(content, options);
+
+                    return new WeatherApiResponse
+                    {
+                        success = true,
+                        city = city,
+                        result = rawList
+                    };
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                var hangfireErrorLog = new HangfireLog()
+                {
+                    Method = nameof(RefreshWeather),
+                    Message = $"Error fetching current weather: {ex.Message}",
+                    CreatedDate = DateTime.UtcNow
+                };
+                _context.HangfireLogs.Add(hangfireErrorLog);
+                _context.SaveChanges();
+                return null;
+            }
+        }
+
+        private async Task SaveWeatherData(List<WeatherDataResponse> weatherData, int cityID)
+        {
+            try
+            {
+                var existingData = _context.WeatherData.Where(w => w.CityID == cityID).ToList();
+
+                _context.WeatherData.RemoveRange(existingData);
+                _context.SaveChanges();
+
+                foreach (var weather in weatherData)
+                {
+                    DateTime weatherdate = DateTime.ParseExact(weather.date, "M/d/yyyy", CultureInfo.InvariantCulture);
+                    var newWeatherData = new WeatherData
+                    {
+                        CityID = cityID,
+                        Status = weather.status,
+                        Description = weather.description,
+                        Night = weather.night,
+                        Date = weatherdate.ToString("dd.MM.yyyy"),
+                        IconURL = weather.icon,
+                        Day = weather.day,
+                        Degree = weather.degree,
+                        Humidity = weather.humidity,
+                        Max = weather.max,
+                        Min = weather.min,
+                    };
+
+                    _context.WeatherData.Add(newWeatherData);
+                }
+
+                _context.SaveChanges();
+                var hangfireLog = new HangfireLog()
+                {
+                    Method = nameof(SaveWeatherData),
+                    Message = $"Weather data saved successfully for city ID {cityID}.",
+                    CreatedDate = DateTime.UtcNow
+                };
+                _context.HangfireLogs.Add(hangfireLog);
+                _context.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                var hangfireErrorLog = new HangfireLog()
+                {
+                    Method = nameof(SaveWeatherData),
+                    Message = $"Error saving weather data for city ID {cityID}: {ex.Message}",
+                    CreatedDate = DateTime.UtcNow
+                };
+                _context.HangfireLogs.Add(hangfireErrorLog);
+                _context.SaveChanges();
+            }
+        }
+    }
+}

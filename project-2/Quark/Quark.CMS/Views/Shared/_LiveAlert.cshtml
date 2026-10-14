@@ -1,0 +1,67 @@
+<div id="liveAlert" class="d-flex flex-column flex-sm-row w-100 p-10 rounded-0 position-fixed shadow-sm" style="z-index:999 !important; background-image: var(--bs-gradient); top: -120px;left: 0; height: 110px">
+    <i class="ki-duotone ki-information-3 fs-3hx text-light me-4 mb-5 mb-sm-0">
+        <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+    </i>
+    <div class="d-flex flex-column text-light pe-0 pe-sm-10">
+        <h4 id="liveAlert_Title" class="mb-2 text-light">ÖNEMLİ UYARI</h4>
+        <span id="liveAlert_Message">Sistem güncellemesi sebebiyle 5 dakika boyunca kapalı kalacaktır. Lütfen çalışmalarınızı kaydediniz.</span>
+    </div>
+    <button type="button" onclick="LiveAlert.Hide();" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto">
+        <i class="ki-duotone ki-cross-circle fs-2x text-light">
+            <span class="path1"></span><span class="path2"></span>
+        </i>
+    </button>
+</div>
+
+<script>
+    let LiveAlert = (function () {
+        let _containerID = "liveAlert";
+        let _titleID = "liveAlert_Title";
+        let _messageID = "liveAlert_Message";
+        let _container = $("#" + _containerID);
+        let _animationDuration = 450;
+        let _bgClass = "bg-danger";
+        
+        let _show = function (message, title) {
+            _container.addClass(_bgClass);
+            if (message != null && message !== "") {$("#" + _messageID).text(message);}
+            if (title != null && title !== "") {$("#" + _titleID).text(title);}
+            _container.animate({top: 0}, _animationDuration, function() {/* Animation complete.*/});
+        };
+        
+        let _hide = function () {
+            _container.animate({top: -120}, _animationDuration, function() {/* Animation complete.*/});
+        };
+        
+        let _config = function (options) {
+            if (options != null) {
+                if (options.AnimationDuration != null && options.AnimationDuration !== "") {_animationDuration = options.AnimationDuration;}
+                if (options.BackgroundClass != null && options.BackgroundClass !== "") {_bgClass = options.BackgroundClass;}
+            }
+        };
+        
+        return {
+            Show: _show,
+            Hide: _hide,
+            Config: _config,
+            ContainerID: _containerID,
+            TitleID: _titleID,
+            MessageID: _messageID,
+            Container: _container,
+            AnimationDuration: _animationDuration,
+            BackgroundClass: _bgClass
+        };
+    })();
+        
+    // This is an example of how to set config of LiveAlert.
+    // LiveAlert.Config({ AnimationDuration: 450, BackgroundClass: "bg-danger"});
+    
+    // This is an example of how to show LiveAlert with Title.
+    // LiveAlert.Show("This is a message.", "This is a title.");
+    
+    // This is an example of how to show LiveAlert without Title.
+    // LiveAlert.Show("This is a message.");
+    
+    // This is an example of how to hide LiveAlert.
+    // LiveAlert.Hide();
+</script>

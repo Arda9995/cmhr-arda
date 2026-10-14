@@ -1,0 +1,11 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+
+<div class="w-100">
+    <label class="required form-label">@_localizer["Author"]</label>
+    <div class="input-group ">
+        <select asp-items="@Model.AuthorIDs" asp-for="@Model.AuthorID" class="form-select" data-control="select2"></select>
+    </div>
+    <span asp-validation-for="@Model.AuthorID" class="fv-plugins-message-container invalid-feedback "></span>
+    <div class="text-muted fs-7">@_localizer["NewsAuthorText"]</div>
+</div>

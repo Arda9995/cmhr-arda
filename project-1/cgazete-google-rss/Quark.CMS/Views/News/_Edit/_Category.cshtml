@@ -1,0 +1,43 @@
+@model Quark.CMS.Business.Models.Requests.NewsRequests.NewsRequest
+
+<div class="card card-flush mb-10" id="categoryCard">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>@_localizer["Category"]</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        <div class="d-flex gap-5">
+            <div class="col-6">
+                <!-- Main Category Section -->
+                <div class="d-flex align-items-center mb-4 gap-10">
+                    <h3 class="required mb-0">@_localizer["MainCategory"]</h3>
+                    @{
+                        var isDisabled = Model.NewsTypeID == (int)NewsTypesEnum.ColumnArticles ? "disabled" : "";
+                    }
+                    <button type="button" class="btn btn-primary btn-sm" @isDisabled data-bs-toggle="modal" data-bs-target="#mainCategoryModal">
+                        <partial name="Icons/Edit" />
+                    </button>
+                </div>
+                <h3 id="spanSelectedMainCategory">---</h3>
+                <input type="hidden" asp-for="@Model.CategoryIDMap" id="mainCategoryIdMap" />
+                <input type="hidden" asp-for="@Model.CategoryID" id="mainCategoryId" />
+                <span asp-validation-for="@Model.CategoryID" class="fv-plugins-message-container invalid-feedback"></span>
+                <span id="mainCategoryValidation" class="fv-plugins-message-container invalid-feedback"></span>
+                <div class="text-muted fs-7 mb-7">@_localizer["NewsMainCategoryText"]</div>
+            </div>
+            <div class="col-6">
+                <!-- Secondary Categories Section -->
+                <div class="d-flex align-items-center mb-4 gap-10">
+                    <h3 class="mb-0">@_localizer["SecondaryCategories"]</h3>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#secondaryCategoryModal">
+                        <partial name="Icons/Edit" />
+                    </button>
+                </div>
+                <h3 id="spanSelectedSecondaryCategories">---</h3>
+                <input type="hidden" asp-for="@Model.SecondaryCategoryIDMaps" id="secondaryCategoryIDs" />
+                <div class="text-muted fs-7 mb-7">@_localizer["NewsSubCategoryText"]</div>
+            </div>
+        </div>
+    </div>
+</div>

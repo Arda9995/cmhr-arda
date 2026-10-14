@@ -1,0 +1,8 @@
+namespace Quark.CMS.Business.Interfaces
+{
+    public interface IGoogleAiFeedJobTrigger
+    {
+        void Enqueue();
+        void EnqueueRemove(long newsId);
+    }
+}

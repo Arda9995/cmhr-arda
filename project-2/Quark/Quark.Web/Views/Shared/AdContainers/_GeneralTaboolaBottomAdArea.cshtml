@@ -1,0 +1,44 @@
+@{
+	var hasPremiumMembership = "False";
+
+	var id = User?.Identities?.FirstOrDefault()?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+	if (id !=  null)
+	{
+		hasPremiumMembership = @User.Identities.FirstOrDefault(u => u.IsAuthenticated && u.HasClaim(c => c.Type == "HasPremiumMembership")).FindFirst("HasPremiumMembership").Value;
+	}
+}
+<div data-astro-cid-j7pv25f6>
+	@if (hasPremiumMembership == "True")
+	{
+		
+	}
+	else
+	{
+		<!-- Ad Start -->
+		<div class="ads-box mt-4 mb-5">
+			<div class="cum-taboola-below-article"></div>
+			<script type="text/javascript">
+			window.isTaboolaMobile = window.isTaboolaMobile || navigator.userAgent.toLowerCase().indexOf('mobile') != -1;
+			window._taboola_iterator = window._taboola_iterator || 0;
+			_taboola_iterator++;
+			_taboola_container_below_article = "cum-taboola-container-below-article" + _taboola_iterator;
+
+			elm1x3 = document.querySelector(".cum-taboola-below-article");
+			elm1x3.setAttribute('class', '');
+			elm1x3.setAttribute('id', _taboola_container_below_article );
+
+			   _taboola_url = window.location.href;
+
+
+			window._taboola = window._taboola || [];
+			if (!isTaboolaMobile) {
+				_taboola.push({mode:'alternating-thumbnails-2x5', container:  _taboola_container_below_article , placement: 'Below Article Widget', target_type: 'mix'});
+			} else {
+				_taboola.push({mode:'thumbnails-a-1x4', container: _taboola_container_below_article , placement: 'Below Article Widget', target_type: 'mix'});
+			}
+			_taboola.push({article:'auto', url: _taboola_url });
+		</script>
+
+		</div> <!-- Ad End -->
+	}
+</div>

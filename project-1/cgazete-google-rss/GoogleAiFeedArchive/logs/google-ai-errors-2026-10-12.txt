@@ -1,0 +1,12 @@
+[2026-10-12 11:16:10] Google AI live feed refresh failed: System.InvalidOperationException: Simulated Elasticsearch outage for archive validation; no network request was made.
+   at Quark.Business.Caching.Services.XmlFeedCachingService.RefreshGoogleAiRSS() in E:\GitHub\cgazete-google-rss\Quark.Business.Caching\Services\XmlFeedCachingService.cs:line 690
+
+[2026-10-12 11:49:44] Google AI live feed refresh failed: System.InvalidOperationException: Simulated Elasticsearch outage for archive validation; no network request was made.
+   at Quark.Business.Caching.Services.XmlFeedCachingService.RefreshGoogleAiRSS() in E:\GitHub\cgazete-google-rss\Quark.Business.Caching\Services\XmlFeedCachingService.cs:line 715
+
+[2026-10-12 11:55:49] Google AI live feed refresh failed: System.InvalidOperationException: Simulated Elasticsearch outage for archive validation; no network request was made.
+   at Quark.Business.Caching.Services.XmlFeedCachingService.RefreshGoogleAiRSS() in E:\GitHub\cgazete-google-rss\Quark.Business.Caching\Services\XmlFeedCachingService.cs:line 715
+
+[2026-10-12 17:17:00] Google AI live feed refresh failed: System.InvalidOperationException: Simulated Elasticsearch outage for archive validation; no network request was made.
+   at Quark.Business.Caching.Services.XmlFeedCachingService.RefreshGoogleAiRSS() in E:\GitHub\cgazete-google-rss\Quark.Business.Caching\Services\XmlFeedCachingService.cs:line 715
+

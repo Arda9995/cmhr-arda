@@ -1,0 +1,321 @@
+﻿@using Quark.Business.Caching.Models.Responses.NewsCachingResponses
+@model MainPageResponse
+@{
+    var survey = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-AnketHaberi").FirstOrDefault();
+
+    var underAuthors2 = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "Anasayfa-YazarAlti").Take(2).ToList();
+    var underAuthors4 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+                                                                  "Anasayfa-YazarAlti").Skip(2).Take(6).ToList();
+
+    var daily2 = Model.PageNewsCachingResponses.Where(x => x.BlockKey == "AnaSayfa-GundemHaberleri").Take(2).ToList();
+    var daily4 = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+                                                           "AnaSayfa-GundemHaberleri").Skip(2).Take(6).ToList();
+}
+
+
+<div class="px-5 mt-4">
+    <!-- Poll Start -->
+
+    @if (survey != null && survey.SurveyItem != null)
+    {
+        <a href="@survey.NewsSlug" target="_blank" class="primary-gradient p-3 text-white block">
+            <!-- Title Start -->
+            <div class="flex items-center gap-4 justify-between">
+                <span class="font-semibold">Cumhuriyet Soruyor?</span>
+                <!-- <span class="flex-1 bg-gradient-to-r from-white to-transparent h-px"></span> -->
+
+                <span
+                    class="text-sm text-[#72C877] font-helvetica">@survey.SurveyItem.JoinedUserCount kişi katıldı</span>
+            </div> <!-- Title End -->
+            <div class="flex gap-3 items-end mt-2">
+                <!-- Text Start -->
+                <div class="font-medium line-clamp-2">@survey.SurveyItem.Question</div> <!-- Text End -->
+                <!-- Button Start -->
+                <div class="flex justify-end">
+                    <div class="font-bold">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M6.07794 2.74405C6.22144 2.60057 6.41235 2.51438 6.61487 2.50164C6.8174 2.48891 7.01761 2.55051 7.17794 2.67488L7.25628 2.74405L13.9229 9.41072C14.0664 9.55421 14.1526 9.74513 14.1653 9.94765C14.1781 10.1502 14.1165 10.3504 13.9921 10.5107L13.9229 10.5891L7.25628 17.2557C7.10631 17.4052 6.90508 17.4919 6.69346 17.4984C6.48183 17.5049 6.27568 17.4305 6.11688 17.2905C5.95807 17.1505 5.85852 16.9553 5.83844 16.7445C5.81837 16.5337 5.87926 16.3232 6.00877 16.1557L6.07794 16.0774L12.1554 9.99989L6.07794 3.92238C5.92171 3.76611 5.83395 3.55419 5.83395 3.33322C5.83395 3.11225 5.92171 2.90032 6.07794 2.74405Z"
+                                fill="#F2F2F7"></path>
+                        </svg>
+                    </div>
+                </div> <!-- Button End -->
+            </div>
+        </a>
+        <!-- Poll End -->
+    }
+    <!-- Items Start -->
+    <!-- Authors Start -->
+    <div class="px-5 py-4 bg-neutral-50 mt-4 mb-5">
+        <!-- Title Start -->
+        <div class="text-slate-900 font-semibold text-center mb-5"> Cumhuriyet Gazetesi Yazarları</div>
+        <!-- Title End --> <!-- Slider Start -->
+        <div class="splide authors--slider" role="group">
+            <div
+                class="splide__arrows absolute top-1/2 -translate-y-1/2 flex items-center justify-between z-10 w-[calc(100%+40px)] -left-5">
+                <button class="prev splide__arrow--prev rotate-180">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M13.9221 2.74405C13.7786 2.60057 13.5876 2.51438 13.3851 2.50164C13.1826 2.48891 12.9824 2.55051 12.8221 2.67488L12.7437 2.74405L6.07706 9.41072C5.93358 9.55421 5.84739 9.74513 5.83465 9.94765C5.82192 10.1502 5.88352 10.3504 6.00789 10.5107L6.07706 10.5891L12.7437 17.2557C12.8937 17.4052 13.0949 17.4919 13.3065 17.4984C13.5182 17.5049 13.7243 17.4305 13.8831 17.2905C14.0419 17.1505 14.1415 16.9553 14.1616 16.7445C14.1816 16.5337 14.1207 16.3232 13.9912 16.1557L13.9221 16.0774L7.84456 9.99989L13.9221 3.92238C14.0783 3.76611 14.166 3.55419 14.166 3.33322C14.166 3.11225 14.0783 2.90032 13.9221 2.74405Z"
+                            fill="#080827"></path>
+                    </svg>
+                </button>
+                <button class="next splide__arrow--next -right-5">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.07794 2.74405C6.22144 2.60057 6.41235 2.51438 6.61487 2.50164C6.8174 2.48891 7.01761 2.55051 7.17794 2.67488L7.25628 2.74405L13.9229 9.41072C14.0664 9.55421 14.1526 9.74513 14.1653 9.94765C14.1781 10.1502 14.1165 10.3504 13.9921 10.5107L13.9229 10.5891L7.25628 17.2557C7.10631 17.4052 6.90508 17.4919 6.69346 17.4984C6.48183 17.5049 6.27568 17.4305 6.11688 17.2905C5.95807 17.1505 5.85852 16.9553 5.83844 16.7445C5.81837 16.5337 5.87926 16.3232 6.00877 16.1557L6.07794 16.0774L12.1554 9.99989L6.07794 3.92238C5.92171 3.76611 5.83395 3.55419 5.83395 3.33322C5.83395 3.11225 5.92171 2.90032 6.07794 2.74405Z"
+                            fill="#080827"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="splide__track">
+                <ul class="splide__list">
+
+                    @for (int i = 0; i < Math.Ceiling((double)Model.AuthorCachingResponse.Count / 4); i++)
+                    {
+                        <li class="splide__slide grid grid-cols-2 gap-x-3 gap-y-3">
+                            @for (int j = 0; j < 4; j++)
+                            {
+                                var index = i * 4 + j;
+
+                                if (index >= Model.AuthorCachingResponse.Count)
+                                {
+                                    break;
+                                }
+
+                                var author = Model.AuthorCachingResponse[index];
+
+                                <a href="@author.LastCreatedNewsSlug" target="_blank" class="text-center">
+                                    <!-- Image Start -->
+                                    <img src="@author.ImageURL"
+                                         class="w-[68px] h-[68px] rounded-full object-cover mx-auto"
+                                         alt="" loading="lazy"/>
+                                    <!-- Image End -->
+                                    <!-- Name Start -->
+                                    <div class="text-gray-500 text-sm font-medium mt-1 mb-2">
+                                        @author.FullName
+                                    </div>
+                                    <!-- Name End -->
+                                    <!-- Featured Text Start -->
+                                    <div class="text-slate-900 text-xs font-semibold line-clamp-3">
+                                        @author.LastCreatedNewsHeadline
+                                    </div>
+                                    <!-- Featured Text End -->
+                                </a>
+                            }
+                        </li>
+                    }
+
+                </ul>
+            </div>
+        </div> <!-- Slider End -->
+    </div> <!-- Authors End -->
+
+    <partial name="~/Views/Shared/AdContainers/_HomePageMobileMembranaAdArea.cshtml"/>
+    <div class="grid grid-cols-2 gap-5 mt-5">
+        @foreach (var news in underAuthors4)
+        {
+            <div class="space-y-1 relative">
+                <!-- Favorite Button Start -->
+                <button
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End --> <!-- Thumbnail Start -->
+                <a href="@news.NewsSlug" target="_blank">
+                    <div class="aspect-[16/9]">
+                        <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                             loading="lazy">
+                    </div>
+                </a> <!-- Thumbnail End --> <!-- Title Start -->
+
+                <a href="@news.NewsSlug" target="_blank"
+                   class="font-semibold line-clamp-2 text-sm">@news.NewsHeadline </a>
+                <!-- Title End -->
+            </div>
+        }
+
+
+        <div class="col-span-2 *:py-4 divide-y divide-[#E5E5EA]">
+            @foreach (var news in underAuthors2)
+            {
+                <div class="col-span-2 gap-3 flex items-center">
+                    <!-- Thumbnail Start -->
+                    <div class="relative w-[38%] shrink-0">
+                        <!-- Favorite Button Start -->
+                        <button
+                            class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                    fill="#FF0101"></path>
+                            </svg>
+                        </button> <!-- Favorite Button End -->
+                        <a target="_blank" href="@news.NewsSlug">
+                            <div class="aspect-[16/9]">
+                                <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                                     loading="lazy">
+                            </div>
+                        </a>
+                    </div> <!-- Thumbnail End --> <!-- Content Start -->
+                    <div class="space-y-1">
+                        <a target="_blank" href="@news.NewsSlug" class="text-sm font-semibold line-clamp-2">
+                            @news.NewsHeadline </a>
+                        <a href="@news.NewsSlug" target="_blank" class="line-clamp-2 text-xs font-medium">
+                            @news.NewsUpSubtitle </a>
+                    </div> <!-- Content End -->
+                </div>
+            }
+
+
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-5 mt-5">
+        @foreach (var news in daily4)
+        {
+            <div class="space-y-1 relative">
+                <!-- Favorite Button Start -->
+                <button
+                    class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                            fill="#FF0101"></path>
+                    </svg>
+                </button> <!-- Favorite Button End --> <!-- Thumbnail Start -->
+                <a href="@news.NewsSlug" target="_blank">
+                    <div class="aspect-[16/9]">
+                        <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                             loading="lazy">
+                    </div>
+                </a> <!-- Thumbnail End --> <!-- Title Start -->
+
+                <a href="@news.NewsSlug" target="_blank"
+                   class="font-semibold line-clamp-2 text-sm"> @news.NewsHeadline</a>
+                <!-- Title End -->
+            </div>
+        }
+
+
+        <div class="col-span-2 *:py-4 divide-y divide-[#E5E5EA]">
+            @foreach (var news in daily2)
+            {
+                <div class="col-span-2 gap-3 flex items-center">
+                    <!-- Thumbnail Start -->
+                    <div class="relative w-[38%] shrink-0">
+                        <!-- Favorite Button Start -->
+                        <button
+                            class="absolute top-1.5 right-1.5 w-6 h-6 rounded bg-white/55 flex items-center justify-center">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M3.2002 3.59961C3.2002 3.06918 3.41091 2.56047 3.78598 2.1854C4.16105 1.81032 4.66976 1.59961 5.2002 1.59961H10.8002C11.3306 1.59961 11.8393 1.81032 12.2144 2.1854C12.5895 2.56047 12.8002 3.06918 12.8002 3.59961V13.9996C12.8001 14.0734 12.7797 14.1457 12.7411 14.2085C12.7025 14.2714 12.6473 14.3223 12.5816 14.3558C12.5159 14.3892 12.4422 14.4038 12.3686 14.398C12.2951 14.3922 12.2246 14.3662 12.165 14.3228L8.0002 11.294L3.8354 14.3228C3.77574 14.3662 3.70526 14.3922 3.63174 14.398C3.55823 14.4038 3.48453 14.3892 3.4188 14.3558C3.35307 14.3223 3.29787 14.2714 3.25929 14.2085C3.22071 14.1457 3.20026 14.0734 3.2002 13.9996V3.59961ZM5.2002 2.39961C4.88194 2.39961 4.57671 2.52604 4.35167 2.75108C4.12662 2.97613 4.0002 3.28135 4.0002 3.59961V13.214L7.765 10.4764C7.83335 10.4267 7.91569 10.4 8.0002 10.4C8.0847 10.4 8.16704 10.4267 8.23539 10.4764L12.0002 13.214V3.59961C12.0002 3.28135 11.8738 2.97613 11.6487 2.75108C11.4237 2.52604 11.1185 2.39961 10.8002 2.39961H5.2002Z"
+                                    fill="#FF0101"></path>
+                            </svg>
+                        </button> <!-- Favorite Button End -->
+                        <a target="_blank" href="@news.NewsSlug">
+                            <div class="aspect-[16/9]">
+                                <img src="@news.NewsPhoto" class="w-full h-full object-cover" alt="@news.NewsHeadline"
+                                     loading="lazy">
+                            </div>
+                        </a>
+                    </div> <!-- Thumbnail End --> <!-- Content Start -->
+                    <div class="space-y-1">
+                        <a target="_blank" href="@news.NewsSlug"
+                           class="text-sm font-semibold line-clamp-2">@news.NewsHeadline</a>
+                        <a href="@news.NewsSlug" target="_blank"
+                           class="line-clamp-2 text-xs font-medium">@news.NewsUpSubtitle</a>
+                    </div> <!-- Content End -->
+                </div>
+            }
+        </div>
+    </div><!-- Items End --> <!-- Newzletter Start -->
+    <div class="primary-gradient p-4 text-white h-full">
+        <div>
+             <a href="/uye/abonelik"> 
+                 <img src="~/assets/img/abone-ol.JPG"/> 
+             </a> 
+         </div> 
+        <!-- Title Start -->
+        @*<div class="font-semibold">Bültene Abone Olun</div> <!-- Title End --> <!-- Description Start -->
+        <p class="text-sm mt-3 mb-3 mr-10 font-helvetica"> En güncel haberlerden anında haberdar olun! </p>
+        <!-- Description End --> <!-- Form Start -->
+        <input type="text"
+               class="bg-neutral-50/20 rounded-full !outline-none text-sm py-2.5 px-4 w-full placeholder-white font-helvetica"
+               placeholder="E-posta adresinizi yazın...">
+        <div class="flex items-start gap-1.5 checkbox-container">
+            <input type="checkbox" id="aydinlatma-metni" class="hidden peer">
+            <svg class="peer-checked:hidden block cursor-pointer mt-2" width="12" height="12" viewBox="0 0 12 12"
+                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M0 2.16668C0 1.59205 0.228273 1.04095 0.634602 0.634617C1.04093 0.228288 1.59203 1.52588e-05 2.16667 1.52588e-05H9.83333C10.408 1.52588e-05 10.9591 0.228288 11.3654 0.634617C11.7717 1.04095 12 1.59205 12 2.16668V9.83335C12 10.408 11.7717 10.9591 11.3654 11.3654C10.9591 11.7717 10.408 12 9.83333 12H2.16667C1.59203 12 1.04093 11.7717 0.634602 11.3654C0.228273 10.9591 0 10.408 0 9.83335V2.16668ZM2.16667 1.00002C1.85725 1.00002 1.5605 1.12293 1.34171 1.34172C1.12292 1.56052 1 1.85726 1 2.16668V9.83335C1 10.4773 1.52267 11 2.16667 11H9.83333C10.1428 11 10.4395 10.8771 10.6583 10.6583C10.8771 10.4395 11 10.1428 11 9.83335V2.16668C11 1.85726 10.8771 1.56052 10.6583 1.34172C10.4395 1.12293 10.1428 1.00002 9.83333 1.00002H2.16667Z"
+                    fill="white"></path>
+            </svg>
+            <svg class="peer-checked:block hidden cursor-pointer mt-2" width="12" height="12" viewBox="0 0 12 12"
+                 fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M2.16667 0C1.59203 0 1.04093 0.228273 0.634602 0.634602C0.228273 1.04093 0 1.59203 0 2.16667V9.83333C0 10.408 0.228273 10.9591 0.634602 11.3654C1.04093 11.7717 1.59203 12 2.16667 12H9.83333C10.408 12 10.9591 11.7717 11.3654 11.3654C11.7717 10.9591 12 10.408 12 9.83333V2.16667C12 1.59203 11.7717 1.04093 11.3654 0.634602C10.9591 0.228273 10.408 0 9.83333 0H2.16667ZM8.85333 4.52L5.52 7.85333C5.42625 7.94697 5.29917 7.99956 5.16667 7.99956C5.03417 7.99956 4.90708 7.94697 4.81333 7.85333L3.47733 6.51733C3.42821 6.47156 3.38881 6.41636 3.36148 6.35503C3.33415 6.29369 3.31946 6.22748 3.31827 6.16035C3.31709 6.09321 3.32944 6.02653 3.35459 5.96427C3.37973 5.90201 3.41716 5.84545 3.46464 5.79797C3.51212 5.7505 3.56868 5.71307 3.63094 5.68792C3.69319 5.66277 3.75988 5.65042 3.82701 5.65161C3.89415 5.65279 3.96036 5.66748 4.02169 5.69481C4.08303 5.72214 4.13823 5.76154 4.184 5.81067L5.16667 6.79267L8.14667 3.81267C8.19281 3.76493 8.248 3.72687 8.30902 3.70069C8.37003 3.67452 8.43565 3.66076 8.50204 3.66021C8.56843 3.65967 8.63426 3.67235 8.6957 3.69752C8.75713 3.72269 8.81294 3.75984 8.85987 3.80681C8.90679 3.85378 8.94389 3.90962 8.969 3.97108C8.99411 4.03254 9.00673 4.09838 9.00612 4.16477C9.00552 4.23116 8.99169 4.29677 8.96546 4.35776C8.93923 4.41874 8.90111 4.4739 8.85333 4.52Z"
+                    fill="white"></path>
+            </svg>
+            <label class="flex items-center gap-1 cursor-pointer select-none text-[0.65rem] font-semibold my-1.5"
+                   for="aydinlatma-metni"> <span><a href="#" class="hover:underline">Aydınlatma metni</a> kapsamında ileti almak istiyorum</span>
+            </label>
+        </div> <!-- Checkboxes Start -->
+        <div class="flex items-center mt-1 mb-2 gap-5">
+            <div class="flex items-center gap-1.5 checkbox-container">
+                <input type="checkbox" id="aylik" class="hidden peer" value="490264">
+                <svg class="peer-checked:hidden block cursor-pointer" width="12" height="12" viewBox="0 0 12 12"
+                     fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M0 2.16668C0 1.59205 0.228273 1.04095 0.634602 0.634617C1.04093 0.228288 1.59203 1.52588e-05 2.16667 1.52588e-05H9.83333C10.408 1.52588e-05 10.9591 0.228288 11.3654 0.634617C11.7717 1.04095 12 1.59205 12 2.16668V9.83335C12 10.408 11.7717 10.9591 11.3654 11.3654C10.9591 11.7717 10.408 12 9.83333 12H2.16667C1.59203 12 1.04093 11.7717 0.634602 11.3654C0.228273 10.9591 0 10.408 0 9.83335V2.16668ZM2.16667 1.00002C1.85725 1.00002 1.5605 1.12293 1.34171 1.34172C1.12292 1.56052 1 1.85726 1 2.16668V9.83335C1 10.4773 1.52267 11 2.16667 11H9.83333C10.1428 11 10.4395 10.8771 10.6583 10.6583C10.8771 10.4395 11 10.1428 11 9.83335V2.16668C11 1.85726 10.8771 1.56052 10.6583 1.34172C10.4395 1.12293 10.1428 1.00002 9.83333 1.00002H2.16667Z"
+                        fill="white"></path>
+                </svg>
+                <svg class="peer-checked:block hidden cursor-pointer" width="12" height="12" viewBox="0 0 12 12"
+                     fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M2.16667 0C1.59203 0 1.04093 0.228273 0.634602 0.634602C0.228273 1.04093 0 1.59203 0 2.16667V9.83333C0 10.408 0.228273 10.9591 0.634602 11.3654C1.04093 11.7717 1.59203 12 2.16667 12H9.83333C10.408 12 10.9591 11.7717 11.3654 11.3654C11.7717 10.9591 12 10.408 12 9.83333V2.16667C12 1.59203 11.7717 1.04093 11.3654 0.634602C10.9591 0.228273 10.408 0 9.83333 0H2.16667ZM8.85333 4.52L5.52 7.85333C5.42625 7.94697 5.29917 7.99956 5.16667 7.99956C5.03417 7.99956 4.90708 7.94697 4.81333 7.85333L3.47733 6.51733C3.42821 6.47156 3.38881 6.41636 3.36148 6.35503C3.33415 6.29369 3.31946 6.22748 3.31827 6.16035C3.31709 6.09321 3.32944 6.02653 3.35459 5.96427C3.37973 5.90201 3.41716 5.84545 3.46464 5.79797C3.51212 5.7505 3.56868 5.71307 3.63094 5.68792C3.69319 5.66277 3.75988 5.65042 3.82701 5.65161C3.89415 5.65279 3.96036 5.66748 4.02169 5.69481C4.08303 5.72214 4.13823 5.76154 4.184 5.81067L5.16667 6.79267L8.14667 3.81267C8.19281 3.76493 8.248 3.72687 8.30902 3.70069C8.37003 3.67452 8.43565 3.66076 8.50204 3.66021C8.56843 3.65967 8.63426 3.67235 8.6957 3.69752C8.75713 3.72269 8.81294 3.75984 8.85987 3.80681C8.90679 3.85378 8.94389 3.90962 8.969 3.97108C8.99411 4.03254 9.00673 4.09838 9.00612 4.16477C9.00552 4.23116 8.99169 4.29677 8.96546 4.35776C8.93923 4.41874 8.90111 4.4739 8.85333 4.52Z"
+                        fill="white"></path>
+                </svg>
+                <label class="flex items-center gap-1 cursor-pointer select-none text-xs font-semibold" for="aylik">
+                    Aylık </label>
+            </div>
+            <div class="flex items-center gap-1.5 checkbox-container">
+                <input type="checkbox" id="haftalik" class="hidden peer" value="490263">
+                <svg class="peer-checked:hidden block active cursor-pointer" width="12" height="12"
+                     viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M0 2.16668C0 1.59205 0.228273 1.04095 0.634602 0.634617C1.04093 0.228288 1.59203 1.52588e-05 2.16667 1.52588e-05H9.83333C10.408 1.52588e-05 10.9591 0.228288 11.3654 0.634617C11.7717 1.04095 12 1.59205 12 2.16668V9.83335C12 10.408 11.7717 10.9591 11.3654 11.3654C10.9591 11.7717 10.408 12 9.83333 12H2.16667C1.59203 12 1.04093 11.7717 0.634602 11.3654C0.228273 10.9591 0 10.408 0 9.83335V2.16668ZM2.16667 1.00002C1.85725 1.00002 1.5605 1.12293 1.34171 1.34172C1.12292 1.56052 1 1.85726 1 2.16668V9.83335C1 10.4773 1.52267 11 2.16667 11H9.83333C10.1428 11 10.4395 10.8771 10.6583 10.6583C10.8771 10.4395 11 10.1428 11 9.83335V2.16668C11 1.85726 10.8771 1.56052 10.6583 1.34172C10.4395 1.12293 10.1428 1.00002 9.83333 1.00002H2.16667Z"
+                        fill="white"></path>
+                </svg>
+                <svg class="peer-checked:block hidden cursor-pointer" width="12" height="12" viewBox="0 0 12 12"
+                     fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M2.16667 0C1.59203 0 1.04093 0.228273 0.634602 0.634602C0.228273 1.04093 0 1.59203 0 2.16667V9.83333C0 10.408 0.228273 10.9591 0.634602 11.3654C1.04093 11.7717 1.59203 12 2.16667 12H9.83333C10.408 12 10.9591 11.7717 11.3654 11.3654C11.7717 10.9591 12 10.408 12 9.83333V2.16667C12 1.59203 11.7717 1.04093 11.3654 0.634602C10.9591 0.228273 10.408 0 9.83333 0H2.16667ZM8.85333 4.52L5.52 7.85333C5.42625 7.94697 5.29917 7.99956 5.16667 7.99956C5.03417 7.99956 4.90708 7.94697 4.81333 7.85333L3.47733 6.51733C3.42821 6.47156 3.38881 6.41636 3.36148 6.35503C3.33415 6.29369 3.31946 6.22748 3.31827 6.16035C3.31709 6.09321 3.32944 6.02653 3.35459 5.96427C3.37973 5.90201 3.41716 5.84545 3.46464 5.79797C3.51212 5.7505 3.56868 5.71307 3.63094 5.68792C3.69319 5.66277 3.75988 5.65042 3.82701 5.65161C3.89415 5.65279 3.96036 5.66748 4.02169 5.69481C4.08303 5.72214 4.13823 5.76154 4.184 5.81067L5.16667 6.79267L8.14667 3.81267C8.19281 3.76493 8.248 3.72687 8.30902 3.70069C8.37003 3.67452 8.43565 3.66076 8.50204 3.66021C8.56843 3.65967 8.63426 3.67235 8.6957 3.69752C8.75713 3.72269 8.81294 3.75984 8.85987 3.80681C8.90679 3.85378 8.94389 3.90962 8.969 3.97108C8.99411 4.03254 9.00673 4.09838 9.00612 4.16477C9.00552 4.23116 8.99169 4.29677 8.96546 4.35776C8.93923 4.41874 8.90111 4.4739 8.85333 4.52Z"
+                        fill="white"></path>
+                </svg>
+                <label class="flex items-center gap-1 cursor-pointer select-none text-xs font-semibold"
+                       for="haftalik"> Haftalık </label>
+            </div>
+        </div> <!-- Checkboxes End --> <!-- Button Start -->
+        <button class="bg-[#F2F2F7] text-secondary-500 text-sm font-semibold py-3 w-full clickSubsButton"> Abone Ol</button>
+        <!-- Button End -->
+    </div> <!-- Newsletter End -->*@
+    @if (Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup ==
+                                                      (int)GovernmentOrderGroupEnum.UnderGundem).Any())
+    {
+        var governmentModel = new GovernmentFilledBlock
+        {
+            GovernmentAnnouncementItems = Model.GovernmentAnnouncementItems.Where(x => x.OrderGroup ==
+                                                                                       (int)GovernmentOrderGroupEnum.UnderGundem).ToList(),
+            FillerBlockNews = Model.PageNewsCachingResponses.Where(x => x.BlockKey ==
+                                                                        "AnaSayfa-BlokDoldurucu").ToList(),
+        };
+
+        @await Html.PartialAsync("MobileBlockContainers/_MobileGovernmentAnnouncementsBlock", governmentModel)
+    }
+</div>

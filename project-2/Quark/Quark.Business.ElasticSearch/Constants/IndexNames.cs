@@ -1,0 +1,35 @@
+namespace Quark.Business.ElasticSearch.Constants;
+
+public class IndexNames
+{
+    public static string NewsListByCategorySlug => GetIndexName("news_list_by_category_slug");
+    public static string WeatherData => GetIndexName("weather_data");
+    public static string NewsPublishedPhotoGalleryItem => GetIndexName("news_published_photo_gallery_item");
+    public static string Tags => GetIndexName("tags");
+    public static string PrayerTimes => GetIndexName("prayer_times");
+    public static string News_Published_Search => GetIndexName("news_published_search");
+    public static string News_View_Count => GetIndexName("news_view_count");
+
+    #region RSS Index
+
+    public static string MainRSS => GetIndexName("main_rss");
+    public static string Category_RSS => GetIndexName("category_rss");
+    public static string Sitemaps => GetIndexName("sitemaps");
+    public static string Monthly_Post_Sitemap => GetIndexName("monthly_post_sitemap");
+    public static string Monthly_Tag_Sitemap => GetIndexName("monthly_tag_sitemap");
+
+    #endregion
+    
+    private static string GetIndexName(string indexName)
+    {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        
+        return environment switch
+        {
+            "Development" => $"dev_{indexName}",
+            "Staging" => $"staging_{indexName}",
+            "Production" => $"prod_{indexName}",
+            _ => $"dev_{indexName}"
+        };
+    }
+}

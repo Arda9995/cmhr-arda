@@ -1,0 +1,78 @@
+﻿@{
+ViewData[ViewDataNames.Title] = _localizer["Surveys"];
+ViewData[ViewDataNames.AsideMenu] = "Content";
+ViewData[ViewDataNames.AsideSubMenu] = "Surveys";
+ViewData[ViewDataNames.Breadcrumb] = new List<BreadcrumbItem>
+{
+new BreadcrumbItem(_localizer["Content"], string.Empty),
+new BreadcrumbItem(_localizer["Surveys"], "/Surveys/List")
+};
+}
+
+@model Quark.CMS.Business.Models.Requests.SurveyRequests.GetSurveyFiltersRequest
+
+@section Scripts{
+<script src="/Scripts/Surveys/List.js" asp-append-version="true"></script>
+}
+
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <div class="card-title">
+            <div class="d-flex align-items-center position-relative my-1">
+                <partial name="Icons/Search" />
+                <input type="text" data-kt-filter="datatable-search" id="search-value" class="form-control form-control-solid w-250px ps-14" placeholder="@_localizer["Search"]">
+            </div>
+        </div>
+        <div class="card-toolbar">
+            <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+                <a href="/Surveys/Create" class="btn btn-primary">
+                    <partial name="Icons/Add" />
+                    @_localizer["New"] @_localizer["Survey"]
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body py-4">
+        <table id="datatable">
+            <thead>
+                <tr>
+                <th>@_localizer["SurveyPhoto"]</th>
+                <th>@_localizer["SurveyQuestion"]</th>
+                <th>@_localizer["TotalAnswers"]</th>
+                <th>@_localizer["CreatedDate"]</th>
+                <th>@_localizer["Status"]</th>
+                    <th></th>
+                
+            </tr>
+            </thead>
+            <tbody>
+            <div style="display:none">
+                 <div id="Col1">
+                        <img src="{0}" alt="{1}" class="w-75px shadow-sm rounded border" />
+                </div>
+                <div id="Col2">
+                    <a href="/Surveys/Details/{1}">{0}</a>
+                </div>
+                <div id="Col3">
+                    {0}
+                </div>
+                <div id="Col4">
+                    {0}
+                </div>
+                <div id="Col5">
+                    <span class="badge badge-light-{0}">{1}</span>
+                </div>
+                
+                <div class="text-center" id="Col12">
+                    <a href="/Surveys/Update/{0}" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="@_localizer["Update"]">
+                        <partial name="Icons/Edit" />
+                    </a>
+                    <a onclick="DeleteRecordAndRefreshPage('/Surveys/Delete/{0}')" class="btn btn-icon btn-bg-light btn-active-color-danger btn-sm me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="@_localizer["Delete"]">
+                        <partial name="Icons/Delete" />
+                    </a>
+                </div>
+            </div>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+@using Microsoft.IdentityModel.Tokens
+@model Quark.CMS.Business.Models.Responses.NewsResponses.DetailsNewsResponse
+
+@if (!string.IsNullOrEmpty(Model.MainCategory) || (Model.SecondaryCategories != null && Model.SecondaryCategories.Any()))
+{
+    <div class="fv-row">
+        <label class="form-label">@_localizer["Category"] : </label>
+        @if (!string.IsNullOrEmpty(Model.MainCategory))
+        {
+            <div class="badge badge-light-primary rounded-pill badge-lg mb-3">@Model.MainCategory</div>
+        }
+
+        @if (Model.SecondaryCategories != null && Model.SecondaryCategories.Any())
+        {
+            @foreach (var category in Model.SecondaryCategories)
+            {
+                <div class="badge badge-light-primary rounded-pill badge-lg mb-3">@category</div>
+            }
+        }
+    </div>
+}

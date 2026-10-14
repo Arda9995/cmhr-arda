@@ -1,0 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Quark.Data.Models;
+
+[Table("News.NewsPublishedPhotos")]
+public class NewsPublishedPhoto
+{
+    public int ID { get; set; }
+    public long NewsID { get; set; }
+    public int PhotoTypeID { get; set; }
+    public string PhotoUrl { get; set; }
+}
